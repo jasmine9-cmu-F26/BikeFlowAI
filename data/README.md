@@ -9,7 +9,9 @@ Raw datasets are not committed. This repository contains extraction/audit code, 
 3. Live Bay Wheels GBFS, linked from the official system-data page: planned inference source, separate from the historical archive.
 4. [Optional archived weather forecasts](https://open-meteo.com/en/docs/previous-runs-api): availability must be verified per model, variable, and date. The initial SF probe found temperature values but no precipitation/wind values for the tested model and dates.
 
-**Original proposal gate: FALLBACK.** Seven-minute slot coverage is 57.56%; no station reaches 90%. See [the full audit](../reports/data_audit/data_audit.md). No model has been trained.
+**Initial archive audit complete; revised data rules pending validation.** The original seven-minute / 90% gate returned FALLBACK (57.56% coverage). The revised proposal treats the archive as irregularly sampled and makes weather optional; the original result does not establish that the revised project is infeasible. See [the original audit](../reports/data_audit/data_audit.md) and its [interpretation notes](../reports/data_audit/README.md). No model has been trained.
+
+The current scripts reproduce the original-rule audit. They still use seven-minute slots and a 3.5-minute tolerance; a revised feature/label builder and rule comparison are not implemented yet. See the [data handoff checklist](../docs/data_handoff.md) for the next deliverables.
 
 ## Reproduce the audit
 
@@ -47,14 +49,18 @@ The extractor writes atomic parts every 500 commits and resumes completed parts 
 
 The initial aggregate reports were copied unchanged from the original archive audit. Their source commit and script/data hashes remain in `audit_summary.json`. Existing raw ZIPs and Parquet remain in the sibling archive checkout; they were not copied into this project.
 
+The script defaults overwrite the report and manifest directories when rerun. To preserve the initial results during experiments, pass separate destinations, for example `--reports reports/sampling_revision --manifests data/manifests/sampling_revision`. This separates output locations only; it does not change the current script's fixed sampling rule.
+
 ## Provisional manifests
 
-- `selected_stations.csv` is intentionally header-only: zero stations passed the gate. It is not a frozen training station list.
+- `selected_stations.csv` is intentionally header-only: zero stations passed the original seven-minute / 90% gate. Selection under the revised rule is still pending; this is not a frozen training station list.
 - `candidate_stations.csv` contains training-only exploratory candidates, not approved selections.
-- `split_manifest.csv` has independent chronological train/tune/calibration/test intervals with 60-minute separation, but remains an audit proposal until the data gate passes.
+- `split_manifest.csv` has independent chronological train/tune/calibration/test intervals with 60-minute separation. It remains an audit proposal until the revised rule and split-boundary checks pass.
 - `station_id_map.csv` contains historical metadata intervals only. Current GBFS IDs remain blank; trip/current mappings are unverified. An open interval does not establish validity through today.
 
-Coverage uses a fixed UTC seven-minute grid. Label retention uses nearest observed snapshots within 3.5 minutes, without filling missing observations with zeros. These diagnostic rates do not represent final training rows: freshness, causal metadata, lag features, trip joins, and weather require further work.
+The initial diagnostic coverage uses a fixed UTC seven-minute grid. Initial label retention uses the nearest observed snapshot within 3.5 minutes, then checks validity; it does not yet implement the revised proposal's nearest-valid matching rule. These diagnostic rates do not represent final training rows. Freshness, causal metadata, lag features, trip joins, and split-boundary checks require further work; weather is optional. Missing or non-reporting observations must never become zero-inventory labels.
+
+The [manifest status notes](manifests/README.md) define what each provisional file can be used for.
 
 ## Licensing
 
