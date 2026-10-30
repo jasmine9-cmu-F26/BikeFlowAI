@@ -1,0 +1,3 @@
+# Dependencies for the currently implemented data audit.
+-r scripts/data/requirements.txt
+

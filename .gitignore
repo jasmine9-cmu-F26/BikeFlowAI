@@ -1,0 +1,34 @@
+# Raw / external / generated data
+/data/raw/
+/data/external/
+/data/processed/
+/data/generated/
+*.parquet
+*.parquet.*
+*.duckdb
+*.duckdb.*
+*.zip
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node / frontend output
+node_modules/
+/frontend/dist/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Local editor / OS files
+.idea/
+.DS_Store
+Thumbs.db
+

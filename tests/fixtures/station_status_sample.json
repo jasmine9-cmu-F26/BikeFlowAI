@@ -1,0 +1,14 @@
+{
+  "last_updated": 1672531200,
+  "ttl": 5,
+  "data": {
+    "stations": [
+      {"station_id": "synthetic-A", "num_bikes_available": 0, "num_docks_available": 10,
+       "num_bikes_disabled": 0, "num_docks_disabled": 0,
+       "is_installed": 1, "is_renting": 1, "is_returning": 1, "last_reported": 1672531190},
+      {"station_id": "synthetic-B", "num_bikes_available": 10, "num_docks_available": 0,
+       "num_bikes_disabled": 0, "num_docks_disabled": 0,
+       "is_installed": 1, "is_renting": 0, "is_returning": 1, "last_reported": 1672531190}
+    ]
+  }
+}
