@@ -1,0 +1,17 @@
+{
+  "captured_at_utc": "2026-10-30T23:01:16.188452+00:00",
+  "discovery_url": "https://gbfs.divvybikes.com/gbfs/2.3/gbfs.json",
+  "status_version": "2.3",
+  "information_stations": 2078,
+  "status_stations": 2078,
+  "station_information_only": 0,
+  "status_only": 0,
+  "historical_identities_with_exact_current_gbfs_uid": 2062,
+  "missing_installed": 0,
+  "missing_renting": 0,
+  "missing_returning": 0,
+  "timezone": "America/Chicago",
+  "publisher_license_url": null,
+  "license_evidence": "MobilityDatabase catalog reports CC-BY-4.0; captured publisher system_information has no license_url",
+  "observation_scope": "single captured live sample, not a historical uptime audit"
+}

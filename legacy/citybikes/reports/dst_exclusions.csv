@@ -1,0 +1,7 @@
+local_start,local_end_exclusive,reason,timezone
+2024-03-10 02:00:00,2024-03-10 03:00:00,nonexistent,America/Chicago
+2024-11-03 01:00:00,2024-11-03 02:00:00,ambiguous,America/Chicago
+2025-03-09 02:00:00,2025-03-09 03:00:00,nonexistent,America/Chicago
+2025-11-02 01:00:00,2025-11-02 02:00:00,ambiguous,America/Chicago
+2026-03-08 02:00:00,2026-03-08 03:00:00,nonexistent,America/Chicago
+2026-11-01 01:00:00,2026-11-01 02:00:00,ambiguous,America/Chicago

@@ -1,0 +1,5 @@
+split,start_utc,end_utc_exclusive,duration_weeks,purge_before_minutes,status
+train,2024-11-04T00:00:00Z,2025-12-22T00:00:00Z,59.0,0,provisional_not_training_ready
+tune,2025-12-22T01:00:00Z,2026-04-06T00:00:00Z,14.994047619047619,60,provisional_not_training_ready
+calibration,2026-04-06T01:00:00Z,2026-06-15T00:00:00Z,9.994047619047619,60,provisional_not_training_ready
+test,2026-06-15T01:00:00Z,2026-09-28T00:00:00Z,14.994047619047619,60,provisional_not_training_ready

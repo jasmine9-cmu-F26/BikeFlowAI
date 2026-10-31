@@ -1,0 +1,376 @@
+{
+  "created_at_utc": "2026-10-31T00:37:21.539086+00:00",
+  "entries": [
+    {
+      "original_path": "reports/data_audit/audit_summary.json",
+      "archived_path": "legacy/baywheels/reports/audit_summary.json",
+      "original_sha256": "5ef88058a008c55fdeb7a707539743ad648cea6f66b7c48e5ed8313028ea16e1",
+      "archived_sha256": "5ef88058a008c55fdeb7a707539743ad648cea6f66b7c48e5ed8313028ea16e1",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/data_audit/class_balance.csv",
+      "archived_path": "legacy/baywheels/reports/class_balance.csv",
+      "original_sha256": "0f55aea3efc7de29021ffae7ca0319981392a07dbc22dd1d0cb7914a72c85b04",
+      "archived_sha256": "0f55aea3efc7de29021ffae7ca0319981392a07dbc22dd1d0cb7914a72c85b04",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/data_audit/coverage_by_station.csv",
+      "archived_path": "legacy/baywheels/reports/coverage_by_station.csv",
+      "original_sha256": "255e178cbaf9b1beaa9ee7852ee7d639a0818291435e2cd20a1a85767886f6fb",
+      "archived_sha256": "255e178cbaf9b1beaa9ee7852ee7d639a0818291435e2cd20a1a85767886f6fb",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/data_audit/data_audit.md",
+      "archived_path": "legacy/baywheels/reports/data_audit.md",
+      "original_sha256": "e187ec380d1f89ebbec6c73bc69e0d0b786c306d729cb61f6d65b0c00a9ee7f4",
+      "archived_sha256": "e187ec380d1f89ebbec6c73bc69e0d0b786c306d729cb61f6d65b0c00a9ee7f4",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/data_audit/external_sources.json",
+      "archived_path": "legacy/baywheels/reports/external_sources.json",
+      "original_sha256": "2ab6f07079204115d7357c059fea9bacadfd850c9e097bb9d1f911610b8d4437",
+      "archived_sha256": "2ab6f07079204115d7357c059fea9bacadfd850c9e097bb9d1f911610b8d4437",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/data_audit/extraction_errors.csv",
+      "archived_path": "legacy/baywheels/reports/extraction_errors.csv",
+      "original_sha256": "0ceda0068b137e3e8f791a6bd51cc87659c40f0b038bbf85c0094d4034aea00f",
+      "archived_sha256": "0ceda0068b137e3e8f791a6bd51cc87659c40f0b038bbf85c0094d4034aea00f",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/data_audit/gap_summary.csv",
+      "archived_path": "legacy/baywheels/reports/gap_summary.csv",
+      "original_sha256": "64dcb887909da7333287f0a1d8e0fa9f7a7acd8bd3e25b1e1d14ad0687f392cd",
+      "archived_sha256": "64dcb887909da7333287f0a1d8e0fa9f7a7acd8bd3e25b1e1d14ad0687f392cd",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/data_audit/label_retention.csv",
+      "archived_path": "legacy/baywheels/reports/label_retention.csv",
+      "original_sha256": "f8a556a9b0e152648b0a44babbde489fadb3907d9128903b07febb3670ac5d45",
+      "archived_sha256": "f8a556a9b0e152648b0a44babbde489fadb3907d9128903b07febb3670ac5d45",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/data_audit/licensing_and_overlap.md",
+      "archived_path": "legacy/baywheels/reports/licensing_and_overlap.md",
+      "original_sha256": "48b0111080c7fa1aeb2b81bd9367cea2dccfd99718b83218e46d323b10699479",
+      "archived_sha256": "84a990ae396211e75f83a93195ef53279e69b9950993fa05a8518483ea49868c",
+      "navigation_or_test_paths_updated": true
+    },
+    {
+      "original_path": "reports/data_audit/README.md",
+      "archived_path": "legacy/baywheels/reports/README.md",
+      "original_sha256": "b20a5562f3fe9a1cce53af369bb2b9a4283a6f4e4e3f00cf2f4b2cfe3b01b059",
+      "archived_sha256": "b52cb85b818e202586aac81553c0f8456919b9a18d515ce6f08dd5ba1fe0adb2",
+      "navigation_or_test_paths_updated": true
+    },
+    {
+      "original_path": "reports/data_audit/station_changes.csv",
+      "archived_path": "legacy/baywheels/reports/station_changes.csv",
+      "original_sha256": "2d2b68326ae360a63829136c46b1f2b78caedd845c1c811dcf7686b19617cbea",
+      "archived_sha256": "2d2b68326ae360a63829136c46b1f2b78caedd845c1c811dcf7686b19617cbea",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/data_audit/validation.md",
+      "archived_path": "legacy/baywheels/reports/validation.md",
+      "original_sha256": "7f2a872768d07e345769df0afd5eee64cd1e06027c81777fff13356bca3e33af",
+      "archived_sha256": "1fab28c82fd8897c1ba0045b27f11bf3d6df2fa47c35012077b5df8530fdf8af",
+      "navigation_or_test_paths_updated": true
+    },
+    {
+      "original_path": "reports/data_audit/weekly_coverage.csv",
+      "archived_path": "legacy/baywheels/reports/weekly_coverage.csv",
+      "original_sha256": "66683700bfe55b6de3476a0cc8ad9758a118e453b6c48f5c90202f71b8b92478",
+      "archived_sha256": "66683700bfe55b6de3476a0cc8ad9758a118e453b6c48f5c90202f71b8b92478",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/audit_summary.json",
+      "archived_path": "legacy/citybikes/reports/audit_summary.json",
+      "original_sha256": "66270e063848a647432a44ce0b78e90b52777c34db5ea13c676924be5a14d058",
+      "archived_sha256": "66270e063848a647432a44ce0b78e90b52777c34db5ea13c676924be5a14d058",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/candidate_od_ride_times.csv",
+      "archived_path": "legacy/citybikes/reports/candidate_od_ride_times.csv",
+      "original_sha256": "359443247c268bcd2d7a18eec01d59c0668c80c6d2b5e661db9ccc0d35e3f8ad",
+      "archived_sha256": "359443247c268bcd2d7a18eec01d59c0668c80c6d2b5e661db9ccc0d35e3f8ad",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/class_balance.csv",
+      "archived_path": "legacy/citybikes/reports/class_balance.csv",
+      "original_sha256": "833e2f75a4c83441870061d83c62efc9b341366865d4d216e97245b141d23580",
+      "archived_sha256": "833e2f75a4c83441870061d83c62efc9b341366865d4d216e97245b141d23580",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/coverage_by_station.csv",
+      "archived_path": "legacy/citybikes/reports/coverage_by_station.csv",
+      "original_sha256": "6d939b7ca2e551d23c5d678fe3363f1c144985d986f16782fe958f81e9677060",
+      "archived_sha256": "6d939b7ca2e551d23c5d678fe3363f1c144985d986f16782fe958f81e9677060",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/data_audit.md",
+      "archived_path": "legacy/citybikes/reports/data_audit.md",
+      "original_sha256": "f654ae29a04e17d5852b2552ae22643f9b02baf5fa2f2f1cbcfc548f9117d2ee",
+      "archived_sha256": "f654ae29a04e17d5852b2552ae22643f9b02baf5fa2f2f1cbcfc548f9117d2ee",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/download_manifest.json",
+      "archived_path": "legacy/citybikes/reports/download_manifest.json",
+      "original_sha256": "d6ccfea40310ce2d3ba9461240fe4e304f0b666fcab1b195edfbaa4e8a5441bf",
+      "archived_sha256": "d6ccfea40310ce2d3ba9461240fe4e304f0b666fcab1b195edfbaa4e8a5441bf",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/dst_exclusions.csv",
+      "archived_path": "legacy/citybikes/reports/dst_exclusions.csv",
+      "original_sha256": "5409d8fc83516759d8aee247df37eb606fcbd9d85aa2200481cfd175cb792704",
+      "archived_sha256": "5409d8fc83516759d8aee247df37eb606fcbd9d85aa2200481cfd175cb792704",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/gap_summary.csv",
+      "archived_path": "legacy/citybikes/reports/gap_summary.csv",
+      "original_sha256": "1008c1d793aead7c5156ae928a5807011343efbe381a0f6c4d44ece7077948b1",
+      "archived_sha256": "1008c1d793aead7c5156ae928a5807011343efbe381a0f6c4d44ece7077948b1",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/label_retention.csv",
+      "archived_path": "legacy/citybikes/reports/label_retention.csv",
+      "original_sha256": "0125eeffae91e404d2dc2e6baf3433c28adfb076b7df4e76f0155b0d4e180895",
+      "archived_sha256": "0125eeffae91e404d2dc2e6baf3433c28adfb076b7df4e76f0155b0d4e180895",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/licensing_and_overlap.md",
+      "archived_path": "legacy/citybikes/reports/licensing_and_overlap.md",
+      "original_sha256": "50cca1db7e9c6ff44d486343cd2dbc17d096024b814937cc230bdf20f52f2e39",
+      "archived_sha256": "49b4882f5fd6082b12a067f9c17ebc439390d6df34a383fbd9173db3f352cfed",
+      "navigation_or_test_paths_updated": true
+    },
+    {
+      "original_path": "reports/divvy_data_audit/live_gbfs_check.json",
+      "archived_path": "legacy/citybikes/reports/live_gbfs_check.json",
+      "original_sha256": "6193aed6fa1ac4a7ded99a7d0741e2c1fac9794138ff17f4bd00bc922242279e",
+      "archived_sha256": "6193aed6fa1ac4a7ded99a7d0741e2c1fac9794138ff17f4bd00bc922242279e",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/network_silences.csv",
+      "archived_path": "legacy/citybikes/reports/network_silences.csv",
+      "original_sha256": "ec6e130e5ffe109a477a9d01269e449aa17af2012b59f849c768359fa5c83277",
+      "archived_sha256": "ec6e130e5ffe109a477a9d01269e449aa17af2012b59f849c768359fa5c83277",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/README.md",
+      "archived_path": "legacy/citybikes/reports/README.md",
+      "original_sha256": "511b55f2fa40f09d686ae694734339c6982ef3d3537360cccbd94cb5ddbaa5cb",
+      "archived_sha256": "0ce1cf74c9cda8f45ca09f8ea78e1e36f5374014b7f0338cf1940feb2ce58d0a",
+      "navigation_or_test_paths_updated": true
+    },
+    {
+      "original_path": "reports/divvy_data_audit/station_changes.csv",
+      "archived_path": "legacy/citybikes/reports/station_changes.csv",
+      "original_sha256": "98fc30700b08173431298e3d176c6aea5a7da59a2e6993973f82aedb77945e97",
+      "archived_sha256": "98fc30700b08173431298e3d176c6aea5a7da59a2e6993973f82aedb77945e97",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/trip_overlap.json",
+      "archived_path": "legacy/citybikes/reports/trip_overlap.json",
+      "original_sha256": "335cfe9ba7d194e98077c9d3dff1c25e38d97ebab65348ec5afe8b31e141e1bc",
+      "archived_sha256": "335cfe9ba7d194e98077c9d3dff1c25e38d97ebab65348ec5afe8b31e141e1bc",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/trip_overlap.md",
+      "archived_path": "legacy/citybikes/reports/trip_overlap.md",
+      "original_sha256": "a18fd9856024cfd6a9696241512d9fd1b126aab25a8b85ea3be05188f78820f7",
+      "archived_sha256": "a18fd9856024cfd6a9696241512d9fd1b126aab25a8b85ea3be05188f78820f7",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/trip_overlap_by_month.csv",
+      "archived_path": "legacy/citybikes/reports/trip_overlap_by_month.csv",
+      "original_sha256": "25b723a58fcd543d04d453d4c826b2642cbfefd0231a20a067264bcf3f87a063",
+      "archived_sha256": "25b723a58fcd543d04d453d4c826b2642cbfefd0231a20a067264bcf3f87a063",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/validation.md",
+      "archived_path": "legacy/citybikes/reports/validation.md",
+      "original_sha256": "29267ae2d4d2eddaf95c1ee7b0a3ec0c9e26cf119003ea0eb4c764f9a5d29204",
+      "archived_sha256": "29267ae2d4d2eddaf95c1ee7b0a3ec0c9e26cf119003ea0eb4c764f9a5d29204",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/validation_results.json",
+      "archived_path": "legacy/citybikes/reports/validation_results.json",
+      "original_sha256": "e3a699bed19de93eadd5ffde06178ec4c004e2d011d9823265fa8a5cf7b98841",
+      "archived_sha256": "e3a699bed19de93eadd5ffde06178ec4c004e2d011d9823265fa8a5cf7b98841",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "reports/divvy_data_audit/weekly_coverage.csv",
+      "archived_path": "legacy/citybikes/reports/weekly_coverage.csv",
+      "original_sha256": "b600fe4c156d408d12e233bbcc658e98666037fb25c39439a0342140f6728093",
+      "archived_sha256": "b600fe4c156d408d12e233bbcc658e98666037fb25c39439a0342140f6728093",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "data/manifests/divvy/candidate_stations.csv",
+      "archived_path": "legacy/citybikes/manifests/candidate_stations.csv",
+      "original_sha256": "6750713de5738ff4c2ee79359a8c4701d9b015248ff87f0131ad85abaf47867f",
+      "archived_sha256": "6750713de5738ff4c2ee79359a8c4701d9b015248ff87f0131ad85abaf47867f",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "data/manifests/divvy/README.md",
+      "archived_path": "legacy/citybikes/manifests/README.md",
+      "original_sha256": "06fad3dabd8e0c61d75e90ab239c9350cf61cfa0d6c3ff582d0cc0d1e76b50f2",
+      "archived_sha256": "a7c61417fec409cc7d0fdd7aa620fb494fe0a47fdbecb5dd21061578bc1cbeaf",
+      "navigation_or_test_paths_updated": true
+    },
+    {
+      "original_path": "data/manifests/divvy/selected_stations.csv",
+      "archived_path": "legacy/citybikes/manifests/selected_stations.csv",
+      "original_sha256": "43b3d64e5d2aa98bfd3b10a8ee51049df3a13a51047ff4eb7b773e2a40af17c8",
+      "archived_sha256": "43b3d64e5d2aa98bfd3b10a8ee51049df3a13a51047ff4eb7b773e2a40af17c8",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "data/manifests/divvy/split_manifest.csv",
+      "archived_path": "legacy/citybikes/manifests/split_manifest.csv",
+      "original_sha256": "389340e79145aaaf3f8da8239b2f6f5a2c2dca700d16094c501246281862885a",
+      "archived_sha256": "389340e79145aaaf3f8da8239b2f6f5a2c2dca700d16094c501246281862885a",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "data/manifests/divvy/station_id_map.csv",
+      "archived_path": "legacy/citybikes/manifests/station_id_map.csv",
+      "original_sha256": "320f5d97109ebb36ea0d6ec86dd7919125835b6ba0386cfa14bb0c12f8a8adf3",
+      "archived_sha256": "320f5d97109ebb36ea0d6ec86dd7919125835b6ba0386cfa14bb0c12f8a8adf3",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "data/manifests/divvy/trip_station_id_map.csv",
+      "archived_path": "legacy/citybikes/manifests/trip_station_id_map.csv",
+      "original_sha256": "a92a35ef0155334b425352ce8c0ad1103a26f527c0f0415b1152002593a588b6",
+      "archived_sha256": "a92a35ef0155334b425352ce8c0ad1103a26f527c0f0415b1152002593a588b6",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "data/manifests/candidate_stations.csv",
+      "archived_path": "legacy/baywheels/manifests/candidate_stations.csv",
+      "original_sha256": "a0c158f9f95a0fc4faed0e921120ee3b99c3813feff2085ee10ff3956cdf5a34",
+      "archived_sha256": "a0c158f9f95a0fc4faed0e921120ee3b99c3813feff2085ee10ff3956cdf5a34",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "data/manifests/selected_stations.csv",
+      "archived_path": "legacy/baywheels/manifests/selected_stations.csv",
+      "original_sha256": "fe9c0af0e7047f29a20aea575f9fec0851031d23ad8263dab6797ecb45271753",
+      "archived_sha256": "fe9c0af0e7047f29a20aea575f9fec0851031d23ad8263dab6797ecb45271753",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "data/manifests/split_manifest.csv",
+      "archived_path": "legacy/baywheels/manifests/split_manifest.csv",
+      "original_sha256": "ec887c46961b768e443c0ef29e4558d303712603232984fbd0c200046246b040",
+      "archived_sha256": "ec887c46961b768e443c0ef29e4558d303712603232984fbd0c200046246b040",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "data/manifests/station_id_map.csv",
+      "archived_path": "legacy/baywheels/manifests/station_id_map.csv",
+      "original_sha256": "38409a1b4942764bdfddd491acb41e1e1955e9dd685e7416e9dc41c1ef8549e1",
+      "archived_sha256": "38409a1b4942764bdfddd491acb41e1e1955e9dd685e7416e9dc41c1ef8549e1",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "docs/baywheels_data_handoff_legacy.md",
+      "archived_path": "legacy/baywheels/data_handoff.md",
+      "original_sha256": "949cd17c06dcea1bcdfe8660c8c6c11b91e0d950c25ece9678df24a52ad89a45",
+      "archived_sha256": "428df0c46b9d81be7b10621aa189b27850a6a98e6128e9e947f93ac305d770b7",
+      "navigation_or_test_paths_updated": true
+    },
+    {
+      "original_path": "scripts/data/extract_baywheels_history.py",
+      "archived_path": "legacy/baywheels/scripts/data/extract_baywheels_history.py",
+      "original_sha256": "49c92f6ab90b301feb63c51b7a8cb16ec8c86d9c5f349c2657e607e05636eab8",
+      "archived_sha256": "49c92f6ab90b301feb63c51b7a8cb16ec8c86d9c5f349c2657e607e05636eab8",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "scripts/data/audit_baywheels_data.py",
+      "archived_path": "legacy/baywheels/scripts/data/audit_baywheels_data.py",
+      "original_sha256": "5e08e7b361db2f5a5211b0d4159617c681e6844ace60f989f9e9139d37d2e3f1",
+      "archived_sha256": "5e08e7b361db2f5a5211b0d4159617c681e6844ace60f989f9e9139d37d2e3f1",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "scripts/data/check_external_sources.py",
+      "archived_path": "legacy/baywheels/scripts/data/check_external_sources.py",
+      "original_sha256": "35c71a9ba50dfe4b0600ccf618c7b0e5891d1dab11d2614dac24669f93d63fba",
+      "archived_sha256": "35c71a9ba50dfe4b0600ccf618c7b0e5891d1dab11d2614dac24669f93d63fba",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "scripts/data/download_divvy_data.py",
+      "archived_path": "legacy/citybikes/scripts/data/download_divvy_data.py",
+      "original_sha256": "c0694af9f47fb1abd70c68e56861227aeaa00aa04a4a835f0ee2c889eedd4f38",
+      "archived_sha256": "c0694af9f47fb1abd70c68e56861227aeaa00aa04a4a835f0ee2c889eedd4f38",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "scripts/data/extract_citybikes_divvy.py",
+      "archived_path": "legacy/citybikes/scripts/data/extract_citybikes_divvy.py",
+      "original_sha256": "f43f164f2fcd9f0ff0d333cc4117f6d48f7e5402ba7fdd7f952e68b08153429d",
+      "archived_sha256": "f43f164f2fcd9f0ff0d333cc4117f6d48f7e5402ba7fdd7f952e68b08153429d",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "scripts/data/audit_divvy_data.py",
+      "archived_path": "legacy/citybikes/scripts/data/audit_divvy_data.py",
+      "original_sha256": "a8817b5ec7ec12210d4a0c21f3ca938ce601974b60ba58709739678e6470fe27",
+      "archived_sha256": "a8817b5ec7ec12210d4a0c21f3ca938ce601974b60ba58709739678e6470fe27",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "scripts/data/audit_divvy_trips.py",
+      "archived_path": "legacy/citybikes/scripts/data/audit_divvy_trips.py",
+      "original_sha256": "1c39b160f730a0a1c7990e41566b808b4088e267ad516047920005388fae9ec4",
+      "archived_sha256": "1c39b160f730a0a1c7990e41566b808b4088e267ad516047920005388fae9ec4",
+      "navigation_or_test_paths_updated": false
+    },
+    {
+      "original_path": "tests/test_data_audit.py",
+      "archived_path": "tests/test_baywheels_legacy.py",
+      "original_sha256": "858b2618ecae3db5bce50ec0b47853d5251e1a8a47b94068e1c15289be8bc9ad",
+      "archived_sha256": "904111a1a103dd0ca7d6c0c823f9b46cec58e1fb7ee82900baf7d0c5326778e5",
+      "navigation_or_test_paths_updated": true
+    },
+    {
+      "original_path": "tests/test_divvy_data.py",
+      "archived_path": "tests/test_citybikes_supplementary.py",
+      "original_sha256": "757f0dbeee0bc679ce457c7f1110846b3dd8d9d1917ad0a88e477acde2911eef",
+      "archived_sha256": "203511434fa8ed8c25df4c962bada5532517ac54b1eaade78c0291a051b437ee",
+      "navigation_or_test_paths_updated": true
+    }
+  ]
+}

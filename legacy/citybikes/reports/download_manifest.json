@@ -1,0 +1,632 @@
+{
+  "created_at_utc": "2026-10-30T22:57:51.499664+00:00",
+  "citybikes_network": "divvy",
+  "start_month": "202411",
+  "end_month": "202609",
+  "scope": "All Divvy-only history and matching monthly trips in the declared interval; no world dumps",
+  "raw_data_redistributed": false,
+  "evidence": [
+    {
+      "path": "evidence/citybikes_terms.html",
+      "url": "https://data.citybik.es/",
+      "bytes": 5063,
+      "sha256": "796934ab34a8da4283efaef7bcb0c5ecd549f59c157e167f4bdcbdef737e59b9",
+      "etag": "\"6a99f06d-13c7\"",
+      "source_last_modified": "Thu, 03 Sep 2026 22:10:53 GMT",
+      "downloaded_at_utc": "2026-10-30T23:01:10.562834+00:00"
+    },
+    {
+      "path": "evidence/odbl_1_0.html",
+      "url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "bytes": 51543,
+      "sha256": "85bc21fb2c00b2effb9202b2aa785934ce5a05df954e17cbd2a1f7c10c04c633",
+      "etag": null,
+      "source_last_modified": "Tue, 04 Aug 2026 19:17:58 GMT",
+      "downloaded_at_utc": "2026-10-30T23:01:10.815643+00:00"
+    },
+    {
+      "path": "evidence/divvy_system_data.html",
+      "url": "https://divvybikes.com/system-data",
+      "bytes": 112537,
+      "sha256": "27ceedc84214bacafca8a57708c2ae8c70ecd0fdbc6c490c5b4160322a467910",
+      "etag": "\"hlopa2qplm2esy\"",
+      "source_last_modified": null,
+      "downloaded_at_utc": "2026-10-30T23:01:11.435644+00:00"
+    },
+    {
+      "path": "evidence/divvy_data_license.html",
+      "url": "https://divvybikes.com/data-license-agreement",
+      "bytes": 120226,
+      "sha256": "5107266201c4512d998f162b00bec50012ac5a4b500f7f436664205a11f43fac",
+      "etag": "\"u11uvd8uj12kon\"",
+      "source_last_modified": null,
+      "downloaded_at_utc": "2026-10-30T23:01:12.028529+00:00"
+    },
+    {
+      "path": "evidence/mobilitydatabase_divvy.html",
+      "url": "https://mobilitydatabase.org/feeds/gbfs/gbfs-lyft_chi",
+      "bytes": 366300,
+      "sha256": "9bd4036270261a0029a63916dae50718b0b9fd28a30bbe6fad1909c56080ea23",
+      "etag": null,
+      "source_last_modified": null,
+      "downloaded_at_utc": "2026-10-30T23:01:13.709642+00:00"
+    },
+    {
+      "path": "evidence/citybikes_collector.py",
+      "url": "https://raw.githubusercontent.com/citybikes/analytics/master/collect.py",
+      "bytes": 6919,
+      "sha256": "2dfffcf2955a459cd1d007dc2636d2bcc2e3b017821de4f61e1bab9d0f405b95",
+      "etag": "\"309c725ca0bb3c49e2ab017297382420aefafda48c01ad995bc42cd5c1f6f42c\"",
+      "source_last_modified": null,
+      "downloaded_at_utc": "2026-10-30T23:01:14.074353+00:00"
+    },
+    {
+      "path": "evidence/citybikes_export.sh",
+      "url": "https://raw.githubusercontent.com/citybikes/analytics/master/export.sh",
+      "bytes": 11021,
+      "sha256": "cc655edb3324477544353e1ffffe7ec6b513d60762e217998a21c6e1f414d402",
+      "etag": "\"bee237cba35aece8184e4e59431c57e897af7763af2e3f33c65075311d78b1ec\"",
+      "source_last_modified": null,
+      "downloaded_at_utc": "2026-10-30T23:01:14.300224+00:00"
+    }
+  ],
+  "live": [
+    {
+      "name": "gbfs",
+      "url": "https://gbfs.divvybikes.com/gbfs/2.3/gbfs.json",
+      "path": "raw/live/gbfs.json",
+      "captured_at_utc": "2026-10-30T23:01:14.655587+00:00"
+    },
+    {
+      "name": "system_information",
+      "url": "https://gbfs.lyft.com/gbfs/2.3/chi/en/system_information.json",
+      "path": "raw/live/system_information.json",
+      "requested_at_utc": "2026-10-30T23:01:14.656614+00:00",
+      "captured_at_utc": "2026-10-30T23:01:14.826415+00:00",
+      "feed_last_updated": 1793401214,
+      "version": "2.3",
+      "sha256": "99aef149bd3207554600abf68d76b299276b1fe5c9ed667d19cfba023571543c"
+    },
+    {
+      "name": "station_information",
+      "url": "https://gbfs.lyft.com/gbfs/2.3/chi/en/station_information.json",
+      "path": "raw/live/station_information.json",
+      "requested_at_utc": "2026-10-30T23:01:14.827805+00:00",
+      "captured_at_utc": "2026-10-30T23:01:15.710963+00:00",
+      "feed_last_updated": 1793401215,
+      "version": "2.3",
+      "sha256": "3b5257225db106e7a66c6247011f55bb2da6fbd86396033c5c66711d6e0a1651"
+    },
+    {
+      "name": "station_status",
+      "url": "https://gbfs.lyft.com/gbfs/2.3/chi/en/station_status.json",
+      "path": "raw/live/station_status.json",
+      "requested_at_utc": "2026-10-30T23:01:15.712736+00:00",
+      "captured_at_utc": "2026-10-30T23:01:16.188452+00:00",
+      "feed_last_updated": 1793401216,
+      "version": "2.3",
+      "sha256": "e9e061f653a2b14ea2f6f5e2c40148e7a62d3a7bd1c11bc71dae286f5da04571"
+    },
+    {
+      "name": "citybikes_current_network",
+      "path": "raw/live/citybikes_network.json",
+      "url": "https://api.citybik.es/v2/networks/divvy",
+      "bytes": 1165850,
+      "sha256": "faf8efb0ae7818c43a515cea3746740cf0748a4de08903a4a0befaf5e42eb556",
+      "etag": null,
+      "source_last_modified": null,
+      "downloaded_at_utc": "2026-10-30T23:01:18.022812+00:00"
+    }
+  ],
+  "completed_at_utc": "2026-10-30T23:01:18.023999+00:00",
+  "total_raw_download_bytes": 624711946,
+  "download_script_sha256": "c0694af9f47fb1abd70c68e56861227aeaa00aa04a4a835f0ee2c889eedd4f38",
+  "files": [
+    {
+      "kind": "citybikes",
+      "month": "202411",
+      "path": "raw/citybikes/202411-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2024/202411-divvy-stats.parquet",
+      "bytes": 6063386,
+      "sha256": "5d4ac56809c328466aa63ed04e3ff1d7341100dd0c68ad182d8586e3a801d958",
+      "etag": "\"67893334-5c851a\"",
+      "source_last_modified": "Thu, 16 Jan 2025 16:26:28 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:01.079910+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202411",
+      "path": "raw/trips/202411-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202411-divvy-tripdata.zip",
+      "bytes": 13826814,
+      "sha256": "40e38c439d15129d4d285be79d596f3b32251a276fc2a96d1b75161b999325c2",
+      "etag": "\"2890bad70cf988ac8fd394d149d527f5\"",
+      "source_last_modified": "Wed, 04 Dec 2024 13:25:18 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:15.454064+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202412",
+      "path": "raw/citybikes/202412-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2024/202412-divvy-stats.parquet",
+      "bytes": 3881162,
+      "sha256": "c17dfb47703a28d7f3c0cdcabb804872c2e42aa40fed5dae7c5964b5ce7a2322",
+      "etag": "\"6789396f-3b38ca\"",
+      "source_last_modified": "Thu, 16 Jan 2025 16:53:03 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:17.821655+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202412",
+      "path": "raw/trips/202412-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202412-divvy-tripdata.zip",
+      "bytes": 6947835,
+      "sha256": "62264ba830bf8e9fc1eaf05325afc4fff2cb2da67fbc352c0ca34b5408371f0e",
+      "etag": "\"947e5defe973bad1e26d6c0b3d1d50b0\"",
+      "source_last_modified": "Mon, 06 Jan 2025 20:25:37 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:19.425928+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202501",
+      "path": "raw/citybikes/202501-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2025/202501-divvy-stats.parquet",
+      "bytes": 3305647,
+      "sha256": "5c6c17b466dc4d0afff6b25653cccf5169fc7b11debffb70f295560d5dde21b2",
+      "etag": "\"67a3e26b-3270af\"",
+      "source_last_modified": "Wed, 05 Feb 2025 22:12:59 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:21.500963+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202501",
+      "path": "raw/trips/202501-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202501-divvy-tripdata.zip",
+      "bytes": 5768519,
+      "sha256": "ce7de5c55fddee608b4f2a29598e7ac263180ab891be4b3464861263f2246e76",
+      "etag": "\"d5ec8027647f12474f0a496e9edccb5d\"",
+      "source_last_modified": "Wed, 05 Feb 2025 16:16:58 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:22.819213+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202502",
+      "path": "raw/citybikes/202502-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2025/202502-divvy-stats.parquet",
+      "bytes": 3556663,
+      "sha256": "98853d5d9e80badcd83aef7f1f1df995bbcb903d62a88ee28bf2d9e0073b942e",
+      "etag": "\"67c75444-364537\"",
+      "source_last_modified": "Tue, 04 Mar 2025 19:28:04 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:25.098905+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202502",
+      "path": "raw/trips/202502-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202502-divvy-tripdata.zip",
+      "bytes": 5893220,
+      "sha256": "8eef7df78ecb3464007ab65940b85cb7a3b1b1bbf6dd6bc61cdb385e4e7cea41",
+      "etag": "\"8e172cadea2a4b63f4ad1005176e6829\"",
+      "source_last_modified": "Tue, 04 Mar 2025 13:38:18 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:26.639131+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202503",
+      "path": "raw/citybikes/202503-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2025/202503-divvy-stats.parquet",
+      "bytes": 5963758,
+      "sha256": "7e2a8e6825275d351bf1cb04af0dcdbea987abbe87f6a6714fbae065485c1caa",
+      "etag": "\"67ed9c62-5affee\"",
+      "source_last_modified": "Wed, 02 Apr 2025 20:21:54 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:29.045302+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202503",
+      "path": "raw/trips/202503-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202503-divvy-tripdata.zip",
+      "bytes": 11039133,
+      "sha256": "cf1f67cc5ee9fd287f2c3a85bc04c2c933be5668a7a5c674663885c49f09845a",
+      "etag": "\"e5083ded15b983f33ab910218c2a8111\"",
+      "source_last_modified": "Fri, 04 Apr 2025 21:12:56 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:31.783065+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202504",
+      "path": "raw/citybikes/202504-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2025/202504-divvy-stats.parquet",
+      "bytes": 7032377,
+      "sha256": "846d16ca585222b0e85bb275b16cdd2144e433cdee73791aac48d6950e818d75",
+      "etag": "\"6814a96d-6b4e39\"",
+      "source_last_modified": "Fri, 02 May 2025 11:15:57 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:35.500453+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202504",
+      "path": "raw/trips/202504-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202504-divvy-tripdata.zip",
+      "bytes": 15067543,
+      "sha256": "bb81bde4a5629a70605f5aa76aefe9a0d37dd38fc8bda5f998d98a63de3095ac",
+      "etag": "\"9be1760a9bc4edb7000afa5fdd0ed0d1\"",
+      "source_last_modified": "Wed, 07 May 2025 12:26:52 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:41.329688+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202505",
+      "path": "raw/citybikes/202505-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2025/202505-divvy-stats.parquet",
+      "bytes": 8776051,
+      "sha256": "db36b42326f2bb3202b8ef725862c6990787c75afe8f610705d5d886a4d5674d",
+      "etag": "\"68405d0e-85e973\"",
+      "source_last_modified": "Wed, 04 Jun 2025 14:49:50 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:44.146453+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202505",
+      "path": "raw/trips/202505-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202505-divvy-tripdata.zip",
+      "bytes": 20193533,
+      "sha256": "1fa953e6b8b14a5bc7ff2b248468485f69d32e272ebee3e1851e6cab4ac87020",
+      "etag": "\"d4293c1c275e1146522d8fd216469a5b-2\"",
+      "source_last_modified": "Wed, 04 Jun 2025 11:53:25 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:47.810748+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202506",
+      "path": "raw/citybikes/202506-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2025/202506-divvy-stats.parquet",
+      "bytes": 9368457,
+      "sha256": "34b80b17c1393240f371eeb5fc6576c28e3cb83e5b7fe76a4a8eb038ba19b5bf",
+      "etag": "\"6868f8a2-8ef389\"",
+      "source_last_modified": "Sat, 05 Jul 2025 10:04:18 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:50.601789+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202506",
+      "path": "raw/trips/202506-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202506-divvy-tripdata.zip",
+      "bytes": 26783328,
+      "sha256": "b9edc5df22f92c46c9a7db24e0dffb78aaac4d62fbadbf62bc2ad63d95978d08",
+      "etag": "\"4a273e63b5bf92f79af70ae5991e8ff8-2\"",
+      "source_last_modified": "Sun, 06 Jul 2025 21:53:09 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:54.681919+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202507",
+      "path": "raw/citybikes/202507-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2025/202507-divvy-stats.parquet",
+      "bytes": 10651768,
+      "sha256": "f42b279cc1e3d17a989b0ba8767e7da35ce97489f66dbe5a8a2f606cc0724859",
+      "etag": "\"688f9da5-a28878\"",
+      "source_last_modified": "Sun, 03 Aug 2025 17:34:29 GMT",
+      "downloaded_at_utc": "2026-10-30T22:58:57.829334+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202507",
+      "path": "raw/trips/202507-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202507-divvy-tripdata.zip",
+      "bytes": 30091311,
+      "sha256": "0113c49d4fef6cea81145d68dec763aa03830218cf1e4851d2e50a3cd825b48a",
+      "etag": "\"a23e06312c211094d96c3278f5d356e0-2\"",
+      "source_last_modified": "Tue, 05 Aug 2025 17:51:23 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:01.476491+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202508",
+      "path": "raw/citybikes/202508-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2025/202508-divvy-stats.parquet",
+      "bytes": 11104688,
+      "sha256": "fd6a573111b6a9ebb8d609fc68cebdf31a68b50ff14b5b34e7a8e25f86b4b5cf",
+      "etag": "\"68bbff46-a971b0\"",
+      "source_last_modified": "Sat, 06 Sep 2025 09:30:46 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:04.528163+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202508",
+      "path": "raw/trips/202508-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202508-divvy-tripdata.zip",
+      "bytes": 28841986,
+      "sha256": "d7f381f87b61ebe6e4f7b6e0c5784eeac7c16589e2982cfea36fa9e12a6a16bf",
+      "etag": "\"4a4269e2425bfe5f80595e2f4c3f07d1-2\"",
+      "source_last_modified": "Thu, 04 Sep 2025 19:25:53 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:09.908626+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202509",
+      "path": "raw/citybikes/202509-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2025/202509-divvy-stats.parquet",
+      "bytes": 10251467,
+      "sha256": "7d8763cc55a496ff1c7768a7e151d91e7aaf847f23d04199f2f8bce3d376c586",
+      "etag": "\"68e4f683-9c6ccb\"",
+      "source_last_modified": "Tue, 07 Oct 2025 11:16:19 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:18.482340+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202509",
+      "path": "raw/trips/202509-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202509-divvy-tripdata.zip",
+      "bytes": 26181186,
+      "sha256": "0335259c0d0810cda38ed3eee4f60646699b1212bd280785e3e5e364c1f2afcd",
+      "etag": "\"965f9f2f8ef0779f906e808fba0cc1d1-2\"",
+      "source_last_modified": "Mon, 06 Oct 2025 12:09:10 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:22.513925+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202510",
+      "path": "raw/citybikes/202510-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2025/202510-divvy-stats.parquet",
+      "bytes": 9717725,
+      "sha256": "fc4af1d3077eaead21a3d72416256a50ac4f5947d9562173a2f68de74719910f",
+      "etag": "\"690a1720-9447dd\"",
+      "source_last_modified": "Tue, 04 Nov 2025 15:09:20 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:25.502588+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202510",
+      "path": "raw/trips/202510-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202510-divvy-tripdata.zip",
+      "bytes": 24605753,
+      "sha256": "1b01969507fb7e136f56c8bf8b586564ed93f0a80ae6ae5f5dcfda3396ff4177",
+      "etag": "\"b57d3fe460157d254534160a3ba32429-2\"",
+      "source_last_modified": "Tue, 04 Nov 2025 17:54:12 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:30.472087+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202511",
+      "path": "raw/citybikes/202511-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2025/202511-divvy-stats.parquet",
+      "bytes": 7033865,
+      "sha256": "9d0d18719060a8a5395d2d4ad5c75152e41f24c19a52270c285f6bc717afa26a",
+      "etag": "\"6931c64c-6b5409\"",
+      "source_last_modified": "Thu, 04 Dec 2025 17:35:08 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:33.499562+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202511",
+      "path": "raw/trips/202511-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202511-divvy-tripdata.zip",
+      "bytes": 13591801,
+      "sha256": "7d873352d710a2c4a4190cbf83c6a9ceb1c21319b02de339578ef71f11587704",
+      "etag": "\"7b9c8f431b8f778201dea6c3b5c77af2\"",
+      "source_last_modified": "Mon, 08 Dec 2025 19:48:16 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:36.566414+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202512",
+      "path": "raw/citybikes/202512-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2025/202512-divvy-stats.parquet",
+      "bytes": 3326426,
+      "sha256": "483b3e0ef129dcfe2fd86f39caebe657a0bd43e22f17bf76837ade6d9c55a55a",
+      "etag": "\"696149d9-32c1da\"",
+      "source_last_modified": "Fri, 09 Jan 2026 18:32:57 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:38.958762+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202512",
+      "path": "raw/trips/202512-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202512-divvy-tripdata.zip",
+      "bytes": 5701852,
+      "sha256": "bd171dbffa690aec3024b3605b86ec5120706eebc9d9bff69358130c58faed9a",
+      "etag": "\"144f40228b09c359cdfe49774ba3b371\"",
+      "source_last_modified": "Mon, 05 Jan 2026 16:27:34 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:40.115123+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202601",
+      "path": "raw/citybikes/202601-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202601-divvy-stats.parquet",
+      "bytes": 3681700,
+      "sha256": "8a16ce18dfa4d1f5b3f86ae33976f4e2934178fc73f509f513d29b0bbfcc609d",
+      "etag": "\"698123c7-382da4\"",
+      "source_last_modified": "Mon, 02 Feb 2026 22:23:03 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:43.827545+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202601",
+      "path": "raw/trips/202601-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202601-divvy-tripdata.zip",
+      "bytes": 5907269,
+      "sha256": "c72e49ced87ed20d4da4730c8905f007f78c771a68fbb5c2caf194fcaf5536ca",
+      "etag": "\"92a778635a31ac1ef0b1e54b49d40614\"",
+      "source_last_modified": "Wed, 04 Feb 2026 14:43:59 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:45.674212+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202602",
+      "path": "raw/citybikes/202602-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202602-divvy-stats.parquet",
+      "bytes": 5569231,
+      "sha256": "00b067fe065aaca7161b9444fdf714f4bb5970841ddd154937294d8f496d29d1",
+      "etag": "\"69baf4c2-54facf\"",
+      "source_last_modified": "Wed, 18 Mar 2026 18:53:54 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:48.463720+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202602",
+      "path": "raw/trips/202602-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202602-divvy-tripdata.zip",
+      "bytes": 8201530,
+      "sha256": "daaccc57e08033a35ead6d0d3c0092d2857ef788bbd7c137d457b56d35b12061",
+      "etag": "\"780b26d9845cd4b79f4f9f1d23baa5b4\"",
+      "source_last_modified": "Wed, 04 Mar 2026 20:07:17 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:50.078817+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202603",
+      "path": "raw/citybikes/202603-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202603-divvy-stats.parquet",
+      "bytes": 7378266,
+      "sha256": "dd4e13c1c63872a3997ef57070cf4ad389a7b65500be0eb045fba553b2a4f7b0",
+      "etag": "\"69db816d-70955a\"",
+      "source_last_modified": "Sun, 12 Apr 2026 11:26:37 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:57.831405+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202603",
+      "path": "raw/trips/202603-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202603-divvy-tripdata.zip",
+      "bytes": 13165409,
+      "sha256": "7553befd3f668bc37d40119984931f78fb870fe62cd1eb69479bb106b1d1038d",
+      "etag": "\"75cb238e64c0951477a27ad2db48dcde\"",
+      "source_last_modified": "Fri, 03 Apr 2026 18:52:43 GMT",
+      "downloaded_at_utc": "2026-10-30T22:59:59.834133+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202604",
+      "path": "raw/citybikes/202604-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202604-divvy-stats.parquet",
+      "bytes": 9560005,
+      "sha256": "adb3aed1e981a0cf31c88e5574f31052244bf0613d986818ae7f32cb1243c7b6",
+      "etag": "\"6a043f95-91dfc5\"",
+      "source_last_modified": "Wed, 13 May 2026 09:08:37 GMT",
+      "downloaded_at_utc": "2026-10-30T23:00:03.241362+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202604",
+      "path": "raw/trips/202604-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202604-divvy-tripdata.zip",
+      "bytes": 17068744,
+      "sha256": "af16f7c43ddcce1383dee15e83c7daa01ecab2346bf856b5333f8e61b6ce7f04",
+      "etag": "\"c502b2070dc71301b235a0bbd9633faf\"",
+      "source_last_modified": "Mon, 04 May 2026 19:02:25 GMT",
+      "downloaded_at_utc": "2026-10-30T23:00:06.492511+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202605",
+      "path": "raw/citybikes/202605-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202605-divvy-stats.parquet",
+      "bytes": 12273520,
+      "sha256": "c5870df29bea72f00a7fff486648f5940aeb712eaa517f5e73b0044af572ed8f",
+      "etag": "\"6a3431da-bb4770\"",
+      "source_last_modified": "Thu, 18 Jun 2026 17:58:50 GMT",
+      "downloaded_at_utc": "2026-10-30T23:00:09.970870+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202605",
+      "path": "raw/trips/202605-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202605-divvy-tripdata.zip",
+      "bytes": 24934348,
+      "sha256": "880e4ff17b03e206ef8f06e5815fc6b520172bd6f0298682823007be99ce34b2",
+      "etag": "\"201e81378e4ba2580c92e7549a3ab594-2\"",
+      "source_last_modified": "Thu, 04 Jun 2026 13:59:21 GMT",
+      "downloaded_at_utc": "2026-10-30T23:00:13.537662+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202606",
+      "path": "raw/citybikes/202606-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202606-divvy-stats.parquet",
+      "bytes": 13962563,
+      "sha256": "fcd76d91600c73c231514ddd6f42c2e8b91506fc92f156f469e54f7f6367df17",
+      "etag": "\"6a4f9c5d-d50d43\"",
+      "source_last_modified": "Thu, 09 Jul 2026 13:04:29 GMT",
+      "downloaded_at_utc": "2026-10-30T23:00:16.826758+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202606",
+      "path": "raw/trips/202606-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202606-divvy-tripdata.zip",
+      "bytes": 28468364,
+      "sha256": "34bde1eddacef591664fa97495460fe33265078f4134f8b80f141f94d126cc01",
+      "etag": "\"8eb6ef6b785866bc5d41a6094201a2dc-2\"",
+      "source_last_modified": "Mon, 06 Jul 2026 14:21:54 GMT",
+      "downloaded_at_utc": "2026-10-30T23:00:21.154167+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202607",
+      "path": "raw/citybikes/202607-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202607-divvy-stats.parquet",
+      "bytes": 15373433,
+      "sha256": "f83a46b42898da30e10521d198f294946895829fe440465e3bca704cd27c31e1",
+      "etag": "\"6a7d90c5-ea9479\"",
+      "source_last_modified": "Thu, 13 Aug 2026 09:39:17 GMT",
+      "downloaded_at_utc": "2026-10-30T23:00:44.544638+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202607",
+      "path": "raw/trips/202607-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202607-divvy-tripdata.zip",
+      "bytes": 32910286,
+      "sha256": "4e6bc8725a92f5e4cebb9b3592874b1cea85111f920f9db9cd607cf88ec1fd14",
+      "etag": "\"cd991325ebcb9e7b83dfe320537a8ead-2\"",
+      "source_last_modified": "Wed, 05 Aug 2026 20:43:02 GMT",
+      "downloaded_at_utc": "2026-10-30T23:00:50.226558+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202608",
+      "path": "raw/citybikes/202608-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202608-divvy-stats.parquet",
+      "bytes": 15275901,
+      "sha256": "08e68ef9825348178e365ca84164cf1230ada36926e77751237c4c36fe4a1668",
+      "etag": "\"6aa7a152-e9177d\"",
+      "source_last_modified": "Mon, 14 Sep 2026 07:25:06 GMT",
+      "downloaded_at_utc": "2026-10-30T23:00:53.507657+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202608",
+      "path": "raw/trips/202608-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202608-divvy-tripdata.zip",
+      "bytes": 32611393,
+      "sha256": "3f4de338ee56b1bee76ea310a42f790a2e88e062c3635638cd382582615b827f",
+      "etag": "\"621eabfa67e82043ea9c6957a072425e-2\"",
+      "source_last_modified": "Wed, 09 Sep 2026 17:32:24 GMT",
+      "downloaded_at_utc": "2026-10-30T23:00:58.806418+00:00"
+    },
+    {
+      "kind": "citybikes",
+      "month": "202609",
+      "path": "raw/citybikes/202609-divvy-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202609-divvy-stats.parquet",
+      "bytes": 14264214,
+      "sha256": "9cffe6358545ee9dd7cbba82ec019aeb75ac107d50cd04c37ff93903f5835c35",
+      "etag": "\"6ad911e1-d9a796\"",
+      "source_last_modified": "Wed, 21 Oct 2026 19:26:25 GMT",
+      "downloaded_at_utc": "2026-10-30T23:01:02.224888+00:00"
+    },
+    {
+      "kind": "trips",
+      "month": "202609",
+      "path": "raw/trips/202609-divvy-tripdata.zip",
+      "url": "https://divvy-tripdata.s3.amazonaws.com/202609-divvy-tripdata.zip",
+      "bytes": 29538516,
+      "sha256": "c4d77fa960becee43885addacd48f82c1ab803f925a079750bb46ffe52c798af",
+      "etag": "\"b3ecee606f78a0a5c55a6bb56b19badc-2\"",
+      "source_last_modified": "Mon, 05 Oct 2026 19:07:52 GMT",
+      "downloaded_at_utc": "2026-10-30T23:01:09.841735+00:00"
+    }
+  ]
+}

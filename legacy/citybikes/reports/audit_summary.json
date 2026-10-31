@@ -1,0 +1,97 @@
+{
+  "decision": "NEED_TO_RESTRICT",
+  "training_ready": false,
+  "reason": "Change-only archive has no complete heartbeat; station selection/rule approval and some GBFS feature semantics remain unresolved",
+  "historical_role": "observed change-event features and nearest-observed valid labels, conditional on revised sampling design",
+  "first_observation_utc": "2024-11-01T15:13:31Z",
+  "last_observation_utc": "2026-09-30T23:59:24Z",
+  "calendar_days": 698.3651967592592,
+  "monthly_parts": 23,
+  "raw_event_rows": 20882734,
+  "deduplicated_event_rows": 20882734,
+  "duplicates_removed": 0,
+  "conflicting_timestamps": 0,
+  "station_identities": 2233,
+  "network_change_timestamps": 476055,
+  "network_change_interval_median_minutes": 2.0,
+  "network_change_interval_p90_minutes": 3.0166666666666666,
+  "longest_network_silence_minutes": 1164.0,
+  "network_silences_gt15": 15,
+  "quality": {
+    "missing_or_negative_counts": 0,
+    "unknown_operating_flags": 0,
+    "capacity_zero_or_missing": 27,
+    "explicit_virtual": 0,
+    "virtual_flag_missing": 2646750,
+    "last_reported_zero_or_missing": 0,
+    "report_age_gt300s": 1200625,
+    "future_report_time": 0,
+    "not_renting": 20480,
+    "not_returning": 20480,
+    "is_installed_unavailable": 20882734,
+    "disabled_counts_unavailable": 20882734,
+    "usable_inventory_sum_ne_capacity": 17661755
+  },
+  "training_top20_candidates": 20,
+  "approved_selected_stations": 0,
+  "historical_metadata_change_events": 8013,
+  "historical_identity_intervals": 2470,
+  "splits": [
+    {
+      "split": "train",
+      "start_utc": "2024-11-04T00:00:00Z",
+      "end_utc_exclusive": "2025-12-22T00:00:00Z",
+      "weeks": 59.0
+    },
+    {
+      "split": "tune",
+      "start_utc": "2025-12-22T01:00:00Z",
+      "end_utc_exclusive": "2026-04-06T00:00:00Z",
+      "weeks": 14.994047619047619
+    },
+    {
+      "split": "calibration",
+      "start_utc": "2026-04-06T01:00:00Z",
+      "end_utc_exclusive": "2026-06-15T00:00:00Z",
+      "weeks": 9.994047619047619
+    },
+    {
+      "split": "test",
+      "start_utc": "2026-06-15T01:00:00Z",
+      "end_utc_exclusive": "2026-09-28T00:00:00Z",
+      "weeks": 14.994047619047619
+    }
+  ],
+  "label_policy": "fresh base and strictly future target, report age 0..300s, nonnegative counts, known renting/returning, positive capacity, not explicitly virtual, same metadata epoch, nearest valid within tolerance, no split crossing",
+  "bias": "event-conditional retention and class balance; not uniform-time occupancy estimates",
+  "reconstruction": "no unlimited carry-forward; silence not treated as unchanged/empty",
+  "experiment_horizons_minutes": [
+    7,
+    14,
+    15,
+    21,
+    28,
+    30,
+    35,
+    42,
+    45,
+    49,
+    56,
+    60
+  ],
+  "experiment_tolerances_seconds": [
+    210,
+    300,
+    450
+  ],
+  "weather": "optional_not_required_for_Divvy_MVP",
+  "raw_download_bytes": 624711946,
+  "audit_script_sha256": "a8817b5ec7ec12210d4a0c21f3ca938ce601974b60ba58709739678e6470fe27",
+  "normalization_manifest_sha256": "e43b568405aec8326bffb025568daa215037f70f9f889a1a0a7c644c8cc98a65",
+  "runtime": {
+    "duckdb": "2.0.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0"
+  },
+  "license_status": "CityBikes ODbL-1.0 compilation + separate operator terms; Divvy trips restricted dataset license; live CC-BY-4.0 is catalog evidence, publisher confirmation pending"
+}

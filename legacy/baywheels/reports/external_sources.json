@@ -1,0 +1,479 @@
+{
+  "checked_at_utc": "2026-10-30T07:21:15.264870+00:00",
+  "archive_start": "2022-08-07",
+  "archive_end": "2023-07-19",
+  "sources": {
+    "archive": {
+      "url": "https://github.com/terinjokes/baywheels-history",
+      "http_status": 200,
+      "sha256": "f65b8498ae49ec32bd655121c9004b0e7382512be38f7c7846712758ec0e4d8b"
+    },
+    "official_system_data": {
+      "url": "https://lyftbikes.com/system-data",
+      "http_status": 200,
+      "sha256": "d0a25f3e328d54549d3e1b8e8ce2b1861d12adb5a1d8839fb7d68d690499c161"
+    },
+    "lyft_license": {
+      "url": "https://baywheels-assets.s3.amazonaws.com/data-license-agreement.html",
+      "http_status": 200,
+      "sha256": "827f00c306726a483e5e8c5b935a614086b0d33b2fefccbfd3da2e7416600d98"
+    },
+    "weather_docs": {
+      "url": "https://open-meteo.com/en/docs/previous-runs-api",
+      "http_status": 200,
+      "sha256": "869ac8962605604cd047b9ef1e86fce392439807125e49490d10df166da29378"
+    },
+    "weather_license": {
+      "url": "https://open-meteo.com/en/licence",
+      "http_status": 200,
+      "sha256": "aa06e2ef26ff1ee70ca298dec1c86710ff841669acc133e87d5a8b8ea8f1ff07"
+    }
+  },
+  "weather": {
+    "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=37.7749&longitude=-122.4194&start_date=2022-08-07&end_date=2023-07-19&hourly=temperature_2m_previous_day1%2Cprecipitation_previous_day1%2Cwind_speed_10m_previous_day1&models=gfs_seamless&timezone=UTC",
+    "location": "SF representative point only",
+    "model": "gfs_seamless",
+    "lead_time": "previous_day1, 24h before valid time",
+    "variables": {
+      "temperature_2m_previous_day1": {
+        "hours": 8328,
+        "nonnull": 8328,
+        "nonnull_rate": 1.0
+      },
+      "precipitation_previous_day1": {
+        "hours": 8328,
+        "nonnull": 0,
+        "nonnull_rate": 0.0
+      },
+      "wind_speed_10m_previous_day1": {
+        "hours": 8328,
+        "nonnull": 0,
+        "nonnull_rate": 0.0
+      }
+    },
+    "status": "probe_only_no_complete_feature_join",
+    "raw_rows_redistributed": false
+  },
+  "trips": [
+    {
+      "month": "202208",
+      "url": "https://s3.amazonaws.com/baywheels-data/202208-baywheels-tripdata.csv.zip",
+      "listing_url": "https://s3.amazonaws.com/baywheels-data?list-type=2&prefix=202208",
+      "bytes": 10242319,
+      "sha256": "77bf72f5e57e43d6e5d60751514b672dbf148d3e5b9a1e9f33188adcba973d4d",
+      "columns": [
+        "ride_id",
+        "rideable_type",
+        "started_at",
+        "ended_at",
+        "start_station_name",
+        "start_station_id",
+        "end_station_name",
+        "end_station_id",
+        "start_lat",
+        "start_lng",
+        "end_lat",
+        "end_lng",
+        "member_casual"
+      ],
+      "rows": 266555,
+      "min_started_at_local_unlocalized": "2022-08-01 00:00:30",
+      "max_started_at_local_unlocalized": "2022-08-31 23:58:17",
+      "rows_within_archive_calendar_dates": 210740,
+      "unique_nonempty_trip_station_ids": 498,
+      "station_id_examples": [
+        "4040 3rd St Depot Station",
+        "BK-A3",
+        "BK-A7",
+        "BK-B7",
+        "BK-C1"
+      ],
+      "status": "row_dates_verified_station_join_and_dst_pending"
+    },
+    {
+      "month": "202209",
+      "url": "https://s3.amazonaws.com/baywheels-data/202209-baywheels-tripdata.csv.zip",
+      "listing_url": "https://s3.amazonaws.com/baywheels-data?list-type=2&prefix=202209",
+      "bytes": 10235863,
+      "sha256": "cae1c18a2941924c9f6a78db2b1a8c3424813db8150ce5f41cad9f7f069973b3",
+      "columns": [
+        "ride_id",
+        "rideable_type",
+        "started_at",
+        "ended_at",
+        "start_station_name",
+        "start_station_id",
+        "end_station_name",
+        "end_station_id",
+        "start_lat",
+        "start_lng",
+        "end_lat",
+        "end_lng",
+        "member_casual"
+      ],
+      "rows": 273479,
+      "min_started_at_local_unlocalized": "2022-09-01 00:00:13",
+      "max_started_at_local_unlocalized": "2022-09-30 23:59:47",
+      "rows_within_archive_calendar_dates": 273479,
+      "unique_nonempty_trip_station_ids": 499,
+      "station_id_examples": [
+        "4040 3rd St Depot Station",
+        "BK-A3",
+        "BK-A7",
+        "BK-B7",
+        "BK-C1"
+      ],
+      "status": "row_dates_verified_station_join_and_dst_pending"
+    },
+    {
+      "month": "202210",
+      "url": "https://s3.amazonaws.com/baywheels-data/202210-baywheels-tripdata.csv.zip",
+      "listing_url": "https://s3.amazonaws.com/baywheels-data?list-type=2&prefix=202210",
+      "bytes": 10312949,
+      "sha256": "512912b41417b62dbe81b42a9daa7aead435e8f903e499ca3de86d481b87e1fe",
+      "columns": [
+        "ride_id",
+        "rideable_type",
+        "started_at",
+        "ended_at",
+        "start_station_name",
+        "start_station_id",
+        "end_station_name",
+        "end_station_id",
+        "start_lat",
+        "start_lng",
+        "end_lat",
+        "end_lng",
+        "member_casual"
+      ],
+      "rows": 265763,
+      "min_started_at_local_unlocalized": "2022-10-01 00:01:10",
+      "max_started_at_local_unlocalized": "2022-10-31 23:59:15",
+      "rows_within_archive_calendar_dates": 265763,
+      "unique_nonempty_trip_station_ids": 500,
+      "station_id_examples": [
+        "4040 3rd St Depot Station",
+        "BK-A3",
+        "BK-A7",
+        "BK-B7",
+        "BK-C1"
+      ],
+      "status": "row_dates_verified_station_join_and_dst_pending"
+    },
+    {
+      "month": "202211",
+      "url": "https://s3.amazonaws.com/baywheels-data/202211-baywheeels-tripdata.csv.zip",
+      "listing_url": "https://s3.amazonaws.com/baywheels-data?list-type=2&prefix=202211",
+      "bytes": 7665226,
+      "sha256": "f0ddcd96531e720d79ca0124f97eb818bd4dbb44122e2ed54a84b091cfe28a6c",
+      "columns": [
+        "ride_id",
+        "rideable_type",
+        "started_at",
+        "ended_at",
+        "start_station_name",
+        "start_station_id",
+        "end_station_name",
+        "end_station_id",
+        "start_lat",
+        "start_lng",
+        "end_lat",
+        "end_lng",
+        "member_casual"
+      ],
+      "rows": 193912,
+      "min_started_at_local_unlocalized": "2022-11-01 00:00:08",
+      "max_started_at_local_unlocalized": "2022-11-30 23:59:13",
+      "rows_within_archive_calendar_dates": 193912,
+      "unique_nonempty_trip_station_ids": 495,
+      "station_id_examples": [
+        "BK-A3",
+        "BK-A7",
+        "BK-B7",
+        "BK-C1",
+        "BK-C5"
+      ],
+      "status": "row_dates_verified_station_join_and_dst_pending"
+    },
+    {
+      "month": "202212",
+      "url": "https://s3.amazonaws.com/baywheels-data/202212-baywheels-tripdata.csv.zip",
+      "listing_url": "https://s3.amazonaws.com/baywheels-data?list-type=2&prefix=202212",
+      "bytes": 5578012,
+      "sha256": "f4e80b2aa70558c2300196cd9c2dc52e3469bd176e25bcc7e6e6d250d61aff96",
+      "columns": [
+        "ride_id",
+        "rideable_type",
+        "started_at",
+        "ended_at",
+        "start_station_name",
+        "start_station_id",
+        "end_station_name",
+        "end_station_id",
+        "start_lat",
+        "start_lng",
+        "end_lat",
+        "end_lng",
+        "member_casual"
+      ],
+      "rows": 136764,
+      "min_started_at_local_unlocalized": "2022-12-01 00:01:00",
+      "max_started_at_local_unlocalized": "2022-12-31 23:59:02",
+      "rows_within_archive_calendar_dates": 136764,
+      "unique_nonempty_trip_station_ids": 492,
+      "station_id_examples": [
+        "BK-A3",
+        "BK-A7",
+        "BK-B7",
+        "BK-C1",
+        "BK-C5"
+      ],
+      "status": "row_dates_verified_station_join_and_dst_pending"
+    },
+    {
+      "month": "202301",
+      "url": "https://s3.amazonaws.com/baywheels-data/202301-baywheels-tripdata.csv.zip",
+      "listing_url": "https://s3.amazonaws.com/baywheels-data?list-type=2&prefix=202301",
+      "bytes": 5833569,
+      "sha256": "17b64aceeb0144fe9660191260bfec2e0b09919c63b7a4f71d9a6d332aa19d38",
+      "columns": [
+        "ride_id",
+        "rideable_type",
+        "started_at",
+        "ended_at",
+        "start_station_name",
+        "start_station_id",
+        "end_station_name",
+        "end_station_id",
+        "start_lat",
+        "start_lng",
+        "end_lat",
+        "end_lng",
+        "member_casual"
+      ],
+      "rows": 154561,
+      "min_started_at_local_unlocalized": "2023-01-01 00:02:50",
+      "max_started_at_local_unlocalized": "2023-01-31 23:59:31",
+      "rows_within_archive_calendar_dates": 154561,
+      "unique_nonempty_trip_station_ids": 495,
+      "station_id_examples": [
+        "BK-A3",
+        "BK-A7",
+        "BK-B7",
+        "BK-C1",
+        "BK-C5"
+      ],
+      "status": "row_dates_verified_station_join_and_dst_pending"
+    },
+    {
+      "month": "202302",
+      "url": "https://s3.amazonaws.com/baywheels-data/202302-baywheels-tripdata.csv.zip",
+      "listing_url": "https://s3.amazonaws.com/baywheels-data?list-type=2&prefix=202302",
+      "bytes": 6265152,
+      "sha256": "2ebbf09d8ba60178efc8c893990446fe6acbd9f5d158e33f7bb08762777a1090",
+      "columns": [
+        "ride_id",
+        "rideable_type",
+        "started_at",
+        "ended_at",
+        "start_station_name",
+        "start_station_id",
+        "end_station_name",
+        "end_station_id",
+        "start_lat",
+        "start_lng",
+        "end_lat",
+        "end_lng",
+        "member_casual"
+      ],
+      "rows": 157715,
+      "min_started_at_local_unlocalized": "2023-02-01 00:00:22",
+      "max_started_at_local_unlocalized": "2023-02-28 23:59:55",
+      "rows_within_archive_calendar_dates": 157715,
+      "unique_nonempty_trip_station_ids": 493,
+      "station_id_examples": [
+        "BK-A3",
+        "BK-A7",
+        "BK-B7",
+        "BK-C1",
+        "BK-C5"
+      ],
+      "status": "row_dates_verified_station_join_and_dst_pending"
+    },
+    {
+      "month": "202303",
+      "url": "https://s3.amazonaws.com/baywheels-data/202303-baywheels-tripdata.csv.zip",
+      "listing_url": "https://s3.amazonaws.com/baywheels-data?list-type=2&prefix=202303",
+      "bytes": 6971624,
+      "sha256": "29221be3176877716c5ea4bd452ae374a767db65dce579bf778ebfb36821bde9",
+      "columns": [
+        "ride_id",
+        "rideable_type",
+        "started_at",
+        "ended_at",
+        "start_station_name",
+        "start_station_id",
+        "end_station_name",
+        "end_station_id",
+        "start_lat",
+        "start_lng",
+        "end_lat",
+        "end_lng",
+        "member_casual"
+      ],
+      "rows": 172807,
+      "min_started_at_local_unlocalized": "2023-03-01 00:11:04",
+      "max_started_at_local_unlocalized": "2023-03-31 23:59:55",
+      "rows_within_archive_calendar_dates": 172807,
+      "unique_nonempty_trip_station_ids": 513,
+      "station_id_examples": [
+        "BK-A3",
+        "BK-A7",
+        "BK-B7",
+        "BK-C1",
+        "BK-C5"
+      ],
+      "status": "row_dates_verified_station_join_and_dst_pending"
+    },
+    {
+      "month": "202304",
+      "url": "https://s3.amazonaws.com/baywheels-data/202304-baywheels-tripdata.csv.zip",
+      "listing_url": "https://s3.amazonaws.com/baywheels-data?list-type=2&prefix=202304",
+      "bytes": 8439358,
+      "sha256": "94badbaacbc111cb678bff6e5bbc83634955856e141a7317a3a30cdb93be8400",
+      "columns": [
+        "ride_id",
+        "rideable_type",
+        "started_at",
+        "ended_at",
+        "start_station_name",
+        "start_station_id",
+        "end_station_name",
+        "end_station_id",
+        "start_lat",
+        "start_lng",
+        "end_lat",
+        "end_lng",
+        "member_casual"
+      ],
+      "rows": 214478,
+      "min_started_at_local_unlocalized": "2023-04-01 00:00:32",
+      "max_started_at_local_unlocalized": "2023-04-30 23:53:59",
+      "rows_within_archive_calendar_dates": 214478,
+      "unique_nonempty_trip_station_ids": 518,
+      "station_id_examples": [
+        "BK-A3",
+        "BK-A7",
+        "BK-B7",
+        "BK-C1",
+        "BK-C5"
+      ],
+      "status": "row_dates_verified_station_join_and_dst_pending"
+    },
+    {
+      "month": "202305",
+      "url": "https://s3.amazonaws.com/baywheels-data/202305-baywheels-tripdata.csv.zip",
+      "listing_url": "https://s3.amazonaws.com/baywheels-data?list-type=2&prefix=202305",
+      "bytes": 8842405,
+      "sha256": "8e46f1f182fa94f3c222f8a37f7bae8d0a699dc636d1746eba05e232323fed94",
+      "columns": [
+        "ride_id",
+        "rideable_type",
+        "started_at",
+        "ended_at",
+        "start_station_name",
+        "start_station_id",
+        "end_station_name",
+        "end_station_id",
+        "start_lat",
+        "start_lng",
+        "end_lat",
+        "end_lng",
+        "member_casual"
+      ],
+      "rows": 218021,
+      "min_started_at_local_unlocalized": "2023-05-01 00:00:03",
+      "max_started_at_local_unlocalized": "2023-05-31 23:56:02",
+      "rows_within_archive_calendar_dates": 218021,
+      "unique_nonempty_trip_station_ids": 520,
+      "station_id_examples": [
+        "2000.0",
+        "BK-A3",
+        "BK-A7",
+        "BK-B7",
+        "BK-C1"
+      ],
+      "status": "row_dates_verified_station_join_and_dst_pending"
+    },
+    {
+      "month": "202306",
+      "url": "https://s3.amazonaws.com/baywheels-data/202306-baywheels-tripdata.csv.zip",
+      "listing_url": "https://s3.amazonaws.com/baywheels-data?list-type=2&prefix=202306",
+      "bytes": 9004833,
+      "sha256": "c37f29b0440c46009a2a8071f069ef5cf4d247a7270a668cc81ba74401893ffc",
+      "columns": [
+        "ride_id",
+        "rideable_type",
+        "started_at",
+        "ended_at",
+        "start_station_name",
+        "start_station_id",
+        "end_station_name",
+        "end_station_id",
+        "start_lat",
+        "start_lng",
+        "end_lat",
+        "end_lng",
+        "member_casual"
+      ],
+      "rows": 226052,
+      "min_started_at_local_unlocalized": "2023-06-01 00:00:24",
+      "max_started_at_local_unlocalized": "2023-06-30 23:59:57",
+      "rows_within_archive_calendar_dates": 226052,
+      "unique_nonempty_trip_station_ids": 518,
+      "station_id_examples": [
+        "BK-A3",
+        "BK-A7",
+        "BK-B7",
+        "BK-C1",
+        "BK-C5"
+      ],
+      "status": "row_dates_verified_station_join_and_dst_pending"
+    },
+    {
+      "month": "202307",
+      "url": "https://s3.amazonaws.com/baywheels-data/202307-baywheels-tripdata.csv.zip",
+      "listing_url": "https://s3.amazonaws.com/baywheels-data?list-type=2&prefix=202307",
+      "bytes": 8661135,
+      "sha256": "6cf5e77d53250c3d258fd1224de11c4f71771044edf3baec21c77fbf27944cb3",
+      "columns": [
+        "ride_id",
+        "rideable_type",
+        "started_at",
+        "ended_at",
+        "start_station_name",
+        "start_station_id",
+        "end_station_name",
+        "end_station_id",
+        "start_lat",
+        "start_lng",
+        "end_lat",
+        "end_lng",
+        "member_casual"
+      ],
+      "rows": 233971,
+      "min_started_at_local_unlocalized": "2023-07-01 00:00:10",
+      "max_started_at_local_unlocalized": "2023-07-31 23:58:10",
+      "rows_within_archive_calendar_dates": 136519,
+      "unique_nonempty_trip_station_ids": 512,
+      "station_id_examples": [
+        "BK-A3",
+        "BK-A7",
+        "BK-B7",
+        "BK-C1",
+        "BK-C5"
+      ],
+      "status": "row_dates_verified_station_join_and_dst_pending"
+    }
+  ]
+}

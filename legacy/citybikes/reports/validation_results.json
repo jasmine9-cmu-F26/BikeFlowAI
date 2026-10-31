@@ -1,0 +1,28 @@
+{
+  "local_test_command": "python -m unittest discover -s tests -v",
+  "local_tests_passed": 13,
+  "python": "3.14.7",
+  "dependency_check": "pip check passed",
+  "raw_download_objects_verified": 46,
+  "normalized_months_verified": 23,
+  "raw_download_bytes": 624711946,
+  "normalized_event_rows": 20882734,
+  "actual_trip_rows": 11095025,
+  "artifact_row_counts": {
+    "coverage_by_station.csv": 2233,
+    "gap_summary.csv": 2233,
+    "station_changes.csv": 8013,
+    "label_retention.csv": 360,
+    "class_balance.csv": 10,
+    "trip_overlap_by_month.csv": 23,
+    "candidate_od_ride_times.csv": 400
+  },
+  "recorded_script_hashes_verified": true,
+  "strictly_future_label_regression_passed": true,
+  "held_out_rides_excluded_from_OD_test_passed": true,
+  "Chicago_DST_regression_passed": true,
+  "old_Bay_Wheels_numeric_results_unchanged": true,
+  "raw_and_processed_files_outside_project": true,
+  "training_ready": false,
+  "hosted_CI": "not run in this session; requires commit/push"
+}

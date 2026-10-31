@@ -1,2 +1,0 @@
-source_commit,commit_timestamp,commit_date,status_blob,information_blob,timestamp,information_timestamp,station_count,error
-e56fb31a716fbf4308e37682932f41963563a042,1659909959,2022-08-07T15:05:59-07:00,,,,,0,missing_status_or_information_file

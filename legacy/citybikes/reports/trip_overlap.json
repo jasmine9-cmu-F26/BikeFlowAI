@@ -1,0 +1,32 @@
+{
+  "timezone": "America/Chicago",
+  "timezone_database_version": "2026.6",
+  "timezone_basis": "Explicit policy: naive trip timestamps interpreted as Chicago local time, based on service area and official GBFS timezone; CSV schema itself has no timezone annotation",
+  "dst_policy": "exclude ambiguous/nonexistent start OR end local times; no guessed fold",
+  "monthly_files": 23,
+  "raw_trip_rows": 11095025,
+  "invalid_timestamp_rows": 0,
+  "dst_ambiguous_or_nonexistent_rows": 947,
+  "exact_utc_start_overlap_rows": 11088338,
+  "missing_start_station_id": 2311116,
+  "missing_end_station_id": 2421539,
+  "both_endpoints_mapped": 7382539,
+  "mapped_and_duration_filtered_overlap": 7301138,
+  "mapped_both_rate": 0.6653918310233641,
+  "od_training_trip_rows": 3949228,
+  "od_pairs": 220354,
+  "od_pairs_with_20plus_training_trips": 38366,
+  "candidate_od_pairs": 400,
+  "candidate_od_pairs_20plus": 400,
+  "ride_time_filter": "60 <= UTC duration_seconds <= 21600; both endpoints mapped; start and end in training split",
+  "matching_rule": "exact normalized name + unique historical publisher UID within observed metadata interval + <=50m coordinates; no fuzzy-name guesses",
+  "scope_limit": "Trip/metadata overlap does NOT prove arrival inventory observable or make every trip replayable",
+  "interpretation": "Completed rides only; does not represent unserved demand",
+  "stored_locally": [
+    "processed/trip_csv",
+    "processed/od_training_rides",
+    "processed/od_ride_times.parquet",
+    "processed/trip_station_mapping.parquet"
+  ],
+  "script_sha256": "1c39b160f730a0a1c7990e41566b808b4088e267ad516047920005388fae9ec4"
+}

@@ -1,0 +1,21 @@
+station_id,name,train_lat,train_lon,train_grid7_tol210_coverage,train_max_displacement_m,status
+a3a5eb69-a135-11e9-9cda-0a87ae2ba916,Kingsbury St & Kinzie St,41.88917683258,-87.6385057718,0.510840395480226,17.552053538784364,provisional_training_only_candidate
+a3a4daa1-a135-11e9-9cda-0a87ae2ba916,Clinton St & Madison St,41.882751965685614,-87.64119029045105,0.4350870998116761,0.0,provisional_training_only_candidate
+1ce9b7b2-6ef1-4e3b-abd4-85dedaf0ee65,State St & Chicago Ave,41.89661720040753,-87.62857854366302,0.43283898305084745,0.0,provisional_training_only_candidate
+a3a7537c-a135-11e9-9cda-0a87ae2ba916,Wells St & Elm St,41.903222,-87.634324,0.41394774011299434,0.0,provisional_training_only_candidate
+a3a9f256-a135-11e9-9cda-0a87ae2ba916,Wells St & Concord Ln,41.912133,-87.634656,0.40251883239171377,0.0,provisional_training_only_candidate
+a3a482fb-a135-11e9-9cda-0a87ae2ba916,Desplaines St & Kinzie St,41.888716036,-87.6444478533,0.392596516007533,0.0,provisional_training_only_candidate
+a3a72aad-a135-11e9-9cda-0a87ae2ba916,Canal St & Madison St,41.882409,-87.639767,0.3913017890772128,0.0,provisional_training_only_candidate
+a3a5700b-a135-11e9-9cda-0a87ae2ba916,Dearborn St & Erie St,41.893992,-87.629318,0.3824741054613936,0.0,provisional_training_only_candidate
+a3a7e19b-a135-11e9-9cda-0a87ae2ba916,Wells St & Hubbard St,41.889906,-87.634266,0.3792961393596987,0.0,provisional_training_only_candidate
+a3a79fdc-a135-11e9-9cda-0a87ae2ba916,Wabash Ave & Grand Ave,41.891466,-87.626761,0.3705626177024482,0.0,provisional_training_only_candidate
+a3a4cb42-a135-11e9-9cda-0a87ae2ba916,Kingsbury St & Erie St,41.8939139,-87.6417358,0.3698328625235405,0.0,provisional_training_only_candidate
+a3a60a65-a135-11e9-9cda-0a87ae2ba916,Dearborn Pkwy & Delaware Pl,41.898969,-87.629912,0.36819679849340864,0.0,provisional_training_only_candidate
+a3a41526-a135-11e9-9cda-0a87ae2ba916,Streeter Dr & Grand Ave,41.892278,-87.612043,0.36686676082862524,0.0,provisional_training_only_candidate
+a3a4591a-a135-11e9-9cda-0a87ae2ba916,Larrabee St & Kingsbury St,41.897764,-87.642884,0.3567090395480226,0.0,provisional_training_only_candidate
+a3a43f48-a135-11e9-9cda-0a87ae2ba916,Michigan Ave & Washington St,41.8839840647265,-87.6246839761734,0.3565677966101695,0.0,provisional_training_only_candidate
+a3a3e67b-a135-11e9-9cda-0a87ae2ba916,New St & Illinois St,41.890847040623804,-87.61861681938171,0.35635593220338985,0.0,provisional_training_only_candidate
+a3b41f78-a135-11e9-9cda-0a87ae2ba916,Clinton St & Jackson Blvd,41.878316611830684,-87.64098107814789,0.35627354048964216,0.0,provisional_training_only_candidate
+a3a5428e-a135-11e9-9cda-0a87ae2ba916,Orleans St & Merchandise Mart Plaza,41.888243,-87.63639,0.35133003766478343,0.0,provisional_training_only_candidate
+a3a74e60-a135-11e9-9cda-0a87ae2ba916,LaSalle St & Illinois St,41.890762,-87.631697,0.3481520715630885,0.0,provisional_training_only_candidate
+a3a513e9-a135-11e9-9cda-0a87ae2ba916,Clinton St & Washington Blvd,41.88338,-87.64117,0.3466454802259887,0.0,provisional_training_only_candidate
