@@ -3,7 +3,7 @@
  * Five-minute triggers are best-effort; actual source/request/receipt times win.
  */
 const BIKEFLOW = Object.freeze({
-  version: 'apps-script-v1',
+  version: 'apps-script-v2-health',
   discovery: 'https://gbfs.divvybikes.com/gbfs/2.3/gbfs.json',
   hosts: ['gbfs.divvybikes.com', 'gbfs.lyft.com'],
   intervalMinutes: 5,
@@ -157,6 +157,7 @@ function captureDivvySnapshot(event) {
     props.setProperty('BIKEFLOW_LAST_ERROR', JSON.stringify({at_utc:new Date().toISOString(),error:String(error)}));
     throw error;
   } finally {
+    try { recordHealth_(record, saved); } catch (healthError) { console.error('Health index update failed: ' + String(healthError)); }
     const day = record.started_at_utc.slice(0,10);
     try {
       const budget = JSON.parse(props.getProperty('BIKEFLOW_RUNTIME_BUDGET') || '{}');
@@ -199,5 +200,78 @@ function collectorStatus() {
     folder_id:props.getProperty(BIKEFLOW.folderProperty),last_poll:JSON.parse(props.getProperty('BIKEFLOW_LAST_POLL') || '{}'),
     last_error:JSON.parse(props.getProperty('BIKEFLOW_LAST_ERROR') || '{}'),
     runtime_budget:JSON.parse(props.getProperty('BIKEFLOW_RUNTIME_BUDGET') || '{}')};
+  console.log(JSON.stringify(result));return result;
+}
+
+
+/** Rolling metadata only: <=40 attempts/hour bucket, last 48 UTC hours.
+ * Counts missing trigger slots independently of request failures. No Drive
+ * folder scan, extra fetch, email, public endpoint or paid service is added.
+ */
+function recordHealth_(record, saved) {
+  const props = PropertiesService.getScriptProperties();
+  const prefix = 'BIKEFLOW_HEALTH_HOUR_';
+  const key = prefix + record.started_at_utc.slice(0,13);
+  const bucket = JSON.parse(props.getProperty(key) || '{"entries":[],"truncated":0}');
+  const capture = record.sources && record.sources.station_status;
+  const received = capture ? Date.parse(capture.received_at_utc) : Date.parse(record.started_at_utc);
+  bucket.entries.push({t:Date.parse(record.started_at_utc),r:received,s:record.status,
+    scheduled:record.invocation==='scheduled',n:record.station_count || null,
+    provider:typeof record.provider_last_updated==='number' ? record.provider_last_updated : null,
+    age:typeof record.provider_last_updated==='number' ? received/1000-record.provider_last_updated : null,
+    saved:!!saved,b: saved ? saved.compressed_bytes : null});
+  if (bucket.entries.length>40) { bucket.entries.shift();bucket.truncated++; }
+  props.setProperty(key,JSON.stringify(bucket));
+  const oldBefore=Date.now()-48*3600*1000;
+  const all=props.getProperties();
+  Object.keys(all).forEach(function(k){
+    if(k.indexOf(prefix)===0 && Date.parse(k.slice(prefix.length)+':00:00Z')<oldBefore)props.deleteProperty(k);
+  });
+}
+
+function healthPercentile_(values,p) {
+  if(!values.length)return null;
+  const a=values.slice().sort(function(x,y){return x-y;});
+  const at=(a.length-1)*p,lo=Math.floor(at),hi=Math.ceil(at);
+  return a[lo]+(a[hi]-a[lo])*(at-lo);
+}
+
+function summarizeHealth_(entries,nowMs,truncated) {
+  const eligible=entries.filter(function(r){return r.t>=nowMs-24*3600*1000 && r.t<=nowMs;});
+  const scheduled=eligible.filter(function(r){return r.scheduled;}).sort(function(a,b){return a.t-b.t;});
+  if(!scheduled.length)return {status:'WAITING_FOR_SCHEDULED_HEALTH_RECORDS',scheduled_attempts:0,index_truncated_entries:truncated};
+  const first=scheduled[0].t;
+  const success=scheduled.filter(function(r){return r.s==='ok' && r.saved;});
+  const slot=function(r){return Math.floor((r.t-first)/(5*60*1000)+.5);};
+  const expected=Math.max(Math.floor((nowMs-first)/(5*60*1000))+1,Math.max.apply(null,scheduled.map(slot))+1);
+  const occupied=new Set(scheduled.map(slot)),good=new Set(success.map(slot));
+  const times=success.map(function(r){return r.r;}).sort(function(a,b){return a-b;});
+  const intervals=[];for(let i=1;i<times.length;i++)intervals.push((times[i]-times[i-1])/1000);
+  const boundaries=times.length?[(times[0]-first)/1000,(nowMs-times[times.length-1])/1000]:[(nowMs-first)/1000];
+  const providers=success.filter(function(r){return r.provider!==null;}).map(function(r){return r.provider;});
+  const counts=success.filter(function(r){return r.n!==null;}).map(function(r){return r.n;});
+  const ages=success.filter(function(r){return r.age!==null;}).map(function(r){return r.age;});
+  return {status:truncated?'PARTIAL_INDEX_TRUNCATED':'ROLLING_OBSERVED_WINDOW',
+    collector:BIKEFLOW.version,nominal_interval_minutes:5,window_start_utc:new Date(first).toISOString(),window_end_utc:new Date(nowMs).toISOString(),
+    window_basis:'First indexed scheduled attempt within last 24h; excludes earlier capture history',
+    expected_poll_slots:expected,scheduled_attempts:scheduled.length,successful_polls:success.length,
+    failed_attempts:scheduled.length-success.length,manual_attempts_excluded:eligible.length-scheduled.length,
+    successful_slots:good.size,slots_without_success:expected-good.size,missing_attempt_slots:expected-occupied.size,
+    extra_attempts_in_occupied_slot:scheduled.length-occupied.size,observed_slot_success_fraction:good.size/expected,
+    median_interval_seconds:healthPercentile_(intervals,.5),p90_interval_seconds:healthPercentile_(intervals,.9),
+    longest_gap_including_boundaries_seconds:Math.max.apply(null,intervals.concat(boundaries)),
+    duplicate_capture_timestamps:times.length-new Set(times).size,repeated_provider_timestamps:providers.length-new Set(providers).size,
+    station_count_min:counts.length?Math.min.apply(null,counts):null,station_count_max:counts.length?Math.max.apply(null,counts):null,
+    feed_age_median_seconds:healthPercentile_(ages,.5),feed_age_p90_seconds:healthPercentile_(ages,.9),
+    feed_age_max_seconds:ages.length?Math.max.apply(null,ages):null,stale_feed_polls_gt5min:ages.filter(function(v){return v>300;}).length,
+    index_truncated_entries:truncated,limitation:'Quota/storage/termination may prevent an attempt/index entry; expected missing slots remain missing, never empty inventory'};
+}
+
+function collectorHealth() {
+  const all=PropertiesService.getScriptProperties().getProperties();const entries=[];let truncated=0;
+  Object.keys(all).forEach(function(k){
+    if(k.indexOf('BIKEFLOW_HEALTH_HOUR_')===0){const bucket=JSON.parse(all[k]);entries.push.apply(entries,bucket.entries);truncated+=bucket.truncated || 0;}
+  });
+  const result=summarizeHealth_(entries,Date.now(),truncated);
   console.log(JSON.stringify(result));return result;
 }

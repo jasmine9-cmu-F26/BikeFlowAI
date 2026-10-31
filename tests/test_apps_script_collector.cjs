@@ -23,7 +23,7 @@ function fixture() {
     createFolder(){return folder;},
     createFile(blob){files.push(blob);return {getId(){return 'file-'+files.length;},getSize(){return blob.bytes.length;}};}
   };
-  const props={getProperty(k){return properties.get(k)||null;},setProperty(k,v){properties.set(k,v);return props;}};
+  const props={getProperty(k){return properties.get(k)||null;},setProperty(k,v){properties.set(k,v);return props;},getProperties(){return Object.fromEntries(properties);},deleteProperty(k){properties.delete(k);}};
   const blob=(data,type,name)=>({bytes:Buffer.from(data),name,type});
   const sandbox={Date:Clock,Set,console:{log(v){logs.push(v);},error(v){logs.push(v);}},
     PropertiesService:{getScriptProperties(){return props;}},
@@ -86,4 +86,28 @@ test('runtime guard stops only collector triggers and records an error',()=>{
   x.properties.set('BIKEFLOW_RUNTIME_BUDGET',JSON.stringify({day:'2026-10-30',ms:65*60*1000}));
   assert.throws(()=>x.sandbox.captureDivvySnapshot(),/daily runtime/);assert.equal(x.triggers.length,0);
   assert.equal(x.records().at(-1).status,'error');
+});
+
+test('health index records real polls and does not count manual smoke as scheduled uptime',()=>{
+  const x=fixture();x.sandbox.setupCollector();
+  assert.equal(x.sandbox.collectorHealth().status,'WAITING_FOR_SCHEDULED_HEALTH_RECORDS');
+  x.sandbox.captureDivvySnapshot({triggerUid:'t'});
+  const health=x.sandbox.collectorHealth();assert.equal(health.successful_polls,1);assert.equal(health.manual_attempts_excluded,1);
+  assert.equal(health.expected_poll_slots,1);assert.equal(health.station_count_min,1);
+});
+test('health distinguishes failed attempts, missing slots and repeated source timestamps',()=>{
+  const x=fixture();const t=Date.parse('2026-10-30T22:00:00Z');
+  const entries=[{t,r:t,s:'ok',saved:true,scheduled:true,n:2,provider:1,age:10},
+    {t:t+300000,r:t+300000,s:'error',saved:true,scheduled:true,n:null,provider:null,age:null},
+    {t:t+900000,r:t+900000,s:'ok',saved:true,scheduled:true,n:2,provider:1,age:400}];
+  const h=x.sandbox.summarizeHealth_(entries,t+900000,0);
+  assert.equal(h.expected_poll_slots,4);assert.equal(h.successful_polls,2);assert.equal(h.failed_attempts,1);
+  assert.equal(h.missing_attempt_slots,1);assert.equal(h.slots_without_success,2);
+  assert.equal(h.repeated_provider_timestamps,1);assert.equal(h.stale_feed_polls_gt5min,1);
+});
+test('health tolerates small five-minute trigger jitter without false missing slots',()=>{
+  const x=fixture();const t=Date.parse('2026-10-30T22:00:00Z');
+  const entries=[0,299000,600000].map(d=>({t:t+d,r:t+d,s:'ok',saved:true,scheduled:true,n:2,provider:d,age:5}));
+  const h=x.sandbox.summarizeHealth_(entries,t+601000,0);
+  assert.equal(h.expected_poll_slots,3);assert.equal(h.successful_slots,3);assert.equal(h.slots_without_success,0);
 });

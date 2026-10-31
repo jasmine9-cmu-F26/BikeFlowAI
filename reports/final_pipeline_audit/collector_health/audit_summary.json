@@ -1,0 +1,10 @@
+{
+  "local_health_complete": true,
+  "cloud_health_status": "ACTIVE_V2_INITIAL_HEALTH_WINDOW_CONFIRMED_FROM_USER_OUTPUT",
+  "cloud_uptime_claim_allowed": false,
+  "script_sha256": "03aba9a02be68938aa154cd201d37497552e5f1fe8f952785f9cfb8744cd7954",
+  "metric_semantics": "Attempts/errors and missing expected slots are separate; duplicate provider timestamps are not suppressed",
+  "user_reported_initial_window_confirmed": true,
+  "cloud_health_evidence": "google_health.json",
+  "verification_basis": "User-supplied collectorHealth execution log at 2026-10-30T20:07:09-07:00; no authenticated cloud read or raw export verification"
+}

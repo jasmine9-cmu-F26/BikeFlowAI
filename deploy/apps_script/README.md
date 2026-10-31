@@ -58,10 +58,16 @@ Source-specific terms and the City disclaimer remain in [DATA_SOURCES.md](../../
 
 ## Local validation
 
-Seven Node service-mock tests cover unchanged full captures/string IDs/hashes, separate setup/start/stop, error-vs-empty outcomes, untrusted redirects, numeric-ID rejection, overlap lock and the runtime guard:
+Ten Node service-mock tests cover unchanged full captures/string IDs/hashes, separate setup/start/stop, error-vs-empty outcomes, untrusted redirects, numeric-ID rejection, overlap lock and the runtime guard:
 
 ```powershell
 node --test tests/test_apps_script_collector.cjs
 ```
 
 These are offline tests; they do not prove real Google authorization, quota headroom, external endpoint access or current cloud uptime. Real smoke and scheduled-run checks above remain required.
+
+## Active automatic health index (v2)
+
+The user supplied an `apps-script-v2-health` report on October 30 at 20:07 Pacific: two scheduled polls succeeded, with no missing slots or failures. The existing trigger runs the health-enabled code. Keep that trigger; no setup/start or duplicate project is needed. Cloud source bytes and raw files have not been independently downloaded; this confirms the reported initial window only.
+
+The index adds no external requests or Drive reads: bounded hourly Script Properties record attempt status, saved flag, timestamps, station counts, provider age and compressed sizes. Reports separate manual polls, failed attempts and expected slots with no attempt. Only the observed indexed window within the last 24 hours is measured; older v1 history is not reconstructed. This does not guarantee uninterrupted trigger execution under quotas. See [collector health audit](../../reports/final_pipeline_audit/collector_health/README.md).

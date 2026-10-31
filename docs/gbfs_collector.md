@@ -35,3 +35,7 @@ Get-ScheduledTask -TaskName 'BikeFlowAI-Divvy-Full-GBFS-Collector'
 The standard-library [local collector](../scripts/data/collect_divvy_gbfs.py) and [installer](../scripts/data/install_divvy_collector.ps1) remain available for a deliberate fallback. Re-enabling/installing it would require this computer to stay logged in, awake and online. Do not run parallel collectors accidentally.
 
 Historical training data, station selection, splits and model timing rules are unchanged. Raw source terms remain documented in [DATA_SOURCES.md](../DATA_SOURCES.md).
+
+## Rolling health metrics active
+
+The [final collector health audit](../reports/final_pipeline_audit/collector_health/README.md) measured the retired local window. The user confirmed Google v2 health with 2/2 successful scheduled slots on October 30 at 20:07 Pacific. Keep the existing trigger; do not rerun setup/start. Periodically save collectorHealth reports, since its index covers only a rolling observed window. Cloud raw exports have not been independently checked.
