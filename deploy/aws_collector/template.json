@@ -1,0 +1,323 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "BikeFlow AI private Divvy full snapshots: 2-minute Lambda + S3; schedule initially disabled; retained data bucket.",
+  "Parameters": {
+    "ProjectName": {
+      "Type": "String",
+      "Default": "bikeflow-divvy-collector",
+      "AllowedPattern": "[a-z][a-z0-9-]{2,39}"
+    },
+    "StopAtUtc": {
+      "Type": "String",
+      "Default": "2026-12-13T07:59:00Z",
+      "AllowedPattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z"
+    },
+    "ScheduleState": {
+      "Type": "String",
+      "Default": "DISABLED",
+      "AllowedValues": [
+        "DISABLED",
+        "ENABLED"
+      ]
+    }
+  },
+  "Resources": {
+    "DataBucket": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "IgnorePublicAcls": true,
+          "BlockPublicPolicy": true,
+          "RestrictPublicBuckets": true
+        },
+        "OwnershipControls": {
+          "Rules": [
+            {
+              "ObjectOwnership": "BucketOwnerEnforced"
+            }
+          ]
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "BucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "DataBucket"
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:*",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "DataBucket",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": "${DataBucket.Arn}/*"
+                }
+              ],
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": "false"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Sub": "/aws/lambda/${ProjectName}"
+        },
+        "RetentionInDays": 14
+      }
+    },
+    "CollectorRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "collector-only",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:GetObject",
+                    "s3:PutObject"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "${DataBucket.Arn}/current_validation/*"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ProjectName}:*"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "CollectorFunction": {
+      "Type": "AWS::Lambda::Function",
+      "DependsOn": "LogGroup",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "ProjectName"
+        },
+        "Runtime": "python3.14",
+        "Handler": "index.lambda_handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "CollectorRole",
+            "Arn"
+          ]
+        },
+        "Timeout": 90,
+        "MemorySize": 512,
+        "Code": {
+          "ZipFile": "\"\"\"Capture complete official Divvy station_status polls with success/error heartbeats.\n\nRun --once from Task Scheduler every 120 seconds, or use --interval-seconds\nfor a foreground loop. Identical inventories are deliberately NOT suppressed.\n\"\"\"\nfrom __future__ import annotations\nimport argparse\nfrom contextlib import contextmanager\nfrom datetime import datetime,timezone\nimport gzip\nimport hashlib\nimport json\nimport os\nfrom pathlib import Path\nimport sys\nimport time\nimport urllib.parse\nimport urllib.request\nimport uuid\n\nDISCOVERY='https://gbfs.divvybikes.com/gbfs/2.3/gbfs.json'\nALLOWED_HOSTS={'gbfs.divvybikes.com','gbfs.lyft.com'}\n\n\ndef now():return datetime.now(timezone.utc).isoformat()\n\n\ndef atomic_json(path,data):\n    path.parent.mkdir(parents=True,exist_ok=True)\n    tmp=path.with_suffix(path.suffix+'.tmp')\n    tmp.write_text(json.dumps(data,indent=2)+'\\n',encoding='utf-8');tmp.replace(path)\n\n\n@contextmanager\ndef capture_lock(root):\n    path=root/'collector.lock';path.parent.mkdir(parents=True,exist_ok=True)\n    f=path.open('a+b');f.seek(0)\n    if path.stat().st_size==0:f.write(b'0');f.flush()\n    locked=False\n    try:\n        try:\n            f.seek(0)\n            if os.name=='nt':\n                import msvcrt\n                msvcrt.locking(f.fileno(),msvcrt.LK_NBLCK,1)\n            else:\n                import fcntl\n                fcntl.flock(f.fileno(),fcntl.LOCK_EX|fcntl.LOCK_NB)\n            locked=True\n        except (BlockingIOError,PermissionError):\n            yield False\n            return\n        yield True\n    finally:\n        if locked:\n            f.seek(0)\n            if os.name=='nt':\n                import msvcrt\n                msvcrt.locking(f.fileno(),msvcrt.LK_UNLCK,1)\n            else:\n                import fcntl\n                fcntl.flock(f.fileno(),fcntl.LOCK_UN)\n        f.close()\n\n\ndef fetch(url):\n    parsed=urllib.parse.urlparse(url)\n    if parsed.scheme!='https' or parsed.hostname not in ALLOWED_HOSTS:\n        raise ValueError('Collector only follows official Divvy/Lyft HTTPS GBFS endpoints')\n    requested=now();start=time.monotonic()\n    req=urllib.request.Request(url,headers={'User-Agent':'BikeFlowAI-full-snapshot-collector/1.0'})\n    with urllib.request.urlopen(req,timeout=20) as r:\n        data=r.read();document=json.loads(data)\n    return document,data,dict(url=url,requested_at_utc=requested,received_at_utc=now(),\n        latency_seconds=time.monotonic()-start,sha256=hashlib.sha256(data).hexdigest())\n\n\ndef save_gzip(path,data):\n    path.parent.mkdir(parents=True,exist_ok=True)\n    tmp=path.with_suffix(path.suffix+'.tmp');tmp.write_bytes(gzip.compress(data,mtime=0));tmp.replace(path)\n\n\ndef capture(data_root,stop_at=None):\n    root=Path(data_root).resolve()/'current_validation'\n    root.mkdir(parents=True,exist_ok=True)\n    if stop_at and datetime.now(timezone.utc)>=datetime.fromisoformat(stop_at.replace('Z','+00:00')):\n        return dict(status='finished',reason='Configured project collection end reached')\n    with capture_lock(root) as locked:\n        if not locked:return dict(status='already_running')\n        state_path=root/'state.json'\n        state=json.loads(state_path.read_text()) if state_path.exists() else {}\n        record=dict(started_at_utc=now(),record_type='full_poll',\n            collector_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())\n        try:\n            if not state.get('feeds') or time.time()-state.get('discovered_epoch',0)>86400:\n                discovery,raw,meta=fetch(DISCOVERY)\n                feeds={x['name']:x['url'] for x in discovery['data']['en']['feeds']}\n                state.update(feeds=feeds,discovered_epoch=time.time())\n                save_gzip(root/'discovery'/f\"{datetime.now(timezone.utc):%Y%m%dT%H%M%S%fZ}.json.gz\",raw)\n            # Metadata is fetched before the status, so it is known at the poll's\n            # request/receipt time. Only its content is deduplicated, never polls.\n            information,raw_info,info_meta=fetch(state['feeds']['station_information'])\n            stations=information['data']['stations']\n            canonical=json.dumps(sorted(stations,key=lambda s:str(s['station_id'])),sort_keys=True,separators=(',',':')).encode()\n            version=hashlib.sha256(canonical).hexdigest()\n            metadata_path=root/'metadata'/(version+'.json.gz')\n            if not metadata_path.exists():save_gzip(metadata_path,raw_info)\n            status,raw,status_meta=fetch(state['feeds']['station_status'])\n            values=status['data']['stations']\n            ids=[str(x['station_id']) for x in values]\n            if not values or len(ids)!=len(set(ids)):\n                raise ValueError('Empty or duplicate-ID full station status response')\n            stamp=datetime.now(timezone.utc)\n            target=root/'status'/f'{stamp:%Y/%m/%d}'/(f'{stamp:%Y%m%dT%H%M%S%fZ}_'+uuid.uuid4().hex[:8]+'.json.gz')\n            save_gzip(target,raw)\n            record.update(status='ok',station_count=len(values),snapshot_path=target.relative_to(root).as_posix(),\n                metadata_path=metadata_path.relative_to(root).as_posix(),metadata_content_sha256=version,\n                metadata_capture=info_meta,status_capture=status_meta,feed_last_updated=status.get('last_updated'),\n                feed_ttl=status.get('ttl'),feed_version=status.get('version'),\n                is_full_status_poll=True,unchanged_inventory_suppressed=False,\n                stale_feed_over_5min=isinstance(status.get('last_updated'),(int,float)) and time.time()-status['last_updated']>300)\n            if not state.get('system_information'):\n                try:\n                    system,system_raw,system_meta=fetch(state['feeds']['system_information'])\n                    state['system_information']=system\n                    save_gzip(root/'system_information.json.gz',system_raw)\n                except Exception as exc:record['system_information_error']=f'{type(exc).__name__}: {exc}'\n            state.update(last_success_utc=record['status_capture']['received_at_utc'],last_snapshot=record['snapshot_path'],\n                successful_polls=state.get('successful_polls',0)+1,metadata_content_sha256=version)\n        except Exception as exc:\n            record.update(status='error',error=f'{type(exc).__name__}: {exc}')\n            state['failed_polls']=state.get('failed_polls',0)+1\n        record['finished_at_utc']=now()\n        with (root/'polls.jsonl').open('a',encoding='utf-8') as f:\n            f.write(json.dumps(record)+'\\n');f.flush();os.fsync(f.fileno())\n        atomic_json(root/'last_poll.json',record);atomic_json(state_path,state)\n        return record\n\n\ndef main():\n    p=argparse.ArgumentParser(description=__doc__)\n    p.add_argument('--data-root',type=Path,required=True)\n    p.add_argument('--once',action='store_true')\n    p.add_argument('--interval-seconds',type=int,default=120)\n    p.add_argument('--stop-at',default='2026-12-13T07:59:00+00:00')\n    args=p.parse_args()\n    if args.interval_seconds<60:p.error('Interval must be >=60 seconds')\n    while True:\n        before=time.monotonic();record=capture(args.data_root,args.stop_at)\n        if sys.stdout is not None:print(json.dumps(record),flush=True)\n        if args.once or record['status']=='finished':break\n        time.sleep(max(1,args.interval_seconds-(time.monotonic()-before)))\n\n\nif __name__=='__main__':main()\n\n\n\"\"\"Stateless AWS adapter: immutable full polls in a private S3 bucket.\n\nNo shared mutable state, public endpoint, cross-account keys or local disk\ndependency. A conditional slot claim prevents duplicate scheduled captures.\n\"\"\"\nfrom datetime import datetime,timezone\nimport hashlib\nimport json\nimport os\nfrom pathlib import Path\nimport sys\nimport tempfile\n\ncollector = sys.modules[__name__]\n\n\ndef utc_time():return datetime.now(timezone.utc)\n\n\ndef error_code(exc):\n    return getattr(exc,'response',{}).get('Error',{}).get('Code')\n\n\ndef put_bytes(s3,bucket,key,body,immutable=False,content_type='application/json'):\n    args=dict(Bucket=bucket,Key=key,Body=body,ContentType=content_type,\n        ServerSideEncryption='AES256',Metadata={'sha256':hashlib.sha256(body).hexdigest()})\n    if immutable:args['IfNoneMatch']='*'\n    try:s3.put_object(**args);return True\n    except Exception as exc:\n        if immutable and error_code(exc) in {'PreconditionFailed','412'}:return False\n        raise\n\n\ndef run(event,context,s3,bucket,stop_at):\n    now_utc=utc_time()\n    if now_utc>=datetime.fromisoformat(stop_at.replace('Z','+00:00')):\n        return dict(status='finished',reason='Configured collection end reached')\n    scheduled=event.get('scheduled_time')\n    if scheduled:\n        slot=datetime.fromisoformat(scheduled.replace('Z','+00:00'))\n        if slot.tzinfo is None:raise ValueError('Scheduled time needs an explicit timezone')\n        slot=slot.astimezone(timezone.utc)\n        token=slot.isoformat()\n    else:\n        slot=now_utc;token='manual:'+context.aws_request_id\n    run_id=hashlib.sha256(token.encode()).hexdigest()[:24]\n    date=f'{slot:%Y/%m/%d}'\n    prefix='current_validation/'\n    claim_key=prefix+f'claims/{date}/{run_id}.json'\n    record_key=prefix+f'polls/{date}/{run_id}.json'\n    claim=dict(scheduled_time=scheduled,aws_request_id=context.aws_request_id,claimed_at_utc=now_utc.isoformat())\n    if not put_bytes(s3,bucket,claim_key,json.dumps(claim).encode(),immutable=True):\n        # An incomplete claim is deliberately not overwritten/retried into a\n        # backdated observation. CloudWatch errors and missing manifests expose\n        # crashes/storage failures; a later regular slot is independent.\n        return dict(status='duplicate_slot_skipped',claim_key=claim_key)\n    record=dict(deployment='aws_lambda',aws_request_id=context.aws_request_id,scheduled_time=scheduled,\n        actual_invocation_utc=now_utc.isoformat(),collector_base_sha256=os.environ.get('COLLECTOR_BASE_SHA256'),\n        snapshot_timing='Actual provider/request/receipt times; never pretend a delayed poll occurred at scheduled time')\n    if scheduled and not -60<=(now_utc-slot).total_seconds()<=90:\n        record.update(status='error',error='Scheduled slot is too old or in the future; no historical backfill')\n        put_bytes(s3,bucket,record_key,json.dumps(record).encode(),immutable=True)\n        raise RuntimeError(record['error'])\n    try:\n        with tempfile.TemporaryDirectory(prefix='bikeflow-') as temp:\n            local=Path(temp)/'current_validation'\n            captured=collector.capture(temp,stop_at)\n            record.update(captured)\n            objects=[]\n            # Stateless invocation: rediscover official feeds and metadata each\n            # poll. The S3 canonical metadata object is content-deduplicated,\n            # while every complete status/discovery poll remains immutable.\n            for path in sorted(local.rglob('*.json.gz')):\n                relative=path.relative_to(local).as_posix();body=path.read_bytes()\n                if relative=='system_information.json.gz':\n                    relative='system_information/'+hashlib.sha256(body).hexdigest()+'.json.gz'\n                key=prefix+relative\n                created=put_bytes(s3,bucket,key,body,immutable=True,content_type='application/gzip')\n                item=dict(key=key,sha256=hashlib.sha256(body).hexdigest(),bytes=len(body),created=created)\n                if not created:\n                    # Canonical station metadata may have the same content but\n                    # different top-level provider timestamps. Record the hash\n                    # of bytes actually stored, alongside this poll's raw hash.\n                    existing=s3.head_object(Bucket=bucket,Key=key)\n                    item.update(captured_sha256=item['sha256'],sha256=existing['Metadata']['sha256'],bytes=existing['ContentLength'])\n                objects.append(item)\n            record['uploaded_objects']=objects\n            record['cloud_log_layout']='Immutable polls/date/slot.json; no shared polls.jsonl or state.json'\n            # Publish the manifest only after all referenced raw objects exist.\n            put_bytes(s3,bucket,record_key,json.dumps(record).encode(),immutable=True)\n            if record['status']!='ok':raise RuntimeError(record.get('error','Capture failed'))\n            print(json.dumps(dict(status='ok',manifest_key=record_key,station_count=record['station_count'])))\n            return dict(status='ok',bucket=bucket,manifest_key=record_key,station_count=record['station_count'])\n    except Exception as exc:\n        if record.get('status')!='error':\n            record.update(status='error',error=f'{type(exc).__name__}: {exc}')\n            try:put_bytes(s3,bucket,record_key,json.dumps(record).encode(),immutable=True)\n            except Exception:pass  # Storage outage is still a Lambda error.\n        raise\n\n\ndef lambda_handler(event,context):\n    import boto3  # AWS managed runtime SDK; version is managed by AWS.\n    return run(event or {},context,boto3.client('s3'),os.environ['DATA_BUCKET'],os.environ['STOP_AT_UTC'])\n"
+        },
+        "Environment": {
+          "Variables": {
+            "DATA_BUCKET": {
+              "Ref": "DataBucket"
+            },
+            "STOP_AT_UTC": {
+              "Ref": "StopAtUtc"
+            },
+            "COLLECTOR_BASE_SHA256": "a323251329c92d461b20004cd5b38027df97da9aea2d9b7a2449c2c877fe42e9"
+          }
+        }
+      }
+    },
+    "AsyncPolicy": {
+      "Type": "AWS::Lambda::EventInvokeConfig",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "CollectorFunction"
+        },
+        "Qualifier": "$LATEST",
+        "MaximumEventAgeInSeconds": 60,
+        "MaximumRetryAttempts": 0
+      }
+    },
+    "ScheduleGroup": {
+      "Type": "AWS::Scheduler::ScheduleGroup",
+      "Properties": {
+        "Name": {
+          "Fn::Sub": "${ProjectName}-schedule"
+        }
+      }
+    },
+    "SchedulerRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "scheduler.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole",
+              "Condition": {
+                "StringEquals": {
+                  "aws:SourceAccount": {
+                    "Ref": "AWS::AccountId"
+                  }
+                },
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Fn::GetAtt": [
+                      "ScheduleGroup",
+                      "Arn"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "invoke-collector-only",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "lambda:InvokeFunction",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "CollectorFunction",
+                      "Arn"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "CollectionSchedule": {
+      "Type": "AWS::Scheduler::Schedule",
+      "DependsOn": "AsyncPolicy",
+      "Properties": {
+        "Name": {
+          "Fn::Sub": "${ProjectName}-2min"
+        },
+        "GroupName": {
+          "Ref": "ScheduleGroup"
+        },
+        "State": {
+          "Ref": "ScheduleState"
+        },
+        "ScheduleExpression": "rate(2 minutes)",
+        "ScheduleExpressionTimezone": "UTC",
+        "EndDate": {
+          "Ref": "StopAtUtc"
+        },
+        "FlexibleTimeWindow": {
+          "Mode": "OFF"
+        },
+        "Target": {
+          "Arn": {
+            "Fn::GetAtt": [
+              "CollectorFunction",
+              "Arn"
+            ]
+          },
+          "RoleArn": {
+            "Fn::GetAtt": [
+              "SchedulerRole",
+              "Arn"
+            ]
+          },
+          "Input": "{\"scheduled_time\": \"<aws.scheduler.scheduled-time>\"}",
+          "RetryPolicy": {
+            "MaximumEventAgeInSeconds": 60,
+            "MaximumRetryAttempts": 0
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "DataBucketName": {
+      "Value": {
+        "Ref": "DataBucket"
+      }
+    },
+    "FunctionName": {
+      "Value": {
+        "Ref": "CollectorFunction"
+      }
+    },
+    "ScheduleName": {
+      "Value": {
+        "Ref": "CollectionSchedule"
+      }
+    },
+    "ScheduleGroupName": {
+      "Value": {
+        "Ref": "ScheduleGroup"
+      }
+    },
+    "ScheduleState": {
+      "Value": {
+        "Ref": "ScheduleState"
+      }
+    },
+    "StopAtUtc": {
+      "Value": {
+        "Ref": "StopAtUtc"
+      }
+    }
+  }
+}

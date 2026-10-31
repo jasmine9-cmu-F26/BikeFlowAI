@@ -7,3 +7,6 @@ scripts/data/** -text
 legacy/** -text
 reports/** -text
 data/manifests/** -text
+
+# Preserve generated AWS template/source-manifest byte hashes.
+deploy/** -text

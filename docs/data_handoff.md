@@ -21,3 +21,7 @@ OD estimates use mapped trips with both times in training, duration 60 secondsâ€
 5. Assess 2021 summer to 2026 season/network shift with the ongoing full-GBFS collection once enough current observations exist. The app's 32-site scope is a deployable subset, not unbiased full-network evidence.
 
 See [app results](../reports/chicago_historical_audit/app32/README.md), [source terms](../DATA_SOURCES.md), and [collector operations](gbfs_collector.md). Earlier source studies are retained under `legacy/`.
+
+## Current collector handoff
+
+Current collection uses Google Apps Script at a nominal five-minute cadence, independently of laptop uptime. Initial user-provided scheduled-run evidence was checked and the local Windows task disabled; existing local data remains intact. Raw cloud download, full-day quota/coverage review and historical/current domain-shift evaluation remain separate tasks. See [collector operations](gbfs_collector.md).

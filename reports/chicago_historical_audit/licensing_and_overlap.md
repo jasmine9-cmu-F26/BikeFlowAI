@@ -24,7 +24,7 @@ Current direct official GBFS metadata yields **32** unique exact-name/geometry m
 ## Live and supplementary sources
 
 Official GBFS is the live inference and own-collector source. MobilityDatabase's catalog lists CC-BY-4.0, but the captured publisher system-information document lacks a license URL; the catalog declaration is not presented as independent publisher confirmation. Keep the general official Divvy terms and this qualification attached.
-The locally installed collector stores complete polls, including unchanged states, and failure heartbeats. It does not grant redistribution rights, establish 24/7 uptime while the laptop is asleep, or retroactively fill historical gaps.
+Current collection has moved to Google Apps Script with nominal five-minute full polls in private Drive. Initial scheduled-run evidence was supplied and checked; the Windows task is disabled with its data preserved. Cloud collection runs independently of laptop uptime but remains subject to Google quotas, storage and scheduler delays. It does not grant redistribution rights, certify continuous uptime, or retroactively fill historical gaps.
 
 CityBikes recent change events remain supplementary only. Its compilation has separate ODbL 1.0 attribution/public-use obligations; they are not a license for the official City source. No CityBikes data is joined into these primary historical labels or trip mappings. Its old reports/attribution remain under `legacy/citybikes/reports/` and [DATA_SOURCES.md](../../DATA_SOURCES.md).
 

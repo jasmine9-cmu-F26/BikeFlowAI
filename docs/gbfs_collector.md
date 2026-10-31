@@ -1,47 +1,37 @@
-# Own full-GBFS collector
+# Own full-GBFS collector: Google cloud active
 
-Started 2026-10-30. The local Windows task `BikeFlowAI-Divvy-Full-GBFS-Collector` captures official Divvy station status every **2 minutes**, through **2026-12-12 23:59 America/Los_Angeles** (2026-12-13 07:59 UTC).
+**Current state:** Google Apps Script saves complete official Divvy snapshots to private Google Drive every **nominal five minutes**. Initial cloud handoff is verified from the user's `collectorStatus` JSON and successful Time-Driven execution screenshot. The Windows task `BikeFlowAI-Divvy-Full-GBFS-Collector` was disabled and queried directly after that evidence arrived. All existing local files were preserved.
 
-It uses a windowless Python process with limited interactive-user permissions. It continues independently of this chat, but the user must be logged in and the computer awake/online. It does not wake the machine, store passwords, or change power settings. Time missed while asleep/offline stays missing; `StartWhenAvailable` is not historical backfill.
+The laptop may now be shut down. No browser tab or local Python process is needed for the Google trigger. This is best-effort collection under shared Apps Script runtime/fetch quotas and available Drive storage; check execution history regularly.
 
-## Stored outside the project
+## Evidence and scope
 
-```text
-BikeFlowAI-data/divvy/current_validation/
-  status/YYYY/MM/DD/*.json.gz  Every successful complete station_status response
-  metadata/<hash>.json.gz     Immutable station_information content versions
-  discovery/                 Captured official discovery responses
-  polls.jsonl                Success/error heartbeat for each attempted poll
-  last_poll.json             Last attempt and any failure/stale-feed warning
-  state.json                 Last successful poll and counters
-  installation.json          Last checked local task configuration
-```
+- Six successful Time-Driven captures were shown, with the latest status response received at `2026-10-31T02:01:29.771Z` (October 30, 19:01:29 America/Los_Angeles).
+- One matching trigger, `last_poll.status: ok`, `invocation: scheduled`, 2,078 stations, and no recorded last error.
+- Latest gzip size: 136,471 bytes. At 288 nominal captures/day, this single-size estimate is about 39.3 MB/day or 1.18 GB/30 days. Real sizes/rates vary; confirm actual Drive space.
+- The agent did not log in to Google or independently download raw cloud files. This initial evidence does not certify every stored byte, a full day of quota headroom, weeks of coverage or model accuracy.
 
-Unchanged inventories are **not suppressed**. Only metadata content is deduplicated. Metadata is fetched before status and its reference/capture times are logged. Successful polls retain raw response hash, provider last_updated/TTL/version, receipt times, count of stations, code hash, and a stale-feed warning. Failed fetches write error heartbeats and never empty station snapshots. A process lock prevents overlapping captures and releases on process exit.
+See [handoff evidence](../reports/chicago_historical_audit/cloud_collector_handoff.json) and [status](../reports/chicago_historical_audit/collector_status.json). Private Drive folder/file IDs remain outside committed reports.
 
-## Run or install
+## Active Google operations
 
-```powershell
-$DivvyRoot = "$env:USERPROFILE\Documents\BikeFlowAI-data\divvy"
-# One full poll; uses the audit environment or any installed Python 3.14.
-.\.venv\Scripts\python.exe scripts/data/collect_divvy_gbfs.py --data-root "$DivvyRoot" --once
+Open your existing Apps Script project with the personal account used during setup. Do not create a duplicate project/trigger. Run `collectorStatus` to inspect the last successful poll, last error and runtime summary; view **Executions** for each Time-Driven run. A successful old poll does not rule out later failures, so compare its timestamp with the current time and inspect errors.
 
-# Foreground loop (Ctrl+C stops this loop only):
-.\.venv\Scripts\python.exe scripts/data/collect_divvy_gbfs.py --data-root "$DivvyRoot" --interval-seconds 120
+Raw captures are in private Drive folder `BikeFlowAI-Divvy-Full-Snapshots`, under daily UTC subfolders. Unchanged inventory is saved on every successful poll. Download the data into `Documents/BikeFlowAI-data/divvy/google_validation/`, outside the repo; it is not automatically synced to this computer. Keep local and Google records with their separate formats/provenance.
 
-# Install/update only this project's Windows task; prefer a stable interpreter.
-.\scripts\data\install_divvy_collector.ps1 -PythonExe "$env:LOCALAPPDATA\Python\pythoncore-3.14-64\python.exe" -DataRoot "$DivvyRoot"
-```
+Run `stopCollector` in Google Apps Script to stop only this collector's cloud triggers without deleting data. Code stops capture at **2026-12-13 07:59 UTC** (December 12, 23:59 America/Los_Angeles). No paid subscription/storage upgrade or automatic data expiry is configured. Quota/storage exhaustion can cause missing captures; do not backfill missing intervals with empty or unchanged state.
 
-Do not delete/move the installed interpreter or collector script while the task is in use. The installer uses `pythonw.exe` if available, so no console window appears every poll. The script uses only the standard library; data/model packages are not needed by the scheduled process.
+The [Google deployment/operation guide](../deploy/apps_script/README.md) contains setup, permissions, quotas, format and validation details. AWS was abandoned due account Paid-plan requirements; do not run its deployment commands.
+
+## Preserved local collector (disabled)
+
+Existing local raw files remain at `Documents/BikeFlowAI-data/divvy/current_validation/`, including full statuses, immutable metadata, poll/error heartbeat logs and state. The old local cadence was two minutes. This evidence is retained rather than mixed silently with the five-minute Google collection.
 
 ```powershell
 Get-ScheduledTask -TaskName 'BikeFlowAI-Divvy-Full-GBFS-Collector'
-Get-ScheduledTaskInfo -TaskName 'BikeFlowAI-Divvy-Full-GBFS-Collector'
-# Stop future scheduled attempts when the project ends early:
-Disable-ScheduledTask -TaskName 'BikeFlowAI-Divvy-Full-GBFS-Collector'
-# Resume before the configured end:
-Enable-ScheduledTask -TaskName 'BikeFlowAI-Divvy-Full-GBFS-Collector'
+# Expected state: Disabled
 ```
 
-These current snapshots are a future sanity/supplemental-evaluation source. A few initial polls do not establish weeks of coverage, validate a 2021 model in 2026, or erase vintage/season differences. Freeze any current evaluation period before using it to tune a model. Keep raw snapshots outside Git and preserve source-specific terms in [DATA_SOURCES.md](../DATA_SOURCES.md).
+The standard-library [local collector](../scripts/data/collect_divvy_gbfs.py) and [installer](../scripts/data/install_divvy_collector.ps1) remain available for a deliberate fallback. Re-enabling/installing it would require this computer to stay logged in, awake and online. Do not run parallel collectors accidentally.
+
+Historical training data, station selection, splits and model timing rules are unchanged. Raw source terms remain documented in [DATA_SOURCES.md](../DATA_SOURCES.md).

@@ -1,0 +1,31 @@
+{
+  "checked_at_utc": "2026-10-31T02:04:13.339727+00:00",
+  "verification_method": "User-provided collectorStatus JSON and screenshot of successful Time-Driven execution history; Google API and raw cloud bytes not independently fetched",
+  "matching_triggers": 1,
+  "successful_time_driven_executions_shown": 6,
+  "first_scheduled_start_shown_utc": "2026-10-31T01:41:26Z",
+  "latest_success_received_utc": "2026-10-31T02:01:29.771Z",
+  "station_count": 2078,
+  "last_error": {},
+  "latest_compressed_bytes": 136471,
+  "runtime_budget_UTC_day": "2026-10-31",
+  "runtime_budget_ms_reported": 45718,
+  "observed_scheduled_durations_seconds": [
+    22.864,
+    3.402,
+    4.351,
+    4.303,
+    7.051,
+    5.055
+  ],
+  "local_task": {
+    "name": "BikeFlowAI-Divvy-Full-GBFS-Collector",
+    "state": "Disabled",
+    "verified_at_utc": "2026-10-31T02:02:58.0718326+00:00",
+    "raw_data_deleted": false
+  },
+  "nominal_interval_minutes": 5,
+  "cloud_runs_independently_of_laptop": true,
+  "paid_plan_or_billing_enabled_by_agent": false,
+  "scope": "Initial cloud handoff verified from supplied execution evidence; not a full-day quota audit, raw-byte audit, weeks of coverage or guaranteed uptime"
+}

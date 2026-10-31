@@ -49,10 +49,15 @@
     },
     "current_validation": {
       "role": "own_full_GBFS_snapshots_for_sanity_and_supplemental_evaluation",
-      "interval_seconds": 120,
-      "started_at_utc": "2026-10-30T23:34:26.127776+00:00",
+      "interval_seconds": 300,
       "stop_at_utc": "2026-12-13T07:59:00Z",
-      "requires_logged_in_awake_online": true
+      "requires_logged_in_awake_online": false,
+      "local_collection_started_at_utc": "2026-10-30T23:34:26.127776+00:00",
+      "active_provider": "google_apps_script",
+      "first_scheduled_start_seen_utc": "2026-10-31T01:41:26Z",
+      "cloud_handoff_verified_from_user_evidence": true,
+      "local_windows_task_state": "Disabled",
+      "cloud_raw_bytes_independently_verified": false
     }
   },
   "audit": {

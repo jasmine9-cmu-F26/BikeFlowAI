@@ -1,21 +1,65 @@
 {
-  "checked_at_utc": "2026-10-31T00:15:57.007225+00:00",
-  "task_name": "BikeFlowAI-Divvy-Full-GBFS-Collector",
-  "configured_interval_seconds": 120,
+  "checked_at_utc": "2026-10-31T02:04:13.339727+00:00",
+  "active_collector": "google_apps_script",
+  "nominal_interval_seconds": 300,
   "planned_end_utc": "2026-12-13T07:59:00Z",
-  "scheduled_executable": "C:\\Users\\44604\\AppData\\Local\\Python\\pythoncore-3.14-64\\pythonw.exe",
-  "last_checked_task_result": 0,
-  "successful_polls": 24,
-  "failed_polls": 0,
-  "first_success_utc": "2026-10-30T23:34:27.472772+00:00",
-  "last_success_utc": "2026-10-31T00:14:26.601244+00:00",
-  "latest_station_count": 2078,
-  "unchanged_states_retained": true,
-  "collector_versions_seen": [
-    "a323251329c92d461b20004cd5b38027df97da9aea2d9b7a2449c2c877fe42e9",
-    "f721026fe8a135bcf301ea49ae8ed49523ddd9e5872b962934a4dfc80af585fc"
-  ],
-  "raw_location": "external DIVVY_ROOT/current_validation",
-  "requires_logged_in_awake_online": true,
-  "scope": "Initial ongoing collection only; not weeks of validated 2026 coverage or a model evaluation"
+  "initial_cloud_handoff": {
+    "checked_at_utc": "2026-10-31T02:04:13.339727+00:00",
+    "verification_method": "User-provided collectorStatus JSON and screenshot of successful Time-Driven execution history; Google API and raw cloud bytes not independently fetched",
+    "matching_triggers": 1,
+    "successful_time_driven_executions_shown": 6,
+    "first_scheduled_start_shown_utc": "2026-10-31T01:41:26Z",
+    "latest_success_received_utc": "2026-10-31T02:01:29.771Z",
+    "station_count": 2078,
+    "last_error": {},
+    "latest_compressed_bytes": 136471,
+    "runtime_budget_UTC_day": "2026-10-31",
+    "runtime_budget_ms_reported": 45718,
+    "observed_scheduled_durations_seconds": [
+      22.864,
+      3.402,
+      4.351,
+      4.303,
+      7.051,
+      5.055
+    ],
+    "local_task": {
+      "name": "BikeFlowAI-Divvy-Full-GBFS-Collector",
+      "state": "Disabled",
+      "verified_at_utc": "2026-10-31T02:02:58.0718326+00:00",
+      "raw_data_deleted": false
+    },
+    "nominal_interval_minutes": 5,
+    "cloud_runs_independently_of_laptop": true,
+    "paid_plan_or_billing_enabled_by_agent": false,
+    "scope": "Initial cloud handoff verified from supplied execution evidence; not a full-day quota audit, raw-byte audit, weeks of coverage or guaranteed uptime"
+  },
+  "previous_local_collector_status": {
+    "checked_at_utc": "2026-10-31T00:15:57.007225+00:00",
+    "task_name": "BikeFlowAI-Divvy-Full-GBFS-Collector",
+    "configured_interval_seconds": 120,
+    "planned_end_utc": "2026-12-13T07:59:00Z",
+    "scheduled_executable": "C:\\Users\\44604\\AppData\\Local\\Python\\pythoncore-3.14-64\\pythonw.exe",
+    "last_checked_task_result": 0,
+    "successful_polls": 24,
+    "failed_polls": 0,
+    "first_success_utc": "2026-10-30T23:34:27.472772+00:00",
+    "last_success_utc": "2026-10-31T00:14:26.601244+00:00",
+    "latest_station_count": 2078,
+    "unchanged_states_retained": true,
+    "collector_versions_seen": [
+      "a323251329c92d461b20004cd5b38027df97da9aea2d9b7a2449c2c877fe42e9",
+      "f721026fe8a135bcf301ea49ae8ed49523ddd9e5872b962934a4dfc80af585fc"
+    ],
+    "raw_location": "external DIVVY_ROOT/current_validation",
+    "requires_logged_in_awake_online": true,
+    "scope": "Initial ongoing collection only; not weeks of validated 2026 coverage or a model evaluation"
+  },
+  "private_cloud_location": "Personal Google Drive / BikeFlowAI-Divvy-Full-Snapshots",
+  "private_folder_and_file_ids": "Not published in repository",
+  "expected_storage_per_30days_bytes_at_latest_size": 1179109440,
+  "storage_estimate_basis": "One observed compressed poll, 288 nominal polls/day; changes with payload, errors and cadence; check actual free Drive space",
+  "privacy": "Raw local/cloud captures remain outside Git",
+  "requires_laptop_awake": false,
+  "operational_limitations": "Best-effort triggers, shared Apps Script quotas and available Drive storage; inspect execution history regularly"
 }

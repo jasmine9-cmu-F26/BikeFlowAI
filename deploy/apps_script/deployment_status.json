@@ -1,0 +1,16 @@
+{
+  "status": "ACTIVE_INITIAL_HANDOFF_VERIFIED_FROM_USER_EVIDENCE",
+  "cloud_deployed": true,
+  "google_authorization_completed": true,
+  "local_collector_disabled": true,
+  "nominal_interval_minutes": 5,
+  "requires_paid_cloud_billing": false,
+  "needs_available_Drive_storage": true,
+  "local_service_mock_tests_passed": 7,
+  "source_sha256": "f292818dc045184e753fb643abe73588c6800d52cde2227535920627af03ad0f",
+  "historical_model_protocol_unchanged": true,
+  "last_verified_cloud_success_utc": "2026-10-31T02:01:29.771Z",
+  "evidence_report": "reports/chicago_historical_audit/cloud_collector_handoff.json",
+  "cloud_raw_bytes_independently_verified": false,
+  "verified_via": "User collectorStatus output + Time-Driven execution screenshot; local task disabled and queried directly"
+}

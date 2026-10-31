@@ -1,0 +1,16 @@
+{
+  "status": "ABANDONED_NO_FREE_PLAN_ELIGIBILITY",
+  "cloud_deployed": false,
+  "cloud_verified": false,
+  "local_collector_disabled": true,
+  "region": "us-east-1",
+  "stack_name": "bikeflow-divvy-collector",
+  "billing_estimate_USD_month": "1-3 under documented workload assumptions; not a cap",
+  "aws_credentials_stored": false,
+  "aws_resources_created": false,
+  "user_constraint": "Keep AWS Free account plan; no paid-plan upgrade or out-of-pocket charges authorized",
+  "cloudshell_access": "Paid plan prompt confirmed also at Lambda console",
+  "local_CLI_alternative": "Not pursued; local CLI cannot bypass account-plan eligibility",
+  "aws_account_eligibility": "User screenshot: information associated with existing/previous AWS account; signup requires Paid plan consent",
+  "active_replacement": "google_apps_script"
+}

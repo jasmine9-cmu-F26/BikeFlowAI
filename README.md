@@ -70,10 +70,17 @@ $DataRoot = Join-Path $DivvyRoot 'chicago_historical_2021_sample'
 
 `make data PYTHON=.venv/Scripts/python.exe` downloads/reuses the bounded sample and rebuilds the app audit. Raw/processed data stays outside Git. See [data setup](data/README.md) and [cleanup validation](reports/chicago_historical_audit/app32/validation.md). No model training/evaluation targets exist yet.
 
-The Windows full-GBFS collector is installed every **2 minutes**, through **2026-12-12 23:59 America/Los_Angeles**. It retains unchanged full polls and error heartbeats while this computer is logged in, awake and online. See [collector operations](docs/gbfs_collector.md).
+Current full-GBFS collection runs in **Google Apps Script every nominal 5 minutes**, saving complete polls to private Google Drive through **2026-12-12 23:59 America/Los_Angeles**. Initial scheduled execution evidence was supplied and checked; the Windows two-minute task is now **disabled**, with its existing data preserved. Laptop uptime is no longer required. Shared quotas, storage limits and best-effort scheduling still apply. See [collector operations](docs/gbfs_collector.md).
 
 ## Team and source terms
 
 Feifan Yang, Jasmine Zhang, Liye Fu, Xiaohan Zhou, Zhouheng Tao.
 
 City of Chicago primary data is labeled **See Terms of Use**, not CC0. Retain [NOTICE_CHICAGO.md](NOTICE_CHICAGO.md). Official trips and live GBFS have separate terms; CityBikes ODbL attribution stays with its supplementary outputs. No project code license has been selected. Raw data is not rehosted.
+
+
+## Current cloud collection
+
+Google Apps Script is active with a nominal five-minute trigger. [Handoff evidence](reports/chicago_historical_audit/cloud_collector_handoff.json) distinguishes user-provided cloud execution evidence from directly verified local task state; cloud raw files were not independently downloaded/validated. Check [current status](deploy/apps_script/deployment_status.json) and [operations](deploy/apps_script/README.md).
+
+AWS was abandoned after account eligibility required a Paid plan. No AWS resources were created; the AWS implementation is inactive evidence only. The active Google script requires no cloud billing setup. These initial captures do not constitute weeks of current-data validation or prove old-to-current model generalization.

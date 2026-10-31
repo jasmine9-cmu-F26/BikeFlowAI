@@ -52,3 +52,8 @@ Historical `In Service` is a broad flag. Do not invent separate installed/rentin
 See [DATA_SOURCES.md](../DATA_SOURCES.md), [the primary license review](../reports/chicago_historical_audit/licensing_and_overlap.md), and [NOTICE_CHICAGO.md](../NOTICE_CHICAGO.md). Primary metadata says See Terms of Use. Official trip restrictions, live catalog/publisher qualifications and CityBikes ODbL remain source-specific.
 
 Earlier code, numeric reports and manifests are archived under [legacy/baywheels](../legacy/baywheels/README.md) and [legacy/citybikes](../legacy/citybikes/README.md). Exact source bytes matching original Chicago audit hashes are in [legacy/official_chicago_audit_v1](../legacy/official_chicago_audit_v1/README.md). CSV/JSON results were preserved; navigation Markdown links were adjusted for relocation.
+
+
+## Current collection handoff
+
+Google Apps Script is now the active collector at a nominal **five-minute** cadence; the original Windows two-minute task is **disabled** and local files are preserved. Laptop uptime is no longer required. Cloud files stay in private personal Drive until explicitly downloaded to a separate external `google_validation/` folder. Google files contain gzip poll envelopes; their format differs from local status/metadata files. Initial verification uses user-supplied scheduled-run logs, not an independent audit of raw Google bytes. See [current operations](../docs/gbfs_collector.md).

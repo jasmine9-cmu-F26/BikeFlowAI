@@ -1,0 +1,16 @@
+{
+  "checked_at_utc": "2026-10-31T00:59:14.410882+00:00",
+  "offline_tests_passed": 34,
+  "aws_contacted": false,
+  "aws_deployed": false,
+  "cloud_handoff_verified": false,
+  "local_collector_code_unchanged": true,
+  "original_historical_protocol_unchanged": true,
+  "source_template_hashes_verified": true,
+  "inline_lambda_executed_with_mocked_S3_and_GBFS": true,
+  "live_AWS_validation": "Pending authenticated CloudShell validate-template/deploy/smoke/start/verify",
+  "raw_data_or_credentials_in_bundle": false,
+  "private_bucket": true,
+  "schedule_default": "DISABLED",
+  "cloud_collection_nominal_interval_seconds": 120
+}
