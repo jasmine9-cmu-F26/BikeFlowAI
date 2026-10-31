@@ -1,0 +1,29 @@
+{
+  "violation_counts": {
+    "future_base_snapshot": 0,
+    "future_metadata": 0,
+    "future_feature_timestamp": 0,
+    "base_too_old": 0,
+    "future_lag_10m": 0,
+    "stale_lag_10m": 0,
+    "future_lag_30m": 0,
+    "stale_lag_30m": 0,
+    "future_lag_60m": 0,
+    "stale_lag_60m": 0,
+    "target_not_future": 0,
+    "target_outside_tolerance": 0,
+    "duplicate_feature_row_id": 0,
+    "feature_label_row_mismatch": 0,
+    "target_crosses_split": 0,
+    "OD_nontraining_fit": 0,
+    "OD_training_week_fit_after_cutoff": 0,
+    "B2_source_at_or_after_fit_cutoff": 0,
+    "B2_fit_beyond_train": 0,
+    "B2_attached_to_training_features": 0,
+    "label_columns_in_model_features": 0
+  },
+  "passed": true,
+  "categorical_encoding": "Raw station strings only; downstream learned encoders/imputers must fit train only",
+  "station_selection": "Existing train qualification plus fixed external 2026 identity scope; held-out labels do not select stations",
+  "publication_latency": "Historical recorded timestamps stand in for unmeasured actual publication latency"
+}

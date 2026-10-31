@@ -29,3 +29,7 @@ Current collection uses Google Apps Script at a nominal five-minute cadence, ind
 ## Weather handoff
 
 The [weather audit](../reports/weather_audit/weather_audit.md) covers five proposed variables, four requested model configurations and the fixed 2021 app32 snapshots. Coverage alone passes, but a stitched historical forecast valid_time cannot establish issued_at/available_at <= request_time. Weather remains optional/excluded from the certified causal baseline. Do not join t+h from a stitched archive and describe it as the forecast known at t. Require issuance-aware provenance or label a supplementary ablation with its assumptions. No collector, station, split or frozen model protocol was changed by this audit.
+
+## Completed feature/OD/freshness handoff
+
+The later [final pipeline audit](../reports/final_pipeline_audit/README.md) supersedes the earlier pending-table status in this historical handoff: 3,276,590 forecaster rows and separate labels now pass recorded-time/fit-cutoff checks. See [forecaster handoff](forecaster_data_handoff.md). Models, OOF policy probabilities and full replay remain pending; Google v2 rolling health is active: the initial user-reported window has 2/2 successful slots and no failures or missing slots; longer uptime and independent cloud raw-export checks remain separate.

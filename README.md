@@ -2,7 +2,7 @@
 
 Divvy / Chicago trip planning with predicted pickup/return availability and backup stations. Project repository: [jasmine9-cmu-F26/BikeFlowAI](https://github.com/jasmine9-cmu-F26/BikeFlowAI).
 
-**The 32-station app data protocol is frozen as version 1 and passes bounded source feasibility.** Model-ready tables, trained/calibrated models, UI/API and a full replay evaluator remain to be implemented.
+**The 32-station app data protocol is frozen as version 1 and passes bounded source feasibility.** Forecaster feature/label tables are now built and audited. Trained/calibrated models, OOF policy probabilities, UI/API and a full replay evaluator remain to be implemented.
 
 | Source | Role |
 |---|---|
@@ -88,3 +88,10 @@ AWS was abandoned after account eligibility required a Paid plan. No AWS resourc
 ## Weather audit
 
 The [2021 weather audit](reports/weather_audit/weather_audit.md) uses the Historical Forecast API [9] and live Forecast schema/licence [10], with ERA5 excluded from primary features. Five proposal variables have good coverage; GFS Global weather code has two missing hours (0.07%), while Seamless/HRRR/Best Match have no missing core values. Strict historical request-time availability cannot be certified from stitched hourly valid times alone, so weather remains **optional / excluded from the certified causal baseline**. See [reference update](docs/proposal_references.md) and [methodology](reports/weather_audit/licensing_and_causality.md).
+
+
+## Final pipeline audit and model handoff
+
+The [final app32 pipeline audit](reports/final_pipeline_audit/README.md) includes planner OD fallback, 10/15/20-minute freshness, **3,276,590 separate feature and label rows**, train-only/past-week B2 and OD lineage, and collector health. See [forecaster handoff](docs/forecaster_data_handoff.md) and [pipeline contract](data/manifests/chicago/final_pipeline_contract.json). Weather remains optional/excluded from the causal baseline.
+
+Google v2 health is active: the user-supplied initial report shows 2/2 scheduled slots successful, zero failures/missing slots, 298.934-second cadence and 2,078 stations. This short window is not a full-day uptime measurement; see [health evidence](reports/final_pipeline_audit/collector_health/google_health.json). The five-minute cloud trigger and disabled local task are not reinstalled by this audit.

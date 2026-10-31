@@ -1,0 +1,11 @@
+version,fit_cutoff_utc,training_rides,source_max_trip_end_utc,source_min_trip_start_utc,use
+train_week_0,2021-05-03T05:00:00Z,0,,,Only this training week; first week geometric fallback only
+train_week_1,2021-05-10T05:00:00Z,1011,2021-05-10T04:45:21Z,2021-05-03T05:09:37Z,Only this training week; first week geometric fallback only
+train_week_2,2021-05-17T05:00:00Z,2386,2021-05-17T04:54:15Z,2021-05-03T05:09:37Z,Only this training week; first week geometric fallback only
+train_week_3,2021-05-24T05:00:00Z,4292,2021-05-24T04:57:47Z,2021-05-03T05:09:37Z,Only this training week; first week geometric fallback only
+train_week_4,2021-05-31T05:00:00Z,6010,2021-05-31T04:54:02Z,2021-05-03T05:09:37Z,Only this training week; first week geometric fallback only
+train_week_5,2021-06-07T05:00:00Z,8267,2021-06-07T04:57:46Z,2021-05-03T05:09:37Z,Only this training week; first week geometric fallback only
+train_week_6,2021-06-14T05:00:00Z,10673,2021-06-14T04:58:57Z,2021-05-03T05:09:37Z,Only this training week; first week geometric fallback only
+train_week_7,2021-06-21T05:00:00Z,12865,2021-06-21T03:45:24Z,2021-05-03T05:09:37Z,Only this training week; first week geometric fallback only
+train_week_8,2021-06-28T05:00:00Z,14626,2021-06-28T04:56:36Z,2021-05-03T05:09:37Z,Only this training week; first week geometric fallback only
+train_week_9,2021-07-05T05:00:00Z,16566,2021-07-05T04:54:53Z,2021-05-03T05:09:37Z,Only this training week; first week geometric fallback only

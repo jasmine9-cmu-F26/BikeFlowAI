@@ -1,0 +1,1669 @@
+{
+  "files": [
+    {
+      "path": "B2/heldout_training_fit_rates.parquet",
+      "sha256": "3a9e51e42be985dedfb849c73595958193595e6dc0514f16a0937d985538a4c5",
+      "bytes": 10639,
+      "rows": 5376
+    },
+    {
+      "path": "B2/training_expanding_week_rates.parquet",
+      "sha256": "b6b3c39292438c41a0076413b1f63936c90483bb64e83923c28f00c5b6e9dad0",
+      "bytes": 38568,
+      "rows": 48384
+    },
+    {
+      "path": "features/chicago_14_calibration.parquet",
+      "sha256": "6fa3f14b06e3d727b00127ee9332f60804ef736ee700143a4cb4a6c7db6562b2",
+      "bytes": 211231,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_14_test.parquet",
+      "sha256": "8301c137bda91185c0f6bc7ba5aa400f6212782304ba04ada26d01ae36d34b91",
+      "bytes": 207661,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_14_train.parquet",
+      "sha256": "b8de978f6f2ed46481d9a97892978bbabffe367b7d4cb6409aa5d37d4759d41b",
+      "bytes": 1092206,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_14_tune.parquet",
+      "sha256": "b44f8654628ba6ef5b83e994bd480e535556b01afd967215c8302edd9f130c25",
+      "bytes": 172968,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_15_calibration.parquet",
+      "sha256": "cbe25b6dd11081338acd43cea09116cca131f55e49b37eed71b9f4c1bf2956dd",
+      "bytes": 212534,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_15_test.parquet",
+      "sha256": "61e8bc3e4ccd693592b72e52298840c6fcbaa06a73229c1fe4376f21ad97c57b",
+      "bytes": 208876,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_15_train.parquet",
+      "sha256": "c0825577defed44ef875e182136d10569b7c312aa21bc86e49d20f97cd4828e9",
+      "bytes": 1109882,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_15_tune.parquet",
+      "sha256": "dbbe3acd80738400d3cc0c1298716ac47ebadd2c46866323d89084c6c6403552",
+      "bytes": 173301,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_17_calibration.parquet",
+      "sha256": "59434b710061b069eae694a28b6d9e4b8a191c08b700896e8d8b18ed5782ab26",
+      "bytes": 213595,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_17_test.parquet",
+      "sha256": "83e03249f319d4ba09f1c7364e44215ec9b9907daac6cf8687458e6e45686c6c",
+      "bytes": 210308,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_17_train.parquet",
+      "sha256": "b6df2c47ac5abac63a0ea7283c08f35414d240a0221cf96288ac33fb5bade745",
+      "bytes": 1139022,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_17_tune.parquet",
+      "sha256": "984475026451be6e85022b271d8cc61dd80ec788110f0ded2c331a594951daff",
+      "bytes": 199850,
+      "rows": 12033
+    },
+    {
+      "path": "features/chicago_19_calibration.parquet",
+      "sha256": "93c11f95574f38733a571243ba8ada7582cb50095ac3f44af99f3ddf59250927",
+      "bytes": 211538,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_19_test.parquet",
+      "sha256": "c14f2d2b66438dadfd1ec3e0fd4c82cfd852aad9c0417a93b23d14c7e52ade99",
+      "bytes": 207304,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_19_train.parquet",
+      "sha256": "4960da96c5c535aa57821d3b733ea63d53a5bff5b4574931954e63534526cfad",
+      "bytes": 1109633,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_19_tune.parquet",
+      "sha256": "a0960efd2f46f9321b0233aae6330a9786cd83b0d5a3ea38d85205e03dffcd4d",
+      "bytes": 172775,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_20_calibration.parquet",
+      "sha256": "b0f367f3d16b2f01a4b8a64c62ed2fdf68fc0ddb0bb00cfcec905603e2c29edc",
+      "bytes": 212576,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_20_test.parquet",
+      "sha256": "6640aad862e9c63ac47ed1a5afb2759a3225b2699f4b8f74b97a94096aef2175",
+      "bytes": 209122,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_20_train.parquet",
+      "sha256": "8f28cde6e4faf8c0428fcc369189cdcea1554a7022b7bcaffb70ac182bc49acf",
+      "bytes": 1127138,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_20_tune.parquet",
+      "sha256": "635b2ea750de34930f4f320c41a29ebea5f64e1b721b89f8b3909ce82fb0aac1",
+      "bytes": 174606,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_21_calibration.parquet",
+      "sha256": "39b6364cbb289e43b0845bddcb4d0ee167c9cb462ecd8aa6a99ae37d35cf5094",
+      "bytes": 211927,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_21_test.parquet",
+      "sha256": "428686156c30f0f194dba32709cdaa01a51f7961ebb8d65ebdbdb830d86b05c5",
+      "bytes": 209734,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_21_train.parquet",
+      "sha256": "2a36daa7e584e6020b9512ee67243d134e06ae5f659c9d09a6f43c61ad5008f3",
+      "bytes": 1129681,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_21_tune.parquet",
+      "sha256": "f86000c0a134a0c9ad545ff5fcf6becf2c8cb7f5a796cf533ce288c6bbb1a876",
+      "bytes": 174055,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_22_calibration.parquet",
+      "sha256": "8671a348d0a9f22f97af396edbd6ab4d6c34a63e4bc7d0b38dac8828880ad47e",
+      "bytes": 202846,
+      "rows": 11637
+    },
+    {
+      "path": "features/chicago_22_test.parquet",
+      "sha256": "682e6afbd2ca902578ec7cf4b6f2edd0046829b29951ed7263e68e124d1b7e26",
+      "bytes": 208884,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_22_train.parquet",
+      "sha256": "6eb554602368eac5127545d1ce962c40d8d7695bcf779b68fb0cdf6a6b5e2027",
+      "bytes": 1113134,
+      "rows": 60046
+    },
+    {
+      "path": "features/chicago_22_tune.parquet",
+      "sha256": "a3fa56df3e1d4962c4e48adbe2c2db7ba8fabf1c6824700df3b22fcc205b7229",
+      "bytes": 194911,
+      "rows": 11937
+    },
+    {
+      "path": "features/chicago_23_calibration.parquet",
+      "sha256": "472110376ee1c027cce50ab85c72b0ba94b963e164cd71e6057b445fa1c4f12a",
+      "bytes": 211301,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_23_test.parquet",
+      "sha256": "21ff753a6f870340cf4f6b963d978732d97d098b46bb4e3484933620dba1a1d8",
+      "bytes": 207099,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_23_train.parquet",
+      "sha256": "84baf1147e38d8cc8a10d1b206a4eeb584ee3bb72ba9250fcc0cc5792a255c57",
+      "bytes": 1109304,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_23_tune.parquet",
+      "sha256": "9534ff3911da536ab3df1e6fb8c538f23980efbeee8254301e610579860aa38d",
+      "bytes": 173122,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_24_calibration.parquet",
+      "sha256": "fa560015fd2fe909e28028e04f614bf8e1f607e286046c8a34baaebcb61f98a7",
+      "bytes": 215486,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_24_test.parquet",
+      "sha256": "a4ed18a0a0120e60b29f4c7a75fd05cb6a79d55f576e71e4cbc38ac3c64204c3",
+      "bytes": 201990,
+      "rows": 18021
+    },
+    {
+      "path": "features/chicago_24_train.parquet",
+      "sha256": "e0869f94ae4e5d69b20e91dc42175faeaa9d5e009f726744bd2bb489ac78f1b2",
+      "bytes": 1117064,
+      "rows": 59938
+    },
+    {
+      "path": "features/chicago_24_tune.parquet",
+      "sha256": "1e22c2d58b83593e158bf0b33f0e61282940d85976e4035b524cfd39e7a51c48",
+      "bytes": 175332,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_26_calibration.parquet",
+      "sha256": "3b3224f9b0dfbdf8f5004976179bd2ef04bdb02bbbeaa0ef1eb327eb3cf5cdea",
+      "bytes": 221454,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_26_test.parquet",
+      "sha256": "f3826c39593b5d67bf04067c789721ecd776038b21189ebb455db41d89806348",
+      "bytes": 212848,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_26_train.parquet",
+      "sha256": "40cbe69c46191a648026ff32e5fcfcd1caf047a2e657421642ebeda8caec8a1b",
+      "bytes": 1266983,
+      "rows": 60400
+    },
+    {
+      "path": "features/chicago_26_tune.parquet",
+      "sha256": "ca64daa81710a39c8ba3b14f30aa4cddfda2867aa60b24b3135eb07f614667e7",
+      "bytes": 176731,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_27_calibration.parquet",
+      "sha256": "130abdec7408870d2959f9383b4c57607abfc1db53d888ca51fc83cdfd43b4ec",
+      "bytes": 211262,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_27_test.parquet",
+      "sha256": "2b2d5dda658a651ba2a25771b22ba7968561a98324f085ec00d987853601b4bf",
+      "bytes": 208677,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_27_train.parquet",
+      "sha256": "ed37e7819d1ddf44e749018757967fe6441b381b718898db1e6d44b5bbbad6e2",
+      "bytes": 1107336,
+      "rows": 60226
+    },
+    {
+      "path": "features/chicago_27_tune.parquet",
+      "sha256": "06c357437bd1312d52e17e9370db07101f012d8cd41d2ef3df6681e5afcb39ac",
+      "bytes": 173844,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_28_calibration.parquet",
+      "sha256": "9d1082f01ccbea3ea728bac14f7b5b355d58309d58c5f421a7ba76005af6d043",
+      "bytes": 210781,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_28_test.parquet",
+      "sha256": "9d5a71f1effb8a466fbb33dc49ce5f3370a7ad2871daf867179b685c18ee118c",
+      "bytes": 206987,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_28_train.parquet",
+      "sha256": "697bcd9a8ffdcc54d3307da435d21adfdda8d598d84bfa55d61548d42d3957e9",
+      "bytes": 1115384,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_28_tune.parquet",
+      "sha256": "1032ab0400904403fa55fccbd39655bfa5188d0dc4e591aafa2881bd16b99a25",
+      "bytes": 172317,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_29_calibration.parquet",
+      "sha256": "c8097073b75b372657eaa486569a703b75b417d92bf528619854e51ad9cb1e9e",
+      "bytes": 211363,
+      "rows": 11883
+    },
+    {
+      "path": "features/chicago_29_test.parquet",
+      "sha256": "de922322e3539cd2be30128b5a0f2487c998942f1dce2f1bd6608db07985c8f8",
+      "bytes": 208421,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_29_train.parquet",
+      "sha256": "d67a4c6a823da450953aa5b4a890e141b777236c22d363307be29323c4b9adc8",
+      "bytes": 1206760,
+      "rows": 60016
+    },
+    {
+      "path": "features/chicago_29_tune.parquet",
+      "sha256": "1ce22c6dc84a4ca1a2eb57bc2a3b576257baebf240644b9bfbb74b6ac90dfb25",
+      "bytes": 173911,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_31_calibration.parquet",
+      "sha256": "dc87f510bb3a0125b61b2238fcb8595e0534a1dd545f6bd93f63a6f78c7c9b96",
+      "bytes": 212301,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_31_test.parquet",
+      "sha256": "6e9d3c501a8f5079f5758c88a33eaa6fb9b41101e897b3e57c3f58b7c2f24a4e",
+      "bytes": 207379,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_31_train.parquet",
+      "sha256": "53c67a4acaef971259482f722bc98350ff4886c479ae792d7f52df8d84c12085",
+      "bytes": 1142545,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_31_tune.parquet",
+      "sha256": "81d84a2ca4649f8fe2a4849ef5ae1c118faaacfde1d1d4180632eabedb75a0a8",
+      "bytes": 173035,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_32_calibration.parquet",
+      "sha256": "5e9efeaf0cbb63c112da789948542ba6216de6cc4142314e59eece40ab988a32",
+      "bytes": 210259,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_32_test.parquet",
+      "sha256": "5bb6a5cdf197ebca4328d1059740c9af69e3fc76b884022be5558fef80f532a2",
+      "bytes": 208105,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_32_train.parquet",
+      "sha256": "06e017c7b6612528f9b12c385480ef48ad4c24b799fb90f9e83fa838c39e65b6",
+      "bytes": 1104984,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_32_tune.parquet",
+      "sha256": "b526b787b79a7e8c6c24f9874987efa6ef76dc0a3afe0fd6e0bafae071d0b3c0",
+      "bytes": 172674,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_36_calibration.parquet",
+      "sha256": "5a108b1991fcd228cf5747d39e9a7d84fb779671329f2fee4bfc9b779252af1e",
+      "bytes": 214651,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_36_test.parquet",
+      "sha256": "bc48bec85938cefb6b5c4c3ec1dbd00611abc02ff006c20dd5be38e075259a6e",
+      "bytes": 211468,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_36_train.parquet",
+      "sha256": "5efe230227d13e0cae63081563c5f98c1ebba2ab509b134dc14ef811ed83c547",
+      "bytes": 1151115,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_36_tune.parquet",
+      "sha256": "7f6669018df01a106fc6762642cb3d983c683bebba0d8166028cf29109d032e7",
+      "bytes": 175830,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_38_calibration.parquet",
+      "sha256": "8cc74d492ca78d8690f60a9a0cb04576f5a438625f12456fa6c66d70f1ac2cb6",
+      "bytes": 213410,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_38_test.parquet",
+      "sha256": "d8044bd53f5a97acc01047eff83bbbde5f33739da971dae5f9aefcfcb9f65eac",
+      "bytes": 210903,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_38_train.parquet",
+      "sha256": "152c15af2ab5b4d9269b3b938cfd19a99404ebca22a944917ac34fded639c5fc",
+      "bytes": 1147005,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_38_tune.parquet",
+      "sha256": "362a9379d394709b159340c2697c5733d14cc78cf10b234d357b88defe64be5b",
+      "bytes": 175081,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_39_calibration.parquet",
+      "sha256": "f4923ad90468dd9fa1b6d30ad7a7f7c3cec6ce8709860d11033b6c62854d13bc",
+      "bytes": 215328,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_39_test.parquet",
+      "sha256": "da685ee2aa02e3f02d7d203b2f682100c82748f0580188345f8eac97ecfbee17",
+      "bytes": 209065,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_39_train.parquet",
+      "sha256": "52155cace9d7bab024d5abd89f2a933e494170b771edd3e554da5646c38e5aca",
+      "bytes": 1137427,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_39_tune.parquet",
+      "sha256": "c2dd1062323258cd8966e9f0403c5a150c25b06605bbed9aafca439a7b94f1ab",
+      "bytes": 174487,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_3_calibration.parquet",
+      "sha256": "a94a880e4881ffcea540d20929b7a9b128070b3a2fc84b100a4435d9a88ec642",
+      "bytes": 214544,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_3_test.parquet",
+      "sha256": "24fc8f5052d39a041ffdef39ea6830b44cfb1b26aa9f5861c4dc0453adf073f4",
+      "bytes": 211552,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_3_train.parquet",
+      "sha256": "ed1e9d374e572724fa423eb4b105565809ef065b0fea2b7c236de28c3adf12a0",
+      "bytes": 1142698,
+      "rows": 59950
+    },
+    {
+      "path": "features/chicago_3_tune.parquet",
+      "sha256": "865e45d6185e6a0bc11d2850f4e8f8186fe275f13d8a8ef377e36b56235250bc",
+      "bytes": 176013,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_41_calibration.parquet",
+      "sha256": "0aa3ca4c0760319c2a7e80bb295a88aa3a6146483249932e5a6ae4751a732859",
+      "bytes": 214285,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_41_test.parquet",
+      "sha256": "b0cf5895a60078b7e255d08f335873cbf23901de903a9b4c2c761ff11678fb60",
+      "bytes": 211292,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_41_train.parquet",
+      "sha256": "ac959f5134b26b35f9fce47219ec8c43f3fcb14007d82b1186d310f9b56ec834",
+      "bytes": 1149827,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_41_tune.parquet",
+      "sha256": "e16de0adfedfa84ae8940acb1d70fa73b6668105246ddb696af07eea97321bcc",
+      "bytes": 175569,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_42_calibration.parquet",
+      "sha256": "914ce2586251b93e7c44af61bf99e465e6d3668e1be75c9e34f09fcda42f258d",
+      "bytes": 210859,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_42_test.parquet",
+      "sha256": "9b9d8e8a4297c0ef21091eae5a7aa7e53e126280c46033aaf4d112125b2c10e4",
+      "bytes": 205568,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_42_train.parquet",
+      "sha256": "67f60d1cbba0bb5fcf21619a5bb9d0e9fc1e70229f4750d88257da4824ded57a",
+      "bytes": 1093414,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_42_tune.parquet",
+      "sha256": "5cd033511384c685d4f3f504193186d2f8fbc2cc6ce7ddcb2c98f450989465ad",
+      "bytes": 171690,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_44_calibration.parquet",
+      "sha256": "05d132bbce25aab38bed702030cc9d2f71234645b64990cf26c53819f8fa4850",
+      "bytes": 214373,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_44_test.parquet",
+      "sha256": "bae4dc2330a017d1cbaef7fb924d0637ca1228418c4099339e986b7b42c490c6",
+      "bytes": 209786,
+      "rows": 17979
+    },
+    {
+      "path": "features/chicago_44_train.parquet",
+      "sha256": "4ad958bd2bef0020dac0cd5b89a680ad0dbc50c82633113a75fa2fe98a73aebd",
+      "bytes": 1196599,
+      "rows": 59956
+    },
+    {
+      "path": "features/chicago_44_tune.parquet",
+      "sha256": "a0e84909caa3a7c842e1fb634dd5985125864442dbdf28389820b0ddfb234a02",
+      "bytes": 210694,
+      "rows": 11481
+    },
+    {
+      "path": "features/chicago_45_calibration.parquet",
+      "sha256": "b81000171a06377add853dd469de1b3e6cc617e640b15abff0e15fc3ab5e1984",
+      "bytes": 213126,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_45_test.parquet",
+      "sha256": "c746bcbeb8af1309b6a024f2676e0bfe0cbee7aaeafa30706a536f74f0c08b1b",
+      "bytes": 208313,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_45_train.parquet",
+      "sha256": "3d08d6cdc139119c18bf59b3824bd8e0d5d7777037024d7e6f50a362831a7fd8",
+      "bytes": 1223736,
+      "rows": 60400
+    },
+    {
+      "path": "features/chicago_45_tune.parquet",
+      "sha256": "2d8ea58f36f53e53f6b2e622d520dc94858d5b3551404873e28766c8eb17fda0",
+      "bytes": 172934,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_46_calibration.parquet",
+      "sha256": "35adbe9bdcd98c8f2f057baf04af59f277381caf70756a4eb4755bb7057dd61f",
+      "bytes": 211320,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_46_test.parquet",
+      "sha256": "145dfaa663c437ee7478c6013c6855c872b5e09a061c193163f6dfd18d6e1166",
+      "bytes": 207469,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_46_train.parquet",
+      "sha256": "27393b91da35a0f7c6d0afb945297e107b136cfc54c67a027182b57a3ff8d48d",
+      "bytes": 1130002,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_46_tune.parquet",
+      "sha256": "4ee248f72518d8b273bc35f483062724b90673b334d7fd90d6c93987dc671e34",
+      "bytes": 173541,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_50_calibration.parquet",
+      "sha256": "a5320b7f06710e0ebd8f6e38bb1a6e24f7b4f782f1cf94acd967a9554010195c",
+      "bytes": 211375,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_50_test.parquet",
+      "sha256": "7ab4c7852f2be1f6d99f4da7f4472173ca28e61c92d7c12b9b8c6e01c6f970da",
+      "bytes": 206898,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_50_train.parquet",
+      "sha256": "a0fe1485eece278c6aa607a108c81f42785ab34dbd085a3d394ff2eacbe6ca49",
+      "bytes": 1104865,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_50_tune.parquet",
+      "sha256": "7bcde3de81eff1f6201adf60be377e3d216897fd091403456255704f2a33f833",
+      "bytes": 172510,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_52_calibration.parquet",
+      "sha256": "5f19939a8556de92cb5d9ec5116da6202f6f69b5e9a345ce1243a351c83af065",
+      "bytes": 214745,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_52_test.parquet",
+      "sha256": "c550840de90339efff4ad84d95bbd4c4c006c24c52fae313d9a022571c0b5493",
+      "bytes": 214953,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_52_train.parquet",
+      "sha256": "f070c5da32ec132398f75372ad2f79343ce5cf2078073027f1f294c9e4ae389f",
+      "bytes": 1169895,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_52_tune.parquet",
+      "sha256": "e03b1d5ddcb5c93c595429ae2c984f7739a15a069cda3c1ae30f1656d1ec0bce",
+      "bytes": 176482,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_53_calibration.parquet",
+      "sha256": "471bcbdb5e3d182818f1143c75d45772c1c4de22cc72c3910475998d5587e3e6",
+      "bytes": 217915,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_53_test.parquet",
+      "sha256": "b8882e11649e7223e6d8ffb51f1975c1afd3d2953447dee804ea73d731e6b0e1",
+      "bytes": 212606,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_53_train.parquet",
+      "sha256": "76071c58d4ab0e4791360f5a90b6c8b40bc64dc91ca7eacbcd506ebd23fa0276",
+      "bytes": 1138904,
+      "rows": 59518
+    },
+    {
+      "path": "features/chicago_53_tune.parquet",
+      "sha256": "c02f11f5d55528fec280f27ec0ada35191f095ee0d9723f0d033cba44dff87b1",
+      "bytes": 175438,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_55_calibration.parquet",
+      "sha256": "b7e740dfc4e73630875282ddc9cb7157ee4579b40ece34997a9c0ff83fc8f54f",
+      "bytes": 209999,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_55_test.parquet",
+      "sha256": "2134f27915775fb31f2aaa54d336b5324ebc5211aa3329b4184324eb8ee873bf",
+      "bytes": 206401,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_55_train.parquet",
+      "sha256": "1a6af683ba1bf1293758d297f7722667d593970de5168c32c24dbc9dedbfde9c",
+      "bytes": 1090850,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_55_tune.parquet",
+      "sha256": "d3e4c3d15fa46999ed207eaeb88afed08ed0554156baa1baedc6bf35f8c21a9f",
+      "bytes": 171752,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_56_calibration.parquet",
+      "sha256": "d7eb34e756025936bd39db503144402ef4cfc2682c6b571246b60d95ebc47d26",
+      "bytes": 214686,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_56_test.parquet",
+      "sha256": "f6d53769967fca2d1b521289c49e0eaf3c673ce3d809b113c51afe1ba42b9c57",
+      "bytes": 211816,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_56_train.parquet",
+      "sha256": "227b6fa06a1bf5e5cc26c6d881dafa439ecc1164ccfdc1cc25674430def35a67",
+      "bytes": 1158498,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_56_tune.parquet",
+      "sha256": "284218298698ef2d2ffdf03fb5e435271fe960e7cb47d073c4efbf2fcdfeebf2",
+      "bytes": 175331,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_57_calibration.parquet",
+      "sha256": "9ea2f0d1300413513f7bfb76b1854593e63ef45537ebedc73eab12e73df99848",
+      "bytes": 211820,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_57_test.parquet",
+      "sha256": "071ffd996e7c8a946e35761b6c6b817b424948303a23f7568a10eeb128a37ad0",
+      "bytes": 207715,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_57_train.parquet",
+      "sha256": "7d48c9847a72eca9c37e9347346ff5b70bf80fbc313bae070380a2f947014cf7",
+      "bytes": 1118305,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_57_tune.parquet",
+      "sha256": "ca36a77a7555b3e4f294150ad6403819cec21016c54ad6fe282d2f203095e7dd",
+      "bytes": 173117,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_5_calibration.parquet",
+      "sha256": "fb7d158abfb6daa94fd454cea9e558be98766bb176bb7a453ff3f4618f0a59ed",
+      "bytes": 213038,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_5_test.parquet",
+      "sha256": "f084c70e0d181f66613a77d2cd1ff1d8cf55b40d9835f62297015635f7cf54d0",
+      "bytes": 207677,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_5_train.parquet",
+      "sha256": "c16f04d57079aa20beb469d0de808a8a8918918fd2d53c199f4c8f01c1455bb9",
+      "bytes": 1139081,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_5_tune.parquet",
+      "sha256": "a77a8c3b6e21ecf9edff50bed930f7f9638a183e292e9d2317b6dd1a6a58b608",
+      "bytes": 174684,
+      "rows": 12039
+    },
+    {
+      "path": "features/chicago_7_calibration.parquet",
+      "sha256": "33225543d6b175a3522e6fd0295c519c8fe24d5595a0bf5f5bec712de581629a",
+      "bytes": 213382,
+      "rows": 12015
+    },
+    {
+      "path": "features/chicago_7_test.parquet",
+      "sha256": "0112eb85dbeb10b3d5f26f6bbe0ecf95101269338f731332cb419fad35b99cb8",
+      "bytes": 209629,
+      "rows": 18075
+    },
+    {
+      "path": "features/chicago_7_train.parquet",
+      "sha256": "ccef1a4480c74e2b376db0b83d14ba3c8dd385976c87d295b780f509d2b81a7c",
+      "bytes": 1147139,
+      "rows": 60406
+    },
+    {
+      "path": "features/chicago_7_tune.parquet",
+      "sha256": "0e129b16f335d8a4a4ff08516a100aabcf5051d20d2e69db52c68ef2bec04eba",
+      "bytes": 175025,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_14_calibration.parquet",
+      "sha256": "fb1e0e84359c796ecb0a11e4cd0c0e994bf822b2edeb32a1f4638d088a0bc9d2",
+      "bytes": 97125,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_14_test.parquet",
+      "sha256": "9c066da37e507c8749de127ad45abaea689fa44bffafb5080946fe1a8c0d45f7",
+      "bytes": 106353,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_14_train.parquet",
+      "sha256": "1c4cfc2939c6ada4d2ead97a8439edabc047e7c080b7733b7c27046f8356af3e",
+      "bytes": 536544,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_14_tune.parquet",
+      "sha256": "64fda74bc72deaa9a68e8d22ab23e956266d50851185f1af6933f290d4b3da96",
+      "bytes": 91722,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_15_calibration.parquet",
+      "sha256": "2a4447a7da8624a17348529415eabe897b437fa314f5464586e2d0b5ae6ceacd",
+      "bytes": 97359,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_15_test.parquet",
+      "sha256": "4116c043f1e69eedf43add7eb3bb8996742a1e3865d2ab413bd52cb68bb1092e",
+      "bytes": 106609,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_15_train.parquet",
+      "sha256": "883d3b0e63432c4cbe0d3a49ba63092bd7a6eab33f0cbdbd77bf97cb15ab7efa",
+      "bytes": 539692,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_15_tune.parquet",
+      "sha256": "e903137d364ee9b3cf8090f272fe54010d77f684abad8103998663cc68ddb6c9",
+      "bytes": 91812,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_17_calibration.parquet",
+      "sha256": "8e0c7e852cb43d8cea9ae9cecab24f5ed4cb7049067a82981a5f29198aac011b",
+      "bytes": 97887,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_17_test.parquet",
+      "sha256": "16ca8208eb4fb7f9cdb23efd00bd8dbbe60a59a1f8a06e2d6f89c75d6b9c8feb",
+      "bytes": 107237,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_17_train.parquet",
+      "sha256": "7e6a970661a77a88c9aeeba9fd57abb96f09a0fa171df2a8b0a2f8be5411326d",
+      "bytes": 549309,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_17_tune.parquet",
+      "sha256": "b489796662559d55d942b175f2d021aaaaf654657d1f114fd4c581bee147f2c2",
+      "bytes": 102819,
+      "rows": 12033
+    },
+    {
+      "path": "labels/chicago_19_calibration.parquet",
+      "sha256": "8e47a4389ec0a004284eb72592279241975e585d6692584485c29b652fd96f31",
+      "bytes": 97234,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_19_test.parquet",
+      "sha256": "994d90e9c8aacc8fefd70e80e2422dfed1812bea0705b50089faead7d0d6344c",
+      "bytes": 106341,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_19_train.parquet",
+      "sha256": "6750aa85d3c3ddbbdc3c92fb9505e5707c4558ccbbb91f70ba7bd334ed13e61b",
+      "bytes": 539284,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_19_tune.parquet",
+      "sha256": "7bed7df720eb2c2c17668a63cad57bfa411cbe6fd9c9a4bc89331b95545f8a89",
+      "bytes": 91811,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_20_calibration.parquet",
+      "sha256": "eaaec307a139392df3141ccc7edacdb8f03eda9505ee829cf5e30f3a1d8d648d",
+      "bytes": 97327,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_20_test.parquet",
+      "sha256": "7ef8942d0e2af60f0513437dd6b0b88fc49a74b51eafe35b48b55b9b6e52b871",
+      "bytes": 106581,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_20_train.parquet",
+      "sha256": "72c36d3407656d4659ab1790e3c17f9d959de5366af2bb5725e7107e1c98b09b",
+      "bytes": 542468,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_20_tune.parquet",
+      "sha256": "9fd4e3ebe617c7ee1fe93330283a94ed9690c407f60006c5109a6a6ad8e3b1be",
+      "bytes": 91858,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_21_calibration.parquet",
+      "sha256": "de04bd3e95d4995d1602c0d8a694a548cd495b87f8a3c4ab8a497dfe5a441f3b",
+      "bytes": 97255,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_21_test.parquet",
+      "sha256": "69ddac976e7cebb5f2043f5e180d975b336ee4234af277a51ecb6d945d156ed4",
+      "bytes": 107323,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_21_train.parquet",
+      "sha256": "6bf0cf0bfb333f74fca03a6656e6b5ee25a1d8c479565b4a117650cf8c7ce32e",
+      "bytes": 547886,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_21_tune.parquet",
+      "sha256": "524dbe3522abbe85f2dc4e7812ff8266a03261c48e0deefd35375389677624fc",
+      "bytes": 92280,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_22_calibration.parquet",
+      "sha256": "42f5dd82680e2b64296f33b43f11c91b4f04622cf37b32f36b53efe956a0e92f",
+      "bytes": 101652,
+      "rows": 11637
+    },
+    {
+      "path": "labels/chicago_22_test.parquet",
+      "sha256": "6c9d301b429a6a1dee7d8a1999ab5c59527c02a92283bf9091c00481e4a9181e",
+      "bytes": 106518,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_22_train.parquet",
+      "sha256": "5df6358dde0ac08e2b3ef1d70b9038a01b83c2161a0457830b43d6b36a2fb29a",
+      "bytes": 536387,
+      "rows": 60046
+    },
+    {
+      "path": "labels/chicago_22_tune.parquet",
+      "sha256": "e2fea9fe6719a53e8bae148e975f4d05699f0cc961a62e751c48c40c3c8f143e",
+      "bytes": 100609,
+      "rows": 11937
+    },
+    {
+      "path": "labels/chicago_23_calibration.parquet",
+      "sha256": "cdd0417a394308f9802f52a41ee6de40676bf49b66f4aed370c036853479e590",
+      "bytes": 97066,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_23_test.parquet",
+      "sha256": "5d9fc8b5aeb1f2fd0c1c3584d57bd44fe279f667e0d12906db9415a9069cd5ab",
+      "bytes": 106248,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_23_train.parquet",
+      "sha256": "60f27e648358f05b31464cb48bb9588e89a132635b96e6950a2bae8ea4e3e3c7",
+      "bytes": 538235,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_23_tune.parquet",
+      "sha256": "0937bf9b4632a1035902649fc5d85c59c327952a068fd4b35193838245f71f62",
+      "bytes": 91744,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_24_calibration.parquet",
+      "sha256": "9f229c8dfcc0222ca62b6c8fda1d3899d05e6da7e7e839a6a643b3d1bf6344bc",
+      "bytes": 97560,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_24_test.parquet",
+      "sha256": "e0b79a2167eee9e55ae56633d3031101449f51c02e444b7fa2e8bf58c6edb00e",
+      "bytes": 112942,
+      "rows": 18021
+    },
+    {
+      "path": "labels/chicago_24_train.parquet",
+      "sha256": "141b1b871c879995c686fb98a4ad2646e66fa3965b33d2a22691f151308ab455",
+      "bytes": 517054,
+      "rows": 59938
+    },
+    {
+      "path": "labels/chicago_24_tune.parquet",
+      "sha256": "6a478e7e0870cfcb67045760efb60378c280a243412200add96eb875ab0faf96",
+      "bytes": 92153,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_26_calibration.parquet",
+      "sha256": "38db05780f4d6c7b614f25e0c24cd4c1882702910e79a4d64eed10645e59c19c",
+      "bytes": 99743,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_26_test.parquet",
+      "sha256": "c38bd17384e5f8a4d47844693145bac86cf32ba1b7ea5512c32e773f34eca95f",
+      "bytes": 107933,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_26_train.parquet",
+      "sha256": "080c1501b9d54c32d179b79b03a482eeff92ce0d33ad3fd6d1b917a83d7b97ca",
+      "bytes": 516453,
+      "rows": 60400
+    },
+    {
+      "path": "labels/chicago_26_tune.parquet",
+      "sha256": "3623e0f385994848f3b60296233883a36815d9f49623beb1f9ecd2af306c70d2",
+      "bytes": 92678,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_27_calibration.parquet",
+      "sha256": "3a268a26dadc66b9191b28a86e07848abf1bf0bc2f347f926c0e234d1ef0b004",
+      "bytes": 97190,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_27_test.parquet",
+      "sha256": "89e73f91b7f77633a2d7a18f8265cb5d5ca1a24c91d87fc7aeab98e150db7b41",
+      "bytes": 107125,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_27_train.parquet",
+      "sha256": "9f40998d183dd4ff697f889af131b222714a6762100509d99949b054de78a05d",
+      "bytes": 518456,
+      "rows": 60226
+    },
+    {
+      "path": "labels/chicago_27_tune.parquet",
+      "sha256": "331f5cdafe1f5e90c66347374371cab109c277cdce4ea2491f23376a3c4d2d7e",
+      "bytes": 92285,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_28_calibration.parquet",
+      "sha256": "1114602bc7170ad3e4a8df6dc29b41f5f56842d1866791d0e71f55da5b6a967e",
+      "bytes": 97100,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_28_test.parquet",
+      "sha256": "7b69e978e8a4077993f3390241e9032e9e7d2061c1cf6c269765293029eb3e18",
+      "bytes": 106284,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_28_train.parquet",
+      "sha256": "91e5de59cf7ddb8c2c3608b350be73357284574bd98064db232084fed7e7f203",
+      "bytes": 539839,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_28_tune.parquet",
+      "sha256": "418d39d6aa62ffb3861495b3de84855417cca34c947697411556408a798c80cc",
+      "bytes": 91673,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_29_calibration.parquet",
+      "sha256": "191feda4df902c9a83c6ef7eabba3335f4f6e827d53b34ce09df3b2cbd1650ea",
+      "bytes": 103083,
+      "rows": 11883
+    },
+    {
+      "path": "labels/chicago_29_test.parquet",
+      "sha256": "831d53598cfaab5f464dca1d381088224130b815f17a759524f5f52873db955f",
+      "bytes": 106695,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_29_train.parquet",
+      "sha256": "5e679e67f37af45e3d471e420167cf0cb94af374316044fac07200ce6220dc19",
+      "bytes": 509710,
+      "rows": 60016
+    },
+    {
+      "path": "labels/chicago_29_tune.parquet",
+      "sha256": "a81cfb0cf2a54cb595c771ac06aabab76ef793456865539fc36b095d237556fd",
+      "bytes": 91890,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_31_calibration.parquet",
+      "sha256": "101bd2e57f976d61307df1c15b07c22adf29c31effc794c49961d6099679926b",
+      "bytes": 97296,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_31_test.parquet",
+      "sha256": "4ebbb4eccbdc4466d39d0f57b956cba40267e1de09356b899f1cbf6902218e0b",
+      "bytes": 106452,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_31_train.parquet",
+      "sha256": "b5108a8b5a9f143e45f3dbbb1641aa4f2655a0b6c9ba97b8c86c721e9ddcf738",
+      "bytes": 549689,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_31_tune.parquet",
+      "sha256": "0ca11b3ee160ccf038e2000dc5ed8bcd6f6308c19576ea7ec359241ac8df53f2",
+      "bytes": 91730,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_32_calibration.parquet",
+      "sha256": "296dc956b2ec28236bbd0de5eb6d5661a70213294a427577b17431928eddda3b",
+      "bytes": 97242,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_32_test.parquet",
+      "sha256": "cdbead3b2392946e1a77e1284366fc07a2d8eac81bcc52cf26223cc6d4b939eb",
+      "bytes": 106712,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_32_train.parquet",
+      "sha256": "d3f6ca428ba3acdbbcde81082e7c75d98aff830ca4c63443161c1d1ff8ada3a7",
+      "bytes": 540230,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_32_tune.parquet",
+      "sha256": "475da3be6831184cb0e86b01a7cf1183793349854a4f7b2bc66eca398cee29c0",
+      "bytes": 91832,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_36_calibration.parquet",
+      "sha256": "85009734bac643f10d40aad0dda96bbfb7fbfc9d7a00148efd3a90194761c8cb",
+      "bytes": 97857,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_36_test.parquet",
+      "sha256": "47d17f06e880690a0310725e8002016eb4e2add11e47a320df46988424a572d9",
+      "bytes": 107420,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_36_train.parquet",
+      "sha256": "bf0f78128c529de04fab8da5c94137b3a82b14834939a361d7ba916ee6d1549c",
+      "bytes": 552067,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_36_tune.parquet",
+      "sha256": "4bcedd8359f4fbaa476da3f84e167a29b1fbc787c77990b22fc39b391bce13b2",
+      "bytes": 92743,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_38_calibration.parquet",
+      "sha256": "71466150df8d45caa163ad9c95847e92045a10022a6d229bccf3eaec4aec446c",
+      "bytes": 97869,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_38_test.parquet",
+      "sha256": "5def70d851b4cc57ac8d1fa7737bc33777f314de82f18cbf52304b29f730a40a",
+      "bytes": 107333,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_38_train.parquet",
+      "sha256": "177d7b0cf428131ddbc04c9651bc4ccad8dfbcd55906b05e32e661def701673c",
+      "bytes": 550015,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_38_tune.parquet",
+      "sha256": "d7b745aa1e790fb8eefb4ca50dcca8888c542a6b5d1861e459d1f909c41c6ba5",
+      "bytes": 92493,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_39_calibration.parquet",
+      "sha256": "8ac483381f59eee1304c40b4421ee49c3afccf77be38776678edb6f6b8e1eacf",
+      "bytes": 98275,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_39_test.parquet",
+      "sha256": "10fb0b654b4bbc95b528a61bc5d8eb1ff63ce547d73d583fa3bdd92ec4bad351",
+      "bytes": 107054,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_39_train.parquet",
+      "sha256": "3a21719ff0c13d32a3f7ab8da3e1f54dd7073a50a528ed78fbb3f9d0cc365f6e",
+      "bytes": 548212,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_39_tune.parquet",
+      "sha256": "e597f40dacae9934ca2e870e2e61cea4417fcf113c0faea694e0162461070417",
+      "bytes": 92457,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_3_calibration.parquet",
+      "sha256": "5384f02b3e1a34b8efe83a9421e33ae0f630cbd8cd0d1a8ba2c2fa5e370a8566",
+      "bytes": 97973,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_3_test.parquet",
+      "sha256": "898670ac05230940053cd6ccb7660fd6c5809fac3395bcbca25dacec59105218",
+      "bytes": 107169,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_3_train.parquet",
+      "sha256": "e2953c8daaa488ac5153a3eff3189e6f278e6e1e6e5f9ff252d3289d96bd889d",
+      "bytes": 547114,
+      "rows": 59950
+    },
+    {
+      "path": "labels/chicago_3_tune.parquet",
+      "sha256": "e1c57e27dcad0a97a3048f1d4fd283192c5d8d2f5fb616176a73a7a2fe7ada68",
+      "bytes": 92523,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_41_calibration.parquet",
+      "sha256": "9ecff61b2c9e51c66ab098e31652b2995c222c9c369583c9d1cd4f04ae92fb97",
+      "bytes": 98083,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_41_test.parquet",
+      "sha256": "a12ac285daef8a736426eed4d6830478c025f1b8a724cf9a9284a3b49695238a",
+      "bytes": 107565,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_41_train.parquet",
+      "sha256": "4318471a5bceabddf5f318da01a73148e8f1cae3515c600077bbad04f713dcae",
+      "bytes": 552474,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_41_tune.parquet",
+      "sha256": "2cbcec0f8681959ef472ffddd434073c20e962f0a6da8bcc3966a68cef39a74b",
+      "bytes": 92617,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_42_calibration.parquet",
+      "sha256": "1cd93a54235e95ccfd6bf0b7539310c0251e6536fcbf321588efe304b44c71d9",
+      "bytes": 97000,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_42_test.parquet",
+      "sha256": "244fb21b64d89ead02629d83890b707263b5903889a85ee7acbe130d36082141",
+      "bytes": 105977,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_42_train.parquet",
+      "sha256": "065a4145798dcab63187f38808158208c5576a478a39f3a10dfe5894b87b8c1b",
+      "bytes": 534920,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_42_tune.parquet",
+      "sha256": "61b5fee4faaec6852e70f5cbcb9a3b8f1ba78717ebea030ff1c5be2c0dd98265",
+      "bytes": 91492,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_44_calibration.parquet",
+      "sha256": "c241b60d28f7117c73a28c13fef3f71d21e2b86a0c7c9b56cb3bfbedcd52df50",
+      "bytes": 97942,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_44_test.parquet",
+      "sha256": "2158165729bf5d3806d8c3970dbde677f3249d71578d66be531d7eed35b224b1",
+      "bytes": 107012,
+      "rows": 17979
+    },
+    {
+      "path": "labels/chicago_44_train.parquet",
+      "sha256": "ffd279b238c1f8694a3d5a9aad7e3c5c81743a07a81d62272770c0321a13b7d2",
+      "bytes": 515960,
+      "rows": 59956
+    },
+    {
+      "path": "labels/chicago_44_tune.parquet",
+      "sha256": "39c74fc3e25d3135e0b91a1badb34bd490b312ef41d1daa3fbe7410ab7700ff5",
+      "bytes": 88430,
+      "rows": 11481
+    },
+    {
+      "path": "labels/chicago_45_calibration.parquet",
+      "sha256": "3d6d03e9715a8784b129fa2be15e27f349126bf58f78fbf5cea735d9f27d06c6",
+      "bytes": 97342,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_45_test.parquet",
+      "sha256": "fb8a742c7415d68d22211327f7a9773fcbec223fd453264d43f88f087157f4bb",
+      "bytes": 106392,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_45_train.parquet",
+      "sha256": "8b799d95424ed041414d2012fa2b14eca97feb4611d694eeee20f553f2729e96",
+      "bytes": 502527,
+      "rows": 60400
+    },
+    {
+      "path": "labels/chicago_45_tune.parquet",
+      "sha256": "89f3eff87f7c597dcf1e151d84979015775553197e2bfd7a6bfb05afba0c7dfc",
+      "bytes": 91651,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_46_calibration.parquet",
+      "sha256": "b86ea1d6e0e10c885cbbf5428cb75f31526a72e5f9bf3301765f63bb75035dd1",
+      "bytes": 96968,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_46_test.parquet",
+      "sha256": "302a2ce652ec2c4c8aea0058f5f85aca04e5dbed6a02ccf2ee99c0ae60161b68",
+      "bytes": 106447,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_46_train.parquet",
+      "sha256": "3606e5ede3b2958dc82958253047c9217bdcb1ab2784baf19f33518ea71b781a",
+      "bytes": 546065,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_46_tune.parquet",
+      "sha256": "37a0c018f586695d19691f4f8108936cc3ecb717d059c8e1425bc9d4e4850327",
+      "bytes": 92054,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_50_calibration.parquet",
+      "sha256": "05aec81a65da4e7a9d848eb32dfe4f84698fc7ec899473f3b261b491c92e67d4",
+      "bytes": 97293,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_50_test.parquet",
+      "sha256": "dd996b5e6b8815067a86c184c80599fcc671a422b321db2005565babe90adf0a",
+      "bytes": 106352,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_50_train.parquet",
+      "sha256": "1f276cb8b5688848356823b32c8f683e6ec921364b8c6b5f48faeb11f0d7c90e",
+      "bytes": 539457,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_50_tune.parquet",
+      "sha256": "e1276100dce0f5f44618e30a250600b6f6ee45e9a0cad62f81c70ddf79c9892f",
+      "bytes": 91858,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_52_calibration.parquet",
+      "sha256": "d2c8a56e28547291b23f0e8467bdfb9e0521bed497513a036a613fbb337874f4",
+      "bytes": 98093,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_52_test.parquet",
+      "sha256": "c84d20160c5763bc8f8859c1b8f6732fcdc5c1ae91ef9763828623799464ac98",
+      "bytes": 108479,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_52_train.parquet",
+      "sha256": "57cd50a12116642e63715207ded30020805e3571368019c6c0d8f30c6e1867f4",
+      "bytes": 558349,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_52_tune.parquet",
+      "sha256": "5069bfade8534690da8ebf4ef26b706d412b915493e25317c041ee93a99790ec",
+      "bytes": 92889,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_53_calibration.parquet",
+      "sha256": "fcff886ddf6de67c08f0b553a7fbf5c5778d5cda07b2c1e54ccfb6903e9a243a",
+      "bytes": 98717,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_53_test.parquet",
+      "sha256": "82146571d5231e297d513dba2c438b14f7c5ab8dd0ec874702aa5b35dd1a0765",
+      "bytes": 107826,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_53_train.parquet",
+      "sha256": "c475febc1e2211e08a9f02f09dee04f4d7dfb2e0532ac73123e704f3ed19535c",
+      "bytes": 544802,
+      "rows": 59518
+    },
+    {
+      "path": "labels/chicago_53_tune.parquet",
+      "sha256": "0c6cc09e0ae402f25bd11de5bc5adb6aed9e598a43080b5117c96f3b3e09e54a",
+      "bytes": 93020,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_55_calibration.parquet",
+      "sha256": "34d90382a08277ef5c37097238b742d3c15f6270a59e9c4570dd0ce4b73d3b21",
+      "bytes": 97138,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_55_test.parquet",
+      "sha256": "d6fea0804a8793fb589045c3d0ce566f32eb276e14512eaf639f4bb31b8925e5",
+      "bytes": 106293,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_55_train.parquet",
+      "sha256": "33e247722efbe71ef150fefbb9a06c8e8de17579cea23596d0af6c8c04ef5429",
+      "bytes": 536097,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_55_tune.parquet",
+      "sha256": "fa5133d59ecbd416c8d7669d76fb07e03053877242262f312c058c5a9319774c",
+      "bytes": 91552,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_56_calibration.parquet",
+      "sha256": "2147a186da226981aef14421430279cd41f9c2f3e8385ef4c96699a7e34a9cba",
+      "bytes": 98122,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_56_test.parquet",
+      "sha256": "c5b216783c2fa09c8439c3d0d982e36884798d20c3ce22503e61e48d4d24b4d2",
+      "bytes": 107716,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_56_train.parquet",
+      "sha256": "7162d23ce3ce8c4dfeec71034bd614f3313d4938c00e809034c93a76d10a892f",
+      "bytes": 553751,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_56_tune.parquet",
+      "sha256": "1d816a79163b07833fd84a91646010196db9215d0fc3e6f04c0e4ad6c791bed4",
+      "bytes": 92620,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_57_calibration.parquet",
+      "sha256": "7909a3a6883a052ae4dc12082918ce222328fb78507afd15610a9f8fa0c3c197",
+      "bytes": 97155,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_57_test.parquet",
+      "sha256": "4dc9ee67464344f5a4f438425341acde63b4d7a77804e0298e57d0520ec14289",
+      "bytes": 106320,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_57_train.parquet",
+      "sha256": "e980751e8124fdd6d3938a11e010f7ceb09ae2b05cc69893a75412f46887e9f9",
+      "bytes": 539525,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_57_tune.parquet",
+      "sha256": "eb33272e034b5e3522e0a0dc5c5c91ece98840ce57e019fb95be130873dbb8cd",
+      "bytes": 91679,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_5_calibration.parquet",
+      "sha256": "e1c944234b8a2942a1c0b7d601e6b426b3176b3d5fbb552ca691ba2e3b9da94a",
+      "bytes": 98000,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_5_test.parquet",
+      "sha256": "ff1c9254d0f44a3997a6a42021d761c30c7aa50952c7dbe29afe37e86cf6c2e0",
+      "bytes": 106501,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_5_train.parquet",
+      "sha256": "8dcab49129d01f9e0c78e05305c39ddb78fc31ed2e814a1eb78b1592fca6b95f",
+      "bytes": 552166,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_5_tune.parquet",
+      "sha256": "b860d1a47a55fd1b1ed881cddff7c3c6e238dd59d23ce961e9a1cf17c7b8d1e3",
+      "bytes": 92286,
+      "rows": 12039
+    },
+    {
+      "path": "labels/chicago_7_calibration.parquet",
+      "sha256": "a741673b04860e0d5165aa4615b3e0b6de45f061ccf3ca2d7982b953b5eaf7a9",
+      "bytes": 97418,
+      "rows": 12015
+    },
+    {
+      "path": "labels/chicago_7_test.parquet",
+      "sha256": "8d39c6141150cee8d6a91e75c82876694e7dc7121a5e0c675165e346d72b7f68",
+      "bytes": 106746,
+      "rows": 18075
+    },
+    {
+      "path": "labels/chicago_7_train.parquet",
+      "sha256": "038f280b2242483134e59d8c170c6f83747a999a52a51e511f7ca196678a5941",
+      "bytes": 553730,
+      "rows": 60406
+    },
+    {
+      "path": "labels/chicago_7_tune.parquet",
+      "sha256": "d29ccb4f96a2a89fa631092229a3547cc7d576f1d05f003e5a15eba305861c0a",
+      "bytes": 92489,
+      "rows": 12039
+    },
+    {
+      "path": "mapped_app32_requests.parquet",
+      "sha256": "3b5a8f9da9bc195886a3551070b5378f6e6ed6183b5d498ad2e5a63c7fba46ed",
+      "bytes": 1834898,
+      "rows": 36007
+    },
+    {
+      "path": "OD/training_expanding_week_od.parquet",
+      "sha256": "c467df5b92354d0d1756cc06fc6649546fe66b5efe85ee54739190ba5706fb5e",
+      "bytes": 15429,
+      "rows": 10240
+    }
+  ],
+  "feature_schema_sha256": "abcc8d5af94a2301f148dfcff4d0725aeb0f489513cffd65745a1a2637d2b81f",
+  "contract": {
+    "version": 1,
+    "status": "audited_feature_table_contract",
+    "base_protocol_sha256": "7f1e0140c9dbd28bb537f17d7e09c64eaaad1ce8c9945a8b699bb62cdacb0441",
+    "cohort_sha256": "934d2591e8e19c701d1a45f03c9053bdc09a7273e1fa62242ef6f8f03d052887",
+    "horizons_minutes": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60
+    ],
+    "chronological_splits": [
+      {
+        "split": "train",
+        "start_utc": "2021-05-03T05:00:00Z",
+        "end_utc_exclusive": "2021-07-12T05:00:00Z",
+        "weeks": 10.0
+      },
+      {
+        "split": "tune",
+        "start_utc": "2021-07-12T06:00:00Z",
+        "end_utc_exclusive": "2021-07-26T05:00:00Z",
+        "weeks": 1.994047619047619
+      },
+      {
+        "split": "calibration",
+        "start_utc": "2021-07-26T06:00:00Z",
+        "end_utc_exclusive": "2021-08-09T05:00:00Z",
+        "weeks": 1.994047619047619
+      },
+      {
+        "split": "test",
+        "start_utc": "2021-08-09T06:00:00Z",
+        "end_utc_exclusive": "2021-08-30T05:00:00Z",
+        "weeks": 2.994047619047619
+      }
+    ],
+    "feature_request_grid": {
+      "interval_seconds": 600,
+      "phase_seconds": 360,
+      "phase_source": "Frozen original app32 audit, learned from training only"
+    },
+    "live_freshness_seconds": 300,
+    "replay_freshness_seconds": 900,
+    "lag_minutes": [
+      10,
+      30,
+      60
+    ],
+    "lag_asof_max_age_seconds": 900,
+    "live_freshness_definition": "Serving cache receipt age and provider feed last_updated age must each be <=300s when present; this is a serving contract, not a claim that the five-minute validation collector implements a live cache",
+    "lag_policy": "Latest valid snapshot <= request_time-lag; never nearest future; missing lags remain native NaN with flags",
+    "feature_metadata_policy": "Capacity/coordinates/service metadata taken from the exact causal base snapshot, not future station-map intervals or 2026 metadata",
+    "label_policy": {
+      "tolerance_seconds": 300,
+      "method": "nearest valid strictly after request, ties earlier, same split, reject >50m relocation",
+      "missing": "exclude, never zero or arbitrary forward fill"
+    },
+    "label_task": "Bike/dock unavailability; known closed target is unavailable; missing target excluded",
+    "base_policy": "Known valid and In Service causal base; no label peeking in feature builder",
+    "B2": {
+      "cell": [
+        "station_id",
+        "weekday",
+        "hour"
+      ],
+      "minimum_cell_observations": 20,
+      "source": "valid training snapshots only",
+      "sparse_cell_fallback": "Station overall rate from same fit period",
+      "held_out_fit": "All train before train end",
+      "training_replay_fit": "Only prior complete training weeks; first week has no B2 and requires B1 fallback"
+    },
+    "OD": {
+      "minimum_training_trips": 20,
+      "duration_seconds": [
+        60,
+        21600
+      ],
+      "both_trip_times_in_training": true,
+      "fallback": "1.3 * haversine_distance_m / 4 m/s, as proposal; zero-distance self pairs retained and flagged"
+    },
+    "weather": "Excluded: historical issue/publication provenance remains unresolved",
+    "split_roles": {
+      "train": "Forecaster fit and future policy training pool",
+      "tune": "Hyperparameters and planner/policy development",
+      "calibration": "Final probability calibration only",
+      "test": "Final held-out evaluation"
+    },
+    "policy_split": "No fifth chronological policy partition; any policy training uses train-only out-of-fold forecaster predictions, not supplied by this feature audit",
+    "limits": [
+      "Recorded source timestamps stand in for unmeasured historical publication latency",
+      "Prospective 2026 identity filter is external deployment scope, not test-label selection",
+      "Feature-table audit is not model or replay-policy performance validation"
+    ]
+  },
+  "raw_tables_outside_Git": true,
+  "table_root": "external 2021 sample / processed/final_pipeline_v1",
+  "current_audit_utility_sha256": "65b2bb38850068d157d3c6576f9820a8ca95e2bf67945a5288b76cceecb428d1",
+  "OD_training_week_source": "Past-only OD fits; unsupported distances require request-time metadata",
+  "producing_feature_source_sha256": "6b69ff3f9eb51817dc2877346a78763c44af3c0a6409a63a6a4edd58000b91c4",
+  "producing_source_preserved_external": "provenance/feature_build_source.py",
+  "post_build_auditor_sha256": "38cbb45ab945322f0a0c88c02cf696b31a661ea0d55ab33fbb778442653dc5c9"
+}

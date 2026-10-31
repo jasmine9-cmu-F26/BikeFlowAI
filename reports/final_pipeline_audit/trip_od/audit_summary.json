@@ -1,0 +1,170 @@
+{
+  "raw_rows": 2887990,
+  "named_app32_endpoints": 38413,
+  "mapped_app32_trips": 36007,
+  "eligible_training_rides": 18571,
+  "both_endpoints_outcome_observable": 34854,
+  "station_count": 32,
+  "mapping_rate": 0.9373649545726707,
+  "mapping_denominator": "Trips naming both historical app32 endpoints with departure in declared window; not full-network trips",
+  "observed_training_OD_pairs": 806,
+  "OD_pairs_20plus": 229,
+  "all_ordered_app32_pairs": 1024,
+  "fallback_pair_proportion_all": 0.7763671875,
+  "fallback_pair_proportion_observed": 0.7158808933002482,
+  "request_fallback": [
+    {
+      "split": "all_mapped",
+      "mapped_requests": 36007,
+      "geometric_fallback_requests": 6979,
+      "eligible_duration_requests": 33360,
+      "eligible_duration_fallback_requests": 6958,
+      "fallback_proportion": 0.19382342322326215,
+      "valid_duration_fallback_proportion": 0.20857314148681055,
+      "interpretation": "Support from final training-only OD table; train percentages are descriptive coverage, not causal within-training replay"
+    },
+    {
+      "split": "train",
+      "mapped_requests": 20117,
+      "geometric_fallback_requests": 3439,
+      "eligible_duration_requests": 18578,
+      "eligible_duration_fallback_requests": 3423,
+      "fallback_proportion": 0.17094994283441864,
+      "valid_duration_fallback_proportion": 0.18425018839487567,
+      "interpretation": "Support from final training-only OD table; train percentages are descriptive coverage, not causal within-training replay"
+    },
+    {
+      "split": "tune",
+      "mapped_requests": 4725,
+      "geometric_fallback_requests": 1031,
+      "eligible_duration_requests": 4376,
+      "eligible_duration_fallback_requests": 1029,
+      "fallback_proportion": 0.2182010582010582,
+      "valid_duration_fallback_proportion": 0.23514625228519195,
+      "interpretation": "Support from final training-only OD table; train percentages are descriptive coverage, not causal within-training replay"
+    },
+    {
+      "split": "calibration",
+      "mapped_requests": 4764,
+      "geometric_fallback_requests": 1073,
+      "eligible_duration_requests": 4460,
+      "eligible_duration_fallback_requests": 1071,
+      "fallback_proportion": 0.22523089840470192,
+      "valid_duration_fallback_proportion": 0.24013452914798206,
+      "interpretation": "Support from final training-only OD table; train percentages are descriptive coverage, not causal within-training replay"
+    },
+    {
+      "split": "purge",
+      "mapped_requests": 12,
+      "geometric_fallback_requests": 2,
+      "eligible_duration_requests": 11,
+      "eligible_duration_fallback_requests": 2,
+      "fallback_proportion": 0.16666666666666666,
+      "valid_duration_fallback_proportion": 0.18181818181818182,
+      "interpretation": "Support from final training-only OD table; train percentages are descriptive coverage, not causal within-training replay"
+    },
+    {
+      "split": "test",
+      "mapped_requests": 6389,
+      "geometric_fallback_requests": 1434,
+      "eligible_duration_requests": 5935,
+      "eligible_duration_fallback_requests": 1433,
+      "fallback_proportion": 0.2244482704648615,
+      "valid_duration_fallback_proportion": 0.24144903117101937,
+      "interpretation": "Support from final training-only OD table; train percentages are descriptive coverage, not causal within-training replay"
+    }
+  ],
+  "fit_cutoff_utc": "2021-07-12T05:00:00Z",
+  "training_min_trip_time_utc": "2021-05-03T05:09:37Z",
+  "training_max_trip_end_utc": "2021-07-12T04:53:40Z",
+  "policy": "Both trip times in train, duration 60s..6h; >=20 training rides -> median; otherwise 1.3 * haversine /4 m/s",
+  "source_manifest_sha256": "280e5d6ea447101fba9fd769e7e40574f3ab02a2b20692424e353c64e67617b6",
+  "preserved_OD_sha256": "d4405711ae56809838c9e4aca9148d35d848481427761930ade5efba6bd33101",
+  "script_sha256": "117d95caca5fbee1d2d287031e189571c3a8efa70353ebb8ffb3d83ab7c92b56",
+  "normalized_request_table_sha256": "3b5a8f9da9bc195886a3551070b5378f6e6ed6183b5d498ad2e5a63c7fba46ed",
+  "normalization": "All point-level mapped requests remain external; no raw trip rows in project",
+  "test_did_not_fit_OD": true,
+  "training_replay_weekly_OD": [
+    {
+      "version": "train_week_0",
+      "fit_cutoff_utc": "2021-05-03T05:00:00Z",
+      "training_rides": 0,
+      "source_max_trip_end_utc": "",
+      "source_min_trip_start_utc": "",
+      "use": "Only this training week; first week geometric fallback only"
+    },
+    {
+      "version": "train_week_1",
+      "fit_cutoff_utc": "2021-05-10T05:00:00Z",
+      "training_rides": 1011,
+      "source_max_trip_end_utc": "2021-05-10T04:45:21Z",
+      "source_min_trip_start_utc": "2021-05-03T05:09:37Z",
+      "use": "Only this training week; first week geometric fallback only"
+    },
+    {
+      "version": "train_week_2",
+      "fit_cutoff_utc": "2021-05-17T05:00:00Z",
+      "training_rides": 2386,
+      "source_max_trip_end_utc": "2021-05-17T04:54:15Z",
+      "source_min_trip_start_utc": "2021-05-03T05:09:37Z",
+      "use": "Only this training week; first week geometric fallback only"
+    },
+    {
+      "version": "train_week_3",
+      "fit_cutoff_utc": "2021-05-24T05:00:00Z",
+      "training_rides": 4292,
+      "source_max_trip_end_utc": "2021-05-24T04:57:47Z",
+      "source_min_trip_start_utc": "2021-05-03T05:09:37Z",
+      "use": "Only this training week; first week geometric fallback only"
+    },
+    {
+      "version": "train_week_4",
+      "fit_cutoff_utc": "2021-05-31T05:00:00Z",
+      "training_rides": 6010,
+      "source_max_trip_end_utc": "2021-05-31T04:54:02Z",
+      "source_min_trip_start_utc": "2021-05-03T05:09:37Z",
+      "use": "Only this training week; first week geometric fallback only"
+    },
+    {
+      "version": "train_week_5",
+      "fit_cutoff_utc": "2021-06-07T05:00:00Z",
+      "training_rides": 8267,
+      "source_max_trip_end_utc": "2021-06-07T04:57:46Z",
+      "source_min_trip_start_utc": "2021-05-03T05:09:37Z",
+      "use": "Only this training week; first week geometric fallback only"
+    },
+    {
+      "version": "train_week_6",
+      "fit_cutoff_utc": "2021-06-14T05:00:00Z",
+      "training_rides": 10673,
+      "source_max_trip_end_utc": "2021-06-14T04:58:57Z",
+      "source_min_trip_start_utc": "2021-05-03T05:09:37Z",
+      "use": "Only this training week; first week geometric fallback only"
+    },
+    {
+      "version": "train_week_7",
+      "fit_cutoff_utc": "2021-06-21T05:00:00Z",
+      "training_rides": 12865,
+      "source_max_trip_end_utc": "2021-06-21T03:45:24Z",
+      "source_min_trip_start_utc": "2021-05-03T05:09:37Z",
+      "use": "Only this training week; first week geometric fallback only"
+    },
+    {
+      "version": "train_week_8",
+      "fit_cutoff_utc": "2021-06-28T05:00:00Z",
+      "training_rides": 14626,
+      "source_max_trip_end_utc": "2021-06-28T04:56:36Z",
+      "source_min_trip_start_utc": "2021-05-03T05:09:37Z",
+      "use": "Only this training week; first week geometric fallback only"
+    },
+    {
+      "version": "train_week_9",
+      "fit_cutoff_utc": "2021-07-05T05:00:00Z",
+      "training_rides": 16566,
+      "source_max_trip_end_utc": "2021-07-05T04:54:53Z",
+      "source_min_trip_start_utc": "2021-05-03T05:09:37Z",
+      "use": "Only this training week; first week geometric fallback only"
+    }
+  ],
+  "weekly_fit_violation_count": 0
+}

@@ -1,0 +1,35 @@
+{
+  "checked_at_utc": "2026-10-31T03:01:14.918724+00:00",
+  "python_tests_passed": 49,
+  "node_service_mock_tests_passed": 10,
+  "generated_parquet_files_hashed": 260,
+  "generated_parquet_bytes": 84250911,
+  "feature_rows": 3276590,
+  "label_rows": 3276590,
+  "independent_actual_source_oracle_violations": {
+    "feature_base_values_disagree_with_actual_source": 0,
+    "unresolvable_feature_base_source": 0,
+    "lag_10m_delta_disagrees_with_actual_source": 0,
+    "lag_30m_delta_disagrees_with_actual_source": 0,
+    "lag_60m_delta_disagrees_with_actual_source": 0,
+    "duplicate_replay_request_ids": 0,
+    "OD_train_eligible_outside_train": 0,
+    "weekly_OD_counts_or_medians_disagree_with_past_requests": 0,
+    "B2_cells_or_fallback_rates_disagree_with_prior_train_source": 0
+  },
+  "frozen_app32_protocol_unchanged": true,
+  "weather_still_optional": true,
+  "original_audit_numerical_outputs_unchanged": true,
+  "production_feature_source_sha256": "6b69ff3f9eb51817dc2877346a78763c44af3c0a6409a63a6a4edd58000b91c4",
+  "active_audit_code_sha256": {
+    "audit_collector_health.py": "03aba9a02be68938aa154cd201d37497552e5f1fe8f952785f9cfb8744cd7954",
+    "audit_final_trip_od.py": "117d95caca5fbee1d2d287031e189571c3a8efa70353ebb8ffb3d83ab7c92b56",
+    "build_audited_features.py": "38cbb45ab945322f0a0c88c02cf696b31a661ea0d55ab33fbb778442653dc5c9",
+    "pipeline_audit_common.py": "65b2bb38850068d157d3c6576f9820a8ca95e2bf67945a5288b76cceecb428d1"
+  },
+  "cloud_health": "User-reported v2 initial window: 2/2 scheduled slots successful; no independent cloud raw export verification",
+  "hosted_CI": "Not run remotely; 49 Python and 10 Node tests passed locally before grouped commits",
+  "weather_commit": "6964cf5",
+  "cloud_health_evidence_updated_at_utc": "2026-10-31T03:07:09.208Z",
+  "final_pipeline_commit_record": "Grouped local commits: collector health, data pipeline, audit reports/handoff; see git log"
+}

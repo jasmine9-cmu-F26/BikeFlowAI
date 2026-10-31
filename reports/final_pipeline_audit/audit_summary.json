@@ -1,0 +1,54 @@
+{
+  "trip_OD": "PASS_FIXED_APP32_TRAIN_ONLY_FIT",
+  "freshness": "KEEP_REPLAY_15MIN_LIVE_5MIN",
+  "features": {
+    "status": "PASS_FEATURE_TABLE_INVARIANTS_UNDER_RECORDED_TIME_ASSUMPTION",
+    "feature_rows": 3276590,
+    "label_rows": 3276590,
+    "split_counts": {
+      "train": 1929788,
+      "tune": 384582,
+      "calibration": 383970,
+      "test": 578250
+    },
+    "policy_training_pool_rows": 1929788,
+    "policy_prediction_table_created": false,
+    "feature_table_ready_for_model_handoff": true,
+    "model_or_policy_trained": false,
+    "all_leakage_violation_counts": {
+      "future_base_snapshot": 0,
+      "future_metadata": 0,
+      "future_feature_timestamp": 0,
+      "base_too_old": 0,
+      "future_lag_10m": 0,
+      "stale_lag_10m": 0,
+      "future_lag_30m": 0,
+      "stale_lag_30m": 0,
+      "future_lag_60m": 0,
+      "stale_lag_60m": 0,
+      "target_not_future": 0,
+      "target_outside_tolerance": 0,
+      "duplicate_feature_row_id": 0,
+      "feature_label_row_mismatch": 0,
+      "target_crosses_split": 0,
+      "OD_nontraining_fit": 0,
+      "OD_training_week_fit_after_cutoff": 0,
+      "B2_source_at_or_after_fit_cutoff": 0,
+      "B2_fit_beyond_train": 0,
+      "B2_attached_to_training_features": 0,
+      "label_columns_in_model_features": 0
+    },
+    "full_replay_implemented": false,
+    "feature_snapshot_source_sha256": "2514c3e97ba586e3f659e917c291169a15ca026e78e396f10f2de25e9d8004fc",
+    "code_sha256": "38cbb45ab945322f0a0c88c02cf696b31a661ea0d55ab33fbb778442653dc5c9",
+    "historical_protocol_unchanged": true
+  },
+  "collector_health": {
+    "local": "AUDITED",
+    "cloud": "ACTIVE_V2_INITIAL_HEALTH_WINDOW_CONFIRMED_FROM_USER_OUTPUT"
+  },
+  "no_new_database": true,
+  "no_model_training": true,
+  "original_station_and_split_protocol_unchanged": true,
+  "prior_weather_commit": "6964cf5"
+}

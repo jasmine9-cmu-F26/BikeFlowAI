@@ -1,0 +1,7 @@
+split,mapped_requests,geometric_fallback_requests,eligible_duration_requests,eligible_duration_fallback_requests,fallback_proportion,valid_duration_fallback_proportion,interpretation
+all_mapped,36007,6979,33360,6958,0.19382342322326215,0.20857314148681055,"Support from final training-only OD table; train percentages are descriptive coverage, not causal within-training replay"
+train,20117,3439,18578,3423,0.17094994283441864,0.18425018839487567,"Support from final training-only OD table; train percentages are descriptive coverage, not causal within-training replay"
+tune,4725,1031,4376,1029,0.2182010582010582,0.23514625228519195,"Support from final training-only OD table; train percentages are descriptive coverage, not causal within-training replay"
+calibration,4764,1073,4460,1071,0.22523089840470192,0.24013452914798206,"Support from final training-only OD table; train percentages are descriptive coverage, not causal within-training replay"
+purge,12,2,11,2,0.16666666666666666,0.18181818181818182,"Support from final training-only OD table; train percentages are descriptive coverage, not causal within-training replay"
+test,6389,1434,5935,1433,0.2244482704648615,0.24144903117101937,"Support from final training-only OD table; train percentages are descriptive coverage, not causal within-training replay"

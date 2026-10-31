@@ -61,3 +61,7 @@ Google Apps Script is now the active collector at a nominal **five-minute** cade
 ## Weather data audit
 
 Historical forecast responses, source evidence and normalized Parquet stay in external `weather_open_meteo_audit/`. The [small 2021 audit](../reports/weather_audit/weather_audit.md) checks hourly missingness, units, schema and backward valid-time matching to the fixed app32 cohort. Weather remains optional because forecast issue/publication provenance is unresolved; a successful timestamp join is not a certified causal feature. No ERA5 was requested or substituted. Reproduce with `python scripts/data/audit_weather_data.py --data-root EXTERNAL_DIVVY_ROOT/weather_open_meteo_audit`; add `--offline` to verify/re-audit saved responses without network. No weather calls were added to the live GBFS collector.
+
+## Audited final model tables
+
+[Final pipeline results](../reports/final_pipeline_audit/README.md) and [model handoff](../docs/forecaster_data_handoff.md) describe the external `processed/final_pipeline_v1/` feature/label, mapped-request, B2 and within-training OD tables. Only aggregate reports and manifests are committed. Features and outcomes are separate; original 32-station protocol remains immutable and is extended by [final_pipeline_contract.json](manifests/chicago/final_pipeline_contract.json).
