@@ -1,8 +1,8 @@
 {
   "network": "divvy",
   "city": "Chicago",
-  "status": "app32_data_protocol_v1_frozen_model_tables_pending",
-  "training_ready": false,
+  "status": "app32_forecaster_feature_table_audited_model_training_pending",
+  "training_ready": true,
   "default_data_root_relative_to_project": "../../BikeFlowAI-data/divvy/chicago_historical_2021_sample",
   "sources": {
     "citybikes": {
@@ -110,5 +110,13 @@
     "required": false,
     "configuration": "configs/weather_data.json",
     "report": "reports/weather_audit/weather_audit.md"
+  },
+  "training_ready_scope": "Forecaster feature/label data under recorded-time assumption only; no OOF policy probabilities or trained model",
+  "policy_training_ready": false,
+  "feature_table_ready_for_forecaster": true,
+  "final_pipeline": {
+    "contract": "data/manifests/chicago/final_pipeline_contract.json",
+    "reports": "reports/final_pipeline_audit",
+    "model_handoff": "docs/forecaster_data_handoff.md"
   }
 }
