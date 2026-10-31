@@ -1,0 +1,22 @@
+{
+  "raw_rows": 2887990,
+  "invalid_timestamp_rows": 0,
+  "DST_excluded_rows": 0,
+  "starts_in_sample_window": 2792957,
+  "both_names_in_cohort_and_window": 111891,
+  "both_endpoints_mapped_in_sample": 104609,
+  "both_selected_endpoints": 79320,
+  "both_selected_endpoints_observable": 76834,
+  "eligible_training_OD_rides": 42356,
+  "mapping_success_among_named_cohort": 0.9349188049083483,
+  "selected_trip_observation_support": 0.9686585980837116,
+  "selected_station_count": 42,
+  "observed_OD_pairs": 1423,
+  "OD_pairs_20plus": 424,
+  "raw_storage": "Original four ZIPs only; full CSV files were streamed, not unpacked",
+  "timezone_policy": "Naive trip timestamps interpreted as America/Chicago using explicit IANA fold/gap policy; not independently annotated in CSV",
+  "mapping_scope": "Bounded 50-station sample: trips outside the cohort are out of scope, not mapping failures",
+  "replay_scope": "Nearest valid snapshot within +/-5min is quantized observation support, not exact continuous-time or causal pre-checkout state",
+  "ride_time_policy": "Mapped training-selected endpoints; both trip times in training; 60s..6h duration; no test/tune/calibration ride-time estimation",
+  "script_sha256": "3795833b1f569154beab31b87fa5df2cd06c5abb81efa303319ea03165af0aeb"
+}

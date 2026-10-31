@@ -1,0 +1,270 @@
+{
+  "checked_at_utc": "2026-10-31T00:38:17.024193+00:00",
+  "local_tests_passed": 25,
+  "local_tests_failed": 0,
+  "old_numeric_results_and_source_bytes_preserved": [
+    {
+      "original": "reports/data_audit/audit_summary.json",
+      "current": "legacy/baywheels/reports/audit_summary.json",
+      "sha256": "5ef88058a008c55fdeb7a707539743ad648cea6f66b7c48e5ed8313028ea16e1"
+    },
+    {
+      "original": "reports/data_audit/class_balance.csv",
+      "current": "legacy/baywheels/reports/class_balance.csv",
+      "sha256": "0f55aea3efc7de29021ffae7ca0319981392a07dbc22dd1d0cb7914a72c85b04"
+    },
+    {
+      "original": "reports/data_audit/coverage_by_station.csv",
+      "current": "legacy/baywheels/reports/coverage_by_station.csv",
+      "sha256": "255e178cbaf9b1beaa9ee7852ee7d639a0818291435e2cd20a1a85767886f6fb"
+    },
+    {
+      "original": "reports/data_audit/external_sources.json",
+      "current": "legacy/baywheels/reports/external_sources.json",
+      "sha256": "2ab6f07079204115d7357c059fea9bacadfd850c9e097bb9d1f911610b8d4437"
+    },
+    {
+      "original": "reports/data_audit/extraction_errors.csv",
+      "current": "legacy/baywheels/reports/extraction_errors.csv",
+      "sha256": "0ceda0068b137e3e8f791a6bd51cc87659c40f0b038bbf85c0094d4034aea00f"
+    },
+    {
+      "original": "reports/data_audit/gap_summary.csv",
+      "current": "legacy/baywheels/reports/gap_summary.csv",
+      "sha256": "64dcb887909da7333287f0a1d8e0fa9f7a7acd8bd3e25b1e1d14ad0687f392cd"
+    },
+    {
+      "original": "reports/data_audit/label_retention.csv",
+      "current": "legacy/baywheels/reports/label_retention.csv",
+      "sha256": "f8a556a9b0e152648b0a44babbde489fadb3907d9128903b07febb3670ac5d45"
+    },
+    {
+      "original": "reports/data_audit/station_changes.csv",
+      "current": "legacy/baywheels/reports/station_changes.csv",
+      "sha256": "2d2b68326ae360a63829136c46b1f2b78caedd845c1c811dcf7686b19617cbea"
+    },
+    {
+      "original": "reports/data_audit/weekly_coverage.csv",
+      "current": "legacy/baywheels/reports/weekly_coverage.csv",
+      "sha256": "66683700bfe55b6de3476a0cc8ad9758a118e453b6c48f5c90202f71b8b92478"
+    },
+    {
+      "original": "reports/divvy_data_audit/audit_summary.json",
+      "current": "legacy/citybikes/reports/audit_summary.json",
+      "sha256": "66270e063848a647432a44ce0b78e90b52777c34db5ea13c676924be5a14d058"
+    },
+    {
+      "original": "reports/divvy_data_audit/candidate_od_ride_times.csv",
+      "current": "legacy/citybikes/reports/candidate_od_ride_times.csv",
+      "sha256": "359443247c268bcd2d7a18eec01d59c0668c80c6d2b5e661db9ccc0d35e3f8ad"
+    },
+    {
+      "original": "reports/divvy_data_audit/class_balance.csv",
+      "current": "legacy/citybikes/reports/class_balance.csv",
+      "sha256": "833e2f75a4c83441870061d83c62efc9b341366865d4d216e97245b141d23580"
+    },
+    {
+      "original": "reports/divvy_data_audit/coverage_by_station.csv",
+      "current": "legacy/citybikes/reports/coverage_by_station.csv",
+      "sha256": "6d939b7ca2e551d23c5d678fe3363f1c144985d986f16782fe958f81e9677060"
+    },
+    {
+      "original": "reports/divvy_data_audit/download_manifest.json",
+      "current": "legacy/citybikes/reports/download_manifest.json",
+      "sha256": "d6ccfea40310ce2d3ba9461240fe4e304f0b666fcab1b195edfbaa4e8a5441bf"
+    },
+    {
+      "original": "reports/divvy_data_audit/dst_exclusions.csv",
+      "current": "legacy/citybikes/reports/dst_exclusions.csv",
+      "sha256": "5409d8fc83516759d8aee247df37eb606fcbd9d85aa2200481cfd175cb792704"
+    },
+    {
+      "original": "reports/divvy_data_audit/gap_summary.csv",
+      "current": "legacy/citybikes/reports/gap_summary.csv",
+      "sha256": "1008c1d793aead7c5156ae928a5807011343efbe381a0f6c4d44ece7077948b1"
+    },
+    {
+      "original": "reports/divvy_data_audit/label_retention.csv",
+      "current": "legacy/citybikes/reports/label_retention.csv",
+      "sha256": "0125eeffae91e404d2dc2e6baf3433c28adfb076b7df4e76f0155b0d4e180895"
+    },
+    {
+      "original": "reports/divvy_data_audit/live_gbfs_check.json",
+      "current": "legacy/citybikes/reports/live_gbfs_check.json",
+      "sha256": "6193aed6fa1ac4a7ded99a7d0741e2c1fac9794138ff17f4bd00bc922242279e"
+    },
+    {
+      "original": "reports/divvy_data_audit/network_silences.csv",
+      "current": "legacy/citybikes/reports/network_silences.csv",
+      "sha256": "ec6e130e5ffe109a477a9d01269e449aa17af2012b59f849c768359fa5c83277"
+    },
+    {
+      "original": "reports/divvy_data_audit/station_changes.csv",
+      "current": "legacy/citybikes/reports/station_changes.csv",
+      "sha256": "98fc30700b08173431298e3d176c6aea5a7da59a2e6993973f82aedb77945e97"
+    },
+    {
+      "original": "reports/divvy_data_audit/trip_overlap.json",
+      "current": "legacy/citybikes/reports/trip_overlap.json",
+      "sha256": "335cfe9ba7d194e98077c9d3dff1c25e38d97ebab65348ec5afe8b31e141e1bc"
+    },
+    {
+      "original": "reports/divvy_data_audit/trip_overlap_by_month.csv",
+      "current": "legacy/citybikes/reports/trip_overlap_by_month.csv",
+      "sha256": "25b723a58fcd543d04d453d4c826b2642cbfefd0231a20a067264bcf3f87a063"
+    },
+    {
+      "original": "reports/divvy_data_audit/validation_results.json",
+      "current": "legacy/citybikes/reports/validation_results.json",
+      "sha256": "e3a699bed19de93eadd5ffde06178ec4c004e2d011d9823265fa8a5cf7b98841"
+    },
+    {
+      "original": "reports/divvy_data_audit/weekly_coverage.csv",
+      "current": "legacy/citybikes/reports/weekly_coverage.csv",
+      "sha256": "b600fe4c156d408d12e233bbcc658e98666037fb25c39439a0342140f6728093"
+    },
+    {
+      "original": "data/manifests/divvy/candidate_stations.csv",
+      "current": "legacy/citybikes/manifests/candidate_stations.csv",
+      "sha256": "6750713de5738ff4c2ee79359a8c4701d9b015248ff87f0131ad85abaf47867f"
+    },
+    {
+      "original": "data/manifests/divvy/selected_stations.csv",
+      "current": "legacy/citybikes/manifests/selected_stations.csv",
+      "sha256": "43b3d64e5d2aa98bfd3b10a8ee51049df3a13a51047ff4eb7b773e2a40af17c8"
+    },
+    {
+      "original": "data/manifests/divvy/split_manifest.csv",
+      "current": "legacy/citybikes/manifests/split_manifest.csv",
+      "sha256": "389340e79145aaaf3f8da8239b2f6f5a2c2dca700d16094c501246281862885a"
+    },
+    {
+      "original": "data/manifests/divvy/station_id_map.csv",
+      "current": "legacy/citybikes/manifests/station_id_map.csv",
+      "sha256": "320f5d97109ebb36ea0d6ec86dd7919125835b6ba0386cfa14bb0c12f8a8adf3"
+    },
+    {
+      "original": "data/manifests/divvy/trip_station_id_map.csv",
+      "current": "legacy/citybikes/manifests/trip_station_id_map.csv",
+      "sha256": "a92a35ef0155334b425352ce8c0ad1103a26f527c0f0415b1152002593a588b6"
+    },
+    {
+      "original": "data/manifests/candidate_stations.csv",
+      "current": "legacy/baywheels/manifests/candidate_stations.csv",
+      "sha256": "a0c158f9f95a0fc4faed0e921120ee3b99c3813feff2085ee10ff3956cdf5a34"
+    },
+    {
+      "original": "data/manifests/selected_stations.csv",
+      "current": "legacy/baywheels/manifests/selected_stations.csv",
+      "sha256": "fe9c0af0e7047f29a20aea575f9fec0851031d23ad8263dab6797ecb45271753"
+    },
+    {
+      "original": "data/manifests/split_manifest.csv",
+      "current": "legacy/baywheels/manifests/split_manifest.csv",
+      "sha256": "ec887c46961b768e443c0ef29e4558d303712603232984fbd0c200046246b040"
+    },
+    {
+      "original": "data/manifests/station_id_map.csv",
+      "current": "legacy/baywheels/manifests/station_id_map.csv",
+      "sha256": "38409a1b4942764bdfddd491acb41e1e1955e9dd685e7416e9dc41c1ef8549e1"
+    },
+    {
+      "original": "scripts/data/extract_baywheels_history.py",
+      "current": "legacy/baywheels/scripts/data/extract_baywheels_history.py",
+      "sha256": "49c92f6ab90b301feb63c51b7a8cb16ec8c86d9c5f349c2657e607e05636eab8"
+    },
+    {
+      "original": "scripts/data/audit_baywheels_data.py",
+      "current": "legacy/baywheels/scripts/data/audit_baywheels_data.py",
+      "sha256": "5e08e7b361db2f5a5211b0d4159617c681e6844ace60f989f9e9139d37d2e3f1"
+    },
+    {
+      "original": "scripts/data/check_external_sources.py",
+      "current": "legacy/baywheels/scripts/data/check_external_sources.py",
+      "sha256": "35c71a9ba50dfe4b0600ccf618c7b0e5891d1dab11d2614dac24669f93d63fba"
+    },
+    {
+      "original": "scripts/data/download_divvy_data.py",
+      "current": "legacy/citybikes/scripts/data/download_divvy_data.py",
+      "sha256": "c0694af9f47fb1abd70c68e56861227aeaa00aa04a4a835f0ee2c889eedd4f38"
+    },
+    {
+      "original": "scripts/data/extract_citybikes_divvy.py",
+      "current": "legacy/citybikes/scripts/data/extract_citybikes_divvy.py",
+      "sha256": "f43f164f2fcd9f0ff0d333cc4117f6d48f7e5402ba7fdd7f952e68b08153429d"
+    },
+    {
+      "original": "scripts/data/audit_divvy_data.py",
+      "current": "legacy/citybikes/scripts/data/audit_divvy_data.py",
+      "sha256": "a8817b5ec7ec12210d4a0c21f3ca938ce601974b60ba58709739678e6470fe27"
+    },
+    {
+      "original": "scripts/data/audit_divvy_trips.py",
+      "current": "legacy/citybikes/scripts/data/audit_divvy_trips.py",
+      "sha256": "1c39b160f730a0a1c7990e41566b808b4088e267ad516047920005388fae9ec4"
+    },
+    {
+      "original": "scripts/data/audit_chicago_historical.py",
+      "current": "legacy/official_chicago_audit_v1/scripts/data/audit_chicago_historical.py",
+      "sha256": "da2f24dbb48541580fd00b9fe2a277fcceb93ddedfa0852662759751f8e2a187"
+    },
+    {
+      "original": "scripts/data/audit_chicago_trips.py",
+      "current": "legacy/official_chicago_audit_v1/scripts/data/audit_chicago_trips.py",
+      "sha256": "3795833b1f569154beab31b87fa5df2cd06c5abb81efa303319ea03165af0aeb"
+    },
+    {
+      "original": "scripts/data/download_chicago_sample.py",
+      "current": "legacy/official_chicago_audit_v1/scripts/data/download_chicago_sample.py",
+      "sha256": "a579b8ca688ab8a54cae9d95e1891dd7d433d90622b4229dbbf8e23c591e12a0"
+    }
+  ],
+  "original_chicago_42_and_failed_2022_numeric_artifacts_unchanged": true,
+  "active_source_sha256": {
+    "scripts/data/audit_chicago_historical.py": "6f15bf25b240eeec978b9c45b5ab50e0e2b1cd9866a72b03434d8f85b3899975",
+    "scripts/data/audit_chicago_trips.py": "95880932e43f44836cccdc2f836ba0af91316012722555fe7bef2f5e652a1e55",
+    "scripts/data/build_app_cohort.py": "18e7b5b1697f219863b50b95c70263d349002247b67516c5668291311b58d125",
+    "scripts/data/collect_divvy_gbfs.py": "a323251329c92d461b20004cd5b38027df97da9aea2d9b7a2449c2c877fe42e9",
+    "scripts/data/download_chicago_sample.py": "eed9f15a86ca52926f2c5fe81998cb0b276c248cfe99d532fe6f2f444f68561b",
+    "scripts/data/bikeflow_data/downloads.py": "7a78de1475e08c778485bf8321986a67ec372bc9b77d02a916d55af167bdb1a0",
+    "scripts/data/bikeflow_data/temporal.py": "1f44b4088cf2f6ea1b44bbbf06845a76d2b21c14b0c74697e0ae0cc5f2b8df62",
+    "scripts/data/bikeflow_data/__init__.py": "2ff9cad3d5d533121154053eb5e07d09b98ab5830fc5d3b44329b5e558a1dc2f"
+  },
+  "raw_processed_data_outside_git": true,
+  "markdown_links_valid": true,
+  "python_syntax_valid": true,
+  "app_cohort_count": 32,
+  "app_metrics": {
+    "snapshot_min_coverage": 0.9980099502487563,
+    "label_min_retention": 0.9979973402174763,
+    "trip_mapping": 0.9373649545726707,
+    "trip_observation_support": 0.9679784486349876,
+    "training_od_rides": 18571,
+    "od_pairs_20plus": 229
+  },
+  "protocol_sha256": "7f1e0140c9dbd28bb537f17d7e09c64eaaad1ce8c9945a8b699bb62cdacb0441",
+  "hosted_CI": "not run for local changes",
+  "git_commit_or_push_performed": false,
+  "collector": {
+    "task": {
+      "State": "Ready",
+      "LastTaskResult": 0,
+      "LastRunUtc": "2026-10-31T00:34:25.0000000Z",
+      "NextRunUtc": "2026-10-31T00:36:24.0000000Z",
+      "Interval": "PT2M",
+      "EndBoundary": "2026-12-13T00:59:00-07:00",
+      "Executable": "C:\\Users\\44604\\AppData\\Local\\Python\\pythoncore-3.14-64\\pythonw.exe"
+    },
+    "last_success_utc": "2026-10-31T00:36:26.799998+00:00",
+    "poll_age_seconds": 110.226681,
+    "successful_polls": 35,
+    "station_count": 2078,
+    "collector_code_unchanged": true
+  },
+  "installed_project_verification_utc": "2026-10-31T00:38:38.163633+00:00",
+  "installed_project_tests_passed": 25,
+  "pip_check": "No broken requirements found.",
+  "git_diff_check": "passed",
+  "archive_copy_hash_verified_before_old_file_removal": true,
+  "git_state_recorded_before_commit_sequence": true
+}

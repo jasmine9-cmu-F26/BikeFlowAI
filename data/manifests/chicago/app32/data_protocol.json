@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "status": "frozen_data_protocol_model_tables_pending",
+  "training_ready": false,
+  "scope": "32 fixed identity-matched stations for primary app/model/replay cohort; original 42-station feasibility audit remains separate",
+  "historical_dataset": "eq45-8inv",
+  "start_local": "2021-05-03T00:00:00",
+  "end_local_exclusive": "2021-08-30T00:00:00",
+  "timezone": "America/Chicago",
+  "station_count": 32,
+  "cohort_manifest": "data/manifests/chicago/app_stations.csv",
+  "cohort_sha256": "934d2591e8e19c701d1a45f03c9053bdc09a7273e1fa62242ef6f8f03d052887",
+  "selection": "Training-qualified cohort intersect fixed captured 2026 identity evidence; no label/test/model performance filters",
+  "live_identity_evidence_capture_utc": "2026-10-30T23:54:26.662644+00:00",
+  "live_identity_evidence_sha256": "d12af990c9b2e20158ae3f3959bb892f23c5bcb413a6944e131d27d87b5d8448",
+  "horizons_minutes": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60
+  ],
+  "label_matching": {
+    "tolerance_seconds": 300,
+    "method": "nearest valid strictly after request, ties earlier, same split, reject >50m relocation",
+    "missing": "exclude, never zero or arbitrary forward fill"
+  },
+  "chronological_splits": [
+    {
+      "split": "train",
+      "start_utc": "2021-05-03T05:00:00Z",
+      "end_utc_exclusive": "2021-07-12T05:00:00Z",
+      "weeks": 10.0
+    },
+    {
+      "split": "tune",
+      "start_utc": "2021-07-12T06:00:00Z",
+      "end_utc_exclusive": "2021-07-26T05:00:00Z",
+      "weeks": 1.994047619047619
+    },
+    {
+      "split": "calibration",
+      "start_utc": "2021-07-26T06:00:00Z",
+      "end_utc_exclusive": "2021-08-09T05:00:00Z",
+      "weeks": 1.994047619047619
+    },
+    {
+      "split": "test",
+      "start_utc": "2021-08-09T06:00:00Z",
+      "end_utc_exclusive": "2021-08-30T05:00:00Z",
+      "weeks": 2.994047619047619
+    }
+  ],
+  "nominal_split_proportions": [
+    0.6,
+    0.15,
+    0.1,
+    0.15
+  ],
+  "actual_calendar_weeks_before_purge": [
+    10,
+    2,
+    2,
+    3
+  ],
+  "purge_before_later_splits_minutes": 60,
+  "causal_features": {
+    "rule": "latest recorded valid observation at or before decision time only",
+    "max_age_seconds": 900,
+    "missing_or_stale": "exclude request from this replay protocol; do not read future observations",
+    "historical_publication_latency": "unmeasured; source recorded timestamps are an explicit availability assumption"
+  },
+  "target_access": "Future observations may be read only by offline labels/outcome evaluation; unavailable to model/planner input or action selection",
+  "od_estimation": {
+    "split": "train only, both trip times in train",
+    "duration_seconds": [
+      60,
+      21600
+    ],
+    "minimum_pair_rides": 20,
+    "unsupported_pairs": "geometric fallback required"
+  },
+  "historical_status": "Broad In Service flag; do not invent installed/renting/returning/disabled fields",
+  "live_status": "Check installed/renting/returning per current official GBFS; do not infer operability from identity mapping alone",
+  "limitations": [
+    "10-minute quantized observations, not exact continuous-time truth",
+    "Completed rides omit unmet demand",
+    "2021 summer to 2026 domain/season shift needs current-data validation",
+    "Frozen cohort identity does not prove uninterrupted operation or current station service"
+  ],
+  "source_manifest_sha256": "280e5d6ea447101fba9fd769e7e40574f3ab02a2b20692424e353c64e67617b6",
+  "snapshot_auditor_sha256": "6f15bf25b240eeec978b9c45b5ab50e0e2b1cd9866a72b03434d8f85b3899975",
+  "trip_auditor_sha256": "95880932e43f44836cccdc2f836ba0af91316012722555fe7bef2f5e652a1e55",
+  "shared_temporal_sha256": "1f44b4088cf2f6ea1b44bbbf06845a76d2b21c14b0c74697e0ae0cc5f2b8df62",
+  "builder_sha256": "18e7b5b1697f219863b50b95c70263d349002247b67516c5668291311b58d125",
+  "completed_checks": {
+    "snapshot_audit": "PASS_BOUNDED_SNAPSHOT_FEASIBILITY",
+    "trip_audit": "completed",
+    "full_replay_implemented": false,
+    "feature_label_table_certified": false
+  }
+}

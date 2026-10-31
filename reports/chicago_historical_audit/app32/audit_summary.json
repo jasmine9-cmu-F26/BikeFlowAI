@@ -1,0 +1,78 @@
+{
+  "decision": "PASS_BOUNDED_SNAPSHOT_FEASIBILITY",
+  "training_ready": false,
+  "cohort_provenance": {
+    "manifest_sha256": "934d2591e8e19c701d1a45f03c9053bdc09a7273e1fa62242ef6f8f03d052887",
+    "selection": "training-qualified historical cohort intersect fixed unique 2026 name/geometry evidence; not held-out outcome selection"
+  },
+  "shared_temporal_sha256": "1f44b4088cf2f6ea1b44bbbf06845a76d2b21c14b0c74697e0ae0cc5f2b8df62",
+  "decision_scope": "Only the declared period and bounded training-selected cohort; not the entire Chicago dataset or a trained/live model",
+  "dataset_id": "eq45-8inv",
+  "source_name": "City of Chicago Divvy Bicycle Stations - Historical",
+  "requested_start_local": "2021-05-03T00:00:00",
+  "requested_end_local_exclusive": "2021-08-30T00:00:00",
+  "sample_start_utc": "2021-05-03T05:00:00Z",
+  "sample_end_utc_exclusive": "2021-08-30T05:00:00Z",
+  "first_observation_utc": "2021-05-03T05:05:15Z",
+  "last_observation_utc": "2021-08-30T04:55:35Z",
+  "raw_rows": 856200,
+  "normalized_rows": 856200,
+  "invalid_or_DST_excluded_rows": 0,
+  "conflicting_station_timestamps": 0,
+  "stations_audited": 50,
+  "stations_selected_from_training": 32,
+  "interval_median_minutes": 10.0,
+  "interval_p90_minutes": 10.583333333333334,
+  "longest_network_gap_minutes": 38.333333333333336,
+  "unchanged_inventory_transition_fraction": 0.668139928750803,
+  "expected_grid_minutes": 10,
+  "grid_phase_seconds_learned_from_training": 360,
+  "minimum_selected_station_valid_coverage_across_splits": 0.9980099502487563,
+  "minimum_selected_label_retention_across_splits_horizons": 0.9979973402174763,
+  "current_2026_exact_name_geo_matches": 32,
+  "current_2026_mapping_capture_utc": "2026-10-31T00:30:26.642778+00:00",
+  "splits": [
+    {
+      "split": "train",
+      "start_utc": "2021-05-03T05:00:00Z",
+      "end_utc_exclusive": "2021-07-12T05:00:00Z",
+      "weeks": 10.0
+    },
+    {
+      "split": "tune",
+      "start_utc": "2021-07-12T06:00:00Z",
+      "end_utc_exclusive": "2021-07-26T05:00:00Z",
+      "weeks": 1.994047619047619
+    },
+    {
+      "split": "calibration",
+      "start_utc": "2021-07-26T06:00:00Z",
+      "end_utc_exclusive": "2021-08-09T05:00:00Z",
+      "weeks": 1.994047619047619
+    },
+    {
+      "split": "test",
+      "start_utc": "2021-08-09T06:00:00Z",
+      "end_utc_exclusive": "2021-08-30T05:00:00Z",
+      "weeks": 2.994047619047619
+    }
+  ],
+  "quality": {
+    "bad_counts": 0,
+    "unknown_status": 0,
+    "closed_status": 1454,
+    "docks_service_sum_mismatch": 0,
+    "in_service_docks_gt_capacity": 22
+  },
+  "documented_dataset_time_period": "2013 to 9/10/2022, except for 7/7/2019 - 12/9/2019 and 2/28/2022 - 4/20/2022",
+  "license": {
+    "name": "See Terms of Use"
+  },
+  "license_id": "SEE_TERMS_OF_USE",
+  "timezone_policy": "Floating source timestamps interpreted as America/Chicago; original wall times retained",
+  "semantics": "Full recorded snapshots; unchanged inventories retained; source broad In Service status is not separate GBFS renting/returning/installed flags",
+  "download_manifest_sha256": "280e5d6ea447101fba9fd769e7e40574f3ab02a2b20692424e353c64e67617b6",
+  "audit_script_sha256": "6f15bf25b240eeec978b9c45b5ab50e0e2b1cd9866a72b03434d8f85b3899975",
+  "raw_compressed_snapshot_bytes": 7943527,
+  "trip_zip_bytes": 102965549
+}

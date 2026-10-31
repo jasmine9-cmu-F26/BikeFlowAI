@@ -1,0 +1,21 @@
+{
+  "checked_at_utc": "2026-10-31T00:15:57.007225+00:00",
+  "task_name": "BikeFlowAI-Divvy-Full-GBFS-Collector",
+  "configured_interval_seconds": 120,
+  "planned_end_utc": "2026-12-13T07:59:00Z",
+  "scheduled_executable": "C:\\Users\\44604\\AppData\\Local\\Python\\pythoncore-3.14-64\\pythonw.exe",
+  "last_checked_task_result": 0,
+  "successful_polls": 24,
+  "failed_polls": 0,
+  "first_success_utc": "2026-10-30T23:34:27.472772+00:00",
+  "last_success_utc": "2026-10-31T00:14:26.601244+00:00",
+  "latest_station_count": 2078,
+  "unchanged_states_retained": true,
+  "collector_versions_seen": [
+    "a323251329c92d461b20004cd5b38027df97da9aea2d9b7a2449c2c877fe42e9",
+    "f721026fe8a135bcf301ea49ae8ed49523ddd9e5872b962934a4dfc80af585fc"
+  ],
+  "raw_location": "external DIVVY_ROOT/current_validation",
+  "requires_logged_in_awake_online": true,
+  "scope": "Initial ongoing collection only; not weeks of validated 2026 coverage or a model evaluation"
+}

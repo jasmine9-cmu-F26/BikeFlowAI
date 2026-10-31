@@ -1,0 +1,5 @@
+split,start_utc,end_utc_exclusive,weeks,purge_before_minutes,status
+train,2021-05-03T05:00:00Z,2021-07-12T05:00:00Z,10.0,0,provisional_sample_design_not_model_ready
+tune,2021-07-12T06:00:00Z,2021-07-26T05:00:00Z,1.994047619047619,60,provisional_sample_design_not_model_ready
+calibration,2021-07-26T06:00:00Z,2021-08-09T05:00:00Z,1.994047619047619,60,provisional_sample_design_not_model_ready
+test,2021-08-09T06:00:00Z,2021-08-30T05:00:00Z,2.994047619047619,60,provisional_sample_design_not_model_ready

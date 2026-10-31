@@ -1,0 +1,11 @@
+group,split,valid_rows,bike_unavailable,dock_unavailable,empty_count,full_count,closed_status,bike_unavailable_rate,dock_unavailable_rate
+all_sample_stations,sample,491350,102811,9397,102592,8884,516,0.209241884603643,0.019124860079373154
+all_sample_stations,train,143450,23575,2172,23479,1997,175,0.1643429766469153,0.015141164168699895
+all_sample_stations,tune,99050,21998,2200,21952,2151,49,0.22208985360928823,0.02221100454316002
+all_sample_stations,calibration,99100,25403,2236,25341,1977,259,0.25633703329969726,0.022563067608476286
+all_sample_stations,test,148850,31692,2775,31677,2745,33,0.21291232784682565,0.01864292912327847
+training_selected,sample,0,0,0,0,0,0,,
+training_selected,train,0,0,0,0,0,0,,
+training_selected,tune,0,0,0,0,0,0,,
+training_selected,calibration,0,0,0,0,0,0,,
+training_selected,test,0,0,0,0,0,0,,

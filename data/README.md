@@ -1,68 +1,54 @@
-# Data
+# Data: official Chicago primary pipeline
 
-Raw datasets are not committed. This repository contains extraction/audit code, aggregate reports, and provisional manifests.
+Primary training/replay uses official City of Chicago historical Divvy snapshots, OD/ride times use matching official trips, live inference uses official GBFS, and current validation uses our full-GBFS collector. CityBikes change events are supplementary only.
 
-## Sources and current result
+## Storage
 
-1. [Historical Bay Wheels GBFS archive](https://github.com/terinjokes/baywheels-history): station-state history, 2022-08-07 to 2023-07-19.
-2. [Official Bay Wheels / Lyft trip history](https://lyftbikes.com/system-data): historical requests and ride-time estimates; station-ID joins and DST handling are still pending.
-3. Live Bay Wheels GBFS, linked from the official system-data page: planned inference source, separate from the historical archive.
-4. [Optional archived weather forecasts](https://open-meteo.com/en/docs/previous-runs-api): availability must be verified per model, variable, and date. The initial SF probe found temperature values but no precipitation/wind values for the tested model and dates.
+Raw and processed files stay outside the checkout, under `C:/Users/44604/Documents/BikeFlowAI-data/divvy/`:
 
-**Initial archive audit complete; revised data rules pending validation.** The original seven-minute / 90% gate returned FALLBACK (57.56% coverage). The revised proposal treats the archive as irregularly sampled and makes weather optional; the original result does not establish that the revised project is infeasible. See [the original audit](../reports/data_audit/data_audit.md) and its [interpretation notes](../reports/data_audit/README.md). No model has been trained.
-
-The current scripts reproduce the original-rule audit. They still use seven-minute slots and a 3.5-minute tolerance; a revised feature/label builder and rule comparison are not implemented yet. See the [data handoff checklist](../docs/data_handoff.md) for the next deliverables.
-
-## Reproduce the audit
-
-Run commands from the BikeFlowAI project root with Git and the audit Python environment installed:
-
-```powershell
-git clone https://github.com/terinjokes/baywheels-history.git ../baywheels-history
-git -C ../baywheels-history checkout b409260cc6a4a38b5d9c5336e32f132d1d8b71ac
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r scripts/data/requirements.txt
-.\.venv\Scripts\python.exe scripts/data/extract_baywheels_history.py --repo ../baywheels-history --output data/processed/baywheels_history
-.\.venv\Scripts\python.exe scripts/data/audit_baywheels_data.py --repo ../baywheels-history --input data/processed/baywheels_history
+```text
+chicago_historical_2021_sample/  Active bounded source sample and source hashes
+  raw/snapshots/               About 7.94 MB compressed, 856,200 full rows
+  raw/trips/                   Four matching ZIPs, about 102.97 MB
+  evidence/                    Source metadata, terms and required disclaimer
+  processed/snapshots.parquet  Local normalized observations
+chicago_historical_sample/     Preserved failed 2022 comparison
+current_validation/            Ongoing full-GBFS snapshots, metadata, poll/error logs
+raw/ and processed/            Earlier supplementary CityBikes audit data
 ```
 
-Skip `git clone` if a complete archive checkout already exists. On this machine the sibling `../baywheels-history` is that original checkout; retain its local files and do not clone over it. Use `--repo` with another path if necessary.
+No full 242-million-row export was downloaded. Full trip CSVs are streamed from ZIPs. The project stores code, configuration, aggregate reports, source notices, station manifests and synthetic tests.
 
-To repeat the external checks after the audit:
+## Reproduce
+
+After installing root `requirements.txt` in a Python 3.14 environment:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts/data/check_external_sources.py
+$DivvyRoot = "$env:USERPROFILE\Documents\BikeFlowAI-data\divvy"
+$DataRoot = Join-Path $DivvyRoot 'chicago_historical_2021_sample'
+.\.venv\Scripts\python.exe scripts/data/collect_divvy_gbfs.py --data-root "$DivvyRoot" --once
+.\.venv\Scripts\python.exe scripts/data/download_chicago_sample.py --data-root "$DataRoot"
+.\.venv\Scripts\python.exe scripts/data/build_app_cohort.py --data-root "$DataRoot"
 ```
 
-This downloads monthly trip ZIPs into ignored `data/raw/trips/`, scans their actual dates, and probes the weather API. It uses the network; results can change. It does not complete trip-ID mapping, localize ambiguous Pacific timestamps, or build a weather feature table.
+The one-time collector call supplies current metadata on a new machine. Ongoing Windows scheduling is separate; see [collector operations](../docs/gbfs_collector.md). The downloader bounds the sample to 50 training-anchor stations / 18 weeks / one million rows, verifies TLS and cached-file SHA-256, and downloads only the four matching trip months.
 
-The extractor writes atomic parts every 500 commits and resumes completed parts only for the same source revision, extractor hash, and options. Use a new output directory if those change. `--limit` is a smoke run; a full audit refuses incomplete extraction.
+`build_app_cohort.py` uses the preserved training-qualified cohort and fixed captured identity evidence, writes [app_stations.csv](manifests/chicago/app_stations.csv), reruns snapshots/trips into separate `app32/` outputs, and writes a versioned data protocol. It does not replace the original 42-station results. Protocol version 1 expects exactly 32 stations; changed selection evidence requires a reviewed new version.
 
-## Local output and committed artifacts
+`make data` runs bounded download then the app audit; `make audit-base` writes a separate reproduced base audit without replacing original evidence. Use explicit external roots and distinct report/manifest destinations for new samples.
 
-| Path | Contents | Git status |
-|---|---|---|
-| `processed/baywheels_history/` | Extracted parts, snapshot inventory, consolidated Parquet, temporary DuckDB files | Ignored |
-| `raw/`, `external/`, `generated/` | Downloaded or generated local data | Ignored |
-| `manifests/` | Candidate stations and provisional station/split manifests | Included |
-| `../reports/data_audit/` | Aggregate audit results, source checks, validation | Included |
+## Cohorts and interpretation
 
-The initial aggregate reports were copied unchanged from the original archive audit. Their source commit and script/data hashes remain in `audit_summary.json`. Existing raw ZIPs and Parquet remain in the sibling archive checkout; they were not copied into this project.
+The original 50 candidate / 42 training-qualified station audit remains in [the original report](../reports/chicago_historical_audit/data_audit.md). The **32-station app cohort** and its own coverage, labels, balance, trip mapping and training OD estimates are in [app32](../reports/chicago_historical_audit/app32/README.md). These have different trip denominators. The failed 2022 sample is retained for its ~50-day gap.
 
-The script defaults overwrite the report and manifest directories when rerun. To preserve the initial results during experiments, pass separate destinations, for example `--reports reports/sampling_revision --manifests data/manifests/sampling_revision`. This separates output locations only; it does not change the current script's fixed sampling rule.
+The [frozen protocol](manifests/chicago/app32/data_protocol.json) specifies 10–60-minute horizons, ±5-minute target matching, exact split dates, 60-minute separation, training-only OD, and causal feature freshness <=15 minutes. Features use only recorded snapshots <= decision time; future snapshots are label/outcome data only. Missing/stale inputs or outcomes exclude the request. Arbitrary filling and missing-as-zero are not permitted.
 
-## Provisional manifests
+Historical floating timestamps and naive trip times use an explicit America/Chicago assumption; raw wall times are retained and DST folds/gaps excluded. Source schema does not independently annotate the historical timezone. GBFS Unix timestamps are UTC. Historical publication latency is unmeasured, so recorded timestamps are an availability assumption.
 
-- `selected_stations.csv` is intentionally header-only: zero stations passed the original seven-minute / 90% gate. Selection under the revised rule is still pending; this is not a frozen training station list.
-- `candidate_stations.csv` contains training-only exploratory candidates, not approved selections.
-- `split_manifest.csv` has independent chronological train/tune/calibration/test intervals with 60-minute separation. It remains an audit proposal until the revised rule and split-boundary checks pass.
-- `station_id_map.csv` contains historical metadata intervals only. Current GBFS IDs remain blank; trip/current mappings are unverified. An open interval does not establish validity through today.
+Historical `In Service` is a broad flag. Do not invent separate installed/renting/returning/disabled fields, add ebikes twice, or copy current metadata into historical features. Identity matches do not prove continuous operation or current service; live flags must be checked. No model-ready feature/label table, full replay or 2026 generalization is certified yet.
 
-The initial diagnostic coverage uses a fixed UTC seven-minute grid. Initial label retention uses the nearest observed snapshot within 3.5 minutes, then checks validity; it does not yet implement the revised proposal's nearest-valid matching rule. These diagnostic rates do not represent final training rows. Freshness, causal metadata, lag features, trip joins, and split-boundary checks require further work; weather is optional. Missing or non-reporting observations must never become zero-inventory labels.
+## Licenses and archived evidence
 
-The [manifest status notes](manifests/README.md) define what each provisional file can be used for.
+See [DATA_SOURCES.md](../DATA_SOURCES.md), [the primary license review](../reports/chicago_historical_audit/licensing_and_overlap.md), and [NOTICE_CHICAGO.md](../NOTICE_CHICAGO.md). Primary metadata says See Terms of Use. Official trip restrictions, live catalog/publisher qualifications and CityBikes ODbL remain source-specific.
 
-## Licensing
-
-The archive has no identified repository license; official Lyft data has separate restrictions. Raw JSON, trip ZIP/CSV, Parquet, DuckDB, and the archive's Git history are not redistributed here. See [licensing_and_overlap.md](../reports/data_audit/licensing_and_overlap.md). The test fixture is entirely synthetic.
-
+Earlier code, numeric reports and manifests are archived under [legacy/baywheels](../legacy/baywheels/README.md) and [legacy/citybikes](../legacy/citybikes/README.md). Exact source bytes matching original Chicago audit hashes are in [legacy/official_chicago_audit_v1](../legacy/official_chicago_audit_v1/README.md). CSV/JSON results were preserved; navigation Markdown links were adjusted for relocation.

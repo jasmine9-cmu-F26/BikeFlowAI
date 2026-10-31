@@ -1,0 +1,103 @@
+{
+  "network": "divvy",
+  "city": "Chicago",
+  "status": "app32_data_protocol_v1_frozen_model_tables_pending",
+  "training_ready": false,
+  "default_data_root_relative_to_project": "../../BikeFlowAI-data/divvy/chicago_historical_2021_sample",
+  "sources": {
+    "citybikes": {
+      "role": "supplementary_recent_identity_and_feasibility_evidence_only",
+      "base_url": "https://data.citybik.es/",
+      "record_type": "inventory_change_events",
+      "polling_heartbeat_available": false,
+      "compilation_license": "ODbL-1.0",
+      "arbitrary_time_ground_truth": false,
+      "primary_training_replay_source": false,
+      "supplementary_download_interval": {
+        "start_month": "202411",
+        "end_month": "202609"
+      }
+    },
+    "trips": {
+      "role": "OD_and_training_only_ride_times",
+      "base_url": "https://divvy-tripdata.s3.amazonaws.com/",
+      "timezone": "America/Chicago",
+      "license_url": "https://divvybikes.com/data-license-agreement",
+      "matching_months": [
+        "202105",
+        "202106",
+        "202107",
+        "202108"
+      ]
+    },
+    "gbfs": {
+      "role": "live_inference",
+      "discovery_url": "https://gbfs.divvybikes.com/gbfs/2.3/gbfs.json",
+      "system_id": "lyft_chi",
+      "timezone": "America/Chicago",
+      "catalog_license": "CC-BY-4.0",
+      "publisher_license_confirmation": "pending_no_license_url_in_captured_system_information"
+    },
+    "primary_historical": {
+      "role": "primary_training_labels_and_quantized_offline_replay",
+      "dataset_id": "eq45-8inv",
+      "url": "https://data.cityofchicago.org/d/eq45-8inv",
+      "license": "SEE_TERMS_OF_USE",
+      "terms_url": "https://www.chicago.gov/city/en/narr/foia/data_disclaimer.html",
+      "record_type": "recorded_full_snapshots",
+      "timezone_policy": "America/Chicago floating-time interpretation; raw local values retained"
+    },
+    "current_validation": {
+      "role": "own_full_GBFS_snapshots_for_sanity_and_supplemental_evaluation",
+      "interval_seconds": 120,
+      "started_at_utc": "2026-10-30T23:34:26.127776+00:00",
+      "stop_at_utc": "2026-12-13T07:59:00Z",
+      "requires_logged_in_awake_online": true
+    }
+  },
+  "audit": {
+    "horizons_minutes": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60
+    ],
+    "tolerance_seconds": 300,
+    "grid_minutes": 10,
+    "diagnostic_min_station_coverage": 0.9,
+    "diagnostic_min_label_retention": 0.9,
+    "train_selected_stations": 42,
+    "final_model_ready": false,
+    "do_not_forward_fill_gaps": true,
+    "exact_continuous_time_truth": false,
+    "status_semantics": "Archived broad In Service, not separate current GBFS flags",
+    "selected_station_status": "app32_protocol_v1_frozen_model_tables_pending",
+    "app_station_count": 32,
+    "original_training_qualified_stations": 42,
+    "max_asof_feature_age_seconds": 900
+  },
+  "paths": {
+    "reports": "reports/chicago_historical_audit",
+    "manifests": "data/manifests/chicago",
+    "supplementary_citybikes_reports": "legacy/citybikes/reports",
+    "app_reports": "reports/chicago_historical_audit/app32",
+    "app_manifests": "data/manifests/chicago/app32",
+    "app_stations": "data/manifests/chicago/app_stations.csv",
+    "frozen_protocol": "data/manifests/chicago/app32/data_protocol.json"
+  },
+  "weather": "optional",
+  "configuration_scope": "Documents CLI defaults and completed sample; scripts are not yet driven by this JSON",
+  "primary_study_window": {
+    "start_local": "2021-05-03T00:00:00",
+    "end_local_exclusive": "2021-08-30T00:00:00",
+    "max_initial_stations": 50,
+    "max_rows": 1000000
+  },
+  "download_interval": {
+    "start_month": "202105",
+    "end_month": "202108",
+    "scope": "primary bounded sample; exact local bounds are in primary_study_window"
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "checked_at_utc": "2026-10-31T00:15:54.015880+00:00",
+  "local_tests": {
+    "passed": 21,
+    "failed": 0,
+    "command": "python -m unittest discover -s tests -v"
+  },
+  "hosted_CI": "not run for these uncommitted changes",
+  "samples": {
+    "chicago_historical_2021_sample": {
+      "manifest_files_verified": 54,
+      "snapshot_rows": 856200,
+      "local_bytes_verified": 110909076,
+      "selected_stations": 42,
+      "decision": "PASS_BOUNDED_SNAPSHOT_FEASIBILITY",
+      "manifest_sha256": "280e5d6ea447101fba9fd769e7e40574f3ab02a2b20692424e353c64e67617b6",
+      "audit_sha256": "da2f24dbb48541580fd00b9fe2a277fcceb93ddedfa0852662759751f8e2a187",
+      "downloader_sha256": "a579b8ca688ab8a54cae9d95e1891dd7d433d90622b4229dbbf8e23c591e12a0"
+    },
+    "chicago_historical_sample": {
+      "manifest_files_verified": 54,
+      "snapshot_rows": 491350,
+      "local_bytes_verified": 111352798,
+      "selected_stations": 0,
+      "decision": "NEED_TO_RESTRICT_PERIOD_OR_COHORT",
+      "manifest_sha256": "894d192abedbfd4cd87f1dd082553cc6ded0c99fab23c762c96490a88449e04d",
+      "audit_sha256": "da2f24dbb48541580fd00b9fe2a277fcceb93ddedfa0852662759751f8e2a187",
+      "downloader_sha256": "2e0577c3129d79a00a7d4bf1a34afeaf476d3d8d0301297a79150f52a1f18791"
+    }
+  },
+  "trip_checks": {
+    "raw_rows": 2887990,
+    "invalid_timestamp_rows": 0,
+    "DST_excluded_rows": 0,
+    "starts_in_sample_window": 2792957,
+    "both_names_in_cohort_and_window": 111891,
+    "both_endpoints_mapped_in_sample": 104609,
+    "both_selected_endpoints": 79320,
+    "both_selected_endpoints_observable": 76834,
+    "eligible_training_OD_rides": 42356,
+    "mapping_success_among_named_cohort": 0.9349188049083483,
+    "selected_trip_observation_support": 0.9686585980837116,
+    "selected_station_count": 42,
+    "observed_OD_pairs": 1423,
+    "OD_pairs_20plus": 424,
+    "raw_storage": "Original four ZIPs only; full CSV files were streamed, not unpacked",
+    "timezone_policy": "Naive trip timestamps interpreted as America/Chicago using explicit IANA fold/gap policy; not independently annotated in CSV",
+    "mapping_scope": "Bounded 50-station sample: trips outside the cohort are out of scope, not mapping failures",
+    "replay_scope": "Nearest valid snapshot within +/-5min is quantized observation support, not exact continuous-time or causal pre-checkout state",
+    "ride_time_policy": "Mapped training-selected endpoints; both trip times in training; 60s..6h duration; no test/tune/calibration ride-time estimation",
+    "script_sha256": "3795833b1f569154beab31b87fa5df2cd06c5abb81efa303319ea03165af0aeb"
+  },
+  "source_code_sha256": {
+    "audit_baywheels_data.py": "5e08e7b361db2f5a5211b0d4159617c681e6844ace60f989f9e9139d37d2e3f1",
+    "audit_chicago_historical.py": "da2f24dbb48541580fd00b9fe2a277fcceb93ddedfa0852662759751f8e2a187",
+    "audit_chicago_trips.py": "3795833b1f569154beab31b87fa5df2cd06c5abb81efa303319ea03165af0aeb",
+    "audit_divvy_data.py": "a8817b5ec7ec12210d4a0c21f3ca938ce601974b60ba58709739678e6470fe27",
+    "audit_divvy_trips.py": "1c39b160f730a0a1c7990e41566b808b4088e267ad516047920005388fae9ec4",
+    "check_external_sources.py": "35c71a9ba50dfe4b0600ccf618c7b0e5891d1dab11d2614dac24669f93d63fba",
+    "collect_divvy_gbfs.py": "a323251329c92d461b20004cd5b38027df97da9aea2d9b7a2449c2c877fe42e9",
+    "download_chicago_sample.py": "a579b8ca688ab8a54cae9d95e1891dd7d433d90622b4229dbbf8e23c591e12a0",
+    "download_divvy_data.py": "c0694af9f47fb1abd70c68e56861227aeaa00aa04a4a835f0ee2c889eedd4f38",
+    "extract_baywheels_history.py": "49c92f6ab90b301feb63c51b7a8cb16ec8c86d9c5f349c2657e607e05636eab8",
+    "extract_citybikes_divvy.py": "f43f164f2fcd9f0ff0d333cc4117f6d48f7e5402ba7fdd7f952e68b08153429d"
+  },
+  "all_python_AST_valid": true,
+  "new_document_relative_links_valid": true,
+  "raw_and_processed_data_outside_project": true,
+  "pip_check": "No broken requirements found.",
+  "collector_recent_poll_age_seconds": 90.405838,
+  "collector_task_read_only_verification": "Task queried separately with elevated read access: last result 0; repetition PT2M; end boundary 2026-12-13T00:59:00-07:00 (=2026-12-12 23:59 America/Los_Angeles)"
+}
