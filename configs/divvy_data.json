@@ -104,5 +104,11 @@
     "start_month": "202105",
     "end_month": "202108",
     "scope": "primary bounded sample; exact local bounds are in primary_study_window"
+  },
+  "weather_audit": {
+    "status": "NEED_TO_RESTRICT_NOT_REQUIRED",
+    "required": false,
+    "configuration": "configs/weather_data.json",
+    "report": "reports/weather_audit/weather_audit.md"
   }
 }

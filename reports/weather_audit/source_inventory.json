@@ -1,0 +1,14 @@
+{
+  "urls": {
+    "historical_forecast": "https://open-meteo.com/en/docs/historical-forecast-api",
+    "live_forecast": "https://open-meteo.com/en/docs",
+    "home": "https://open-meteo.com/",
+    "single_runs": "https://open-meteo.com/en/docs/single-runs-api",
+    "historical_weather_reanalysis": "https://open-meteo.com/en/docs/historical-weather-api",
+    "licence": "https://open-meteo.com/en/licence",
+    "terms": "https://open-meteo.com/en/terms"
+  },
+  "data_license": "https://creativecommons.org/licenses/by/4.0/",
+  "attribution": "Weather data by Open-Meteo.com; normalized hourly data and joins by BikeFlow AI",
+  "free_api_noncommercial_only": true
+}

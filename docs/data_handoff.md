@@ -25,3 +25,7 @@ See [app results](../reports/chicago_historical_audit/app32/README.md), [source 
 ## Current collector handoff
 
 Current collection uses Google Apps Script at a nominal five-minute cadence, independently of laptop uptime. Initial user-provided scheduled-run evidence was checked and the local Windows task disabled; existing local data remains intact. Raw cloud download, full-day quota/coverage review and historical/current domain-shift evaluation remain separate tasks. See [collector operations](gbfs_collector.md).
+
+## Weather handoff
+
+The [weather audit](../reports/weather_audit/weather_audit.md) covers five proposed variables, four requested model configurations and the fixed 2021 app32 snapshots. Coverage alone passes, but a stitched historical forecast valid_time cannot establish issued_at/available_at <= request_time. Weather remains optional/excluded from the certified causal baseline. Do not join t+h from a stitched archive and describe it as the forecast known at t. Require issuance-aware provenance or label a supplementary ablation with its assumptions. No collector, station, split or frozen model protocol was changed by this audit.

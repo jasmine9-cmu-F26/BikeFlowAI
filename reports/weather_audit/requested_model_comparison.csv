@@ -1,0 +1,7 @@
+requested_model_a,requested_model_b,time_arrays_equal,all_requested_variable_arrays_equal,interpretation
+gfs_global,gfs_seamless,True,False,Requested aliases/blends can share an effective model; identical arrays do not prove independent archives
+gfs_global,gfs_hrrr,True,False,Requested aliases/blends can share an effective model; identical arrays do not prove independent archives
+gfs_global,best_match,True,False,Requested aliases/blends can share an effective model; identical arrays do not prove independent archives
+gfs_seamless,gfs_hrrr,True,True,Requested aliases/blends can share an effective model; identical arrays do not prove independent archives
+gfs_seamless,best_match,True,True,Requested aliases/blends can share an effective model; identical arrays do not prove independent archives
+gfs_hrrr,best_match,True,True,Requested aliases/blends can share an effective model; identical arrays do not prove independent archives

@@ -1,0 +1,54 @@
+{
+  "status": "OPTIONAL_CAUSAL_AVAILABILITY_NOT_CERTIFIED",
+  "required": false,
+  "source": "Open-Meteo Historical Forecast API",
+  "references": {
+    "9": "https://open-meteo.com/en/docs/historical-forecast-api",
+    "10": "https://open-meteo.com/"
+  },
+  "historical_endpoint": "https://historical-forecast-api.open-meteo.com/v1/forecast",
+  "live_endpoint": "https://api.open-meteo.com/v1/forecast",
+  "primary_reanalysis_allowed": false,
+  "core_variables": [
+    "temperature_2m",
+    "relative_humidity_2m",
+    "precipitation",
+    "wind_speed_10m",
+    "weather_code"
+  ],
+  "diagnostic_variables": [
+    "apparent_temperature",
+    "cloud_cover",
+    "precipitation_probability"
+  ],
+  "study_start_local": "2021-05-03T00:00:00",
+  "study_end_local_exclusive": "2021-08-30T00:00:00",
+  "request_timezone": "GMT",
+  "timeformat": "unixtime",
+  "spatial_scope": {
+    "latitude": 41.882076,
+    "longitude": -87.635494,
+    "selection": "Median historical coordinates of fixed app32 cohort; one common weather location, not 32 station-specific queries"
+  },
+  "audited_requested_models": [
+    "gfs_global",
+    "gfs_seamless",
+    "gfs_hrrr",
+    "best_match"
+  ],
+  "preferred_candidate": "gfs_global",
+  "units": {
+    "temperature": "celsius",
+    "wind_speed": "ms",
+    "precipitation": "mm"
+  },
+  "coverage_missing_fraction_gate": 0.01,
+  "causal_gate": "Requires issued_at <= available_at <= request_time and appropriate valid_time; missing provenance rejects feature join",
+  "historical_join_status": "Backward valid-time joins audited, not certified causal features",
+  "snapshot_maximum_backward_valid_time_age_seconds": 3600,
+  "data_license": "CC-BY-4.0",
+  "free_service_noncommercial_only": true,
+  "raw_data_location": "external DIVVY_ROOT/weather_open_meteo_audit",
+  "reports": "reports/weather_audit",
+  "configuration_scope": "Audit/design record, not yet a runtime feature configuration"
+}

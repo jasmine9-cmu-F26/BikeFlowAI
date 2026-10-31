@@ -84,3 +84,7 @@ City of Chicago primary data is labeled **See Terms of Use**, not CC0. Retain [N
 Google Apps Script is active with a nominal five-minute trigger. [Handoff evidence](reports/chicago_historical_audit/cloud_collector_handoff.json) distinguishes user-provided cloud execution evidence from directly verified local task state; cloud raw files were not independently downloaded/validated. Check [current status](deploy/apps_script/deployment_status.json) and [operations](deploy/apps_script/README.md).
 
 AWS was abandoned after account eligibility required a Paid plan. No AWS resources were created; the AWS implementation is inactive evidence only. The active Google script requires no cloud billing setup. These initial captures do not constitute weeks of current-data validation or prove old-to-current model generalization.
+
+## Weather audit
+
+The [2021 weather audit](reports/weather_audit/weather_audit.md) uses the Historical Forecast API [9] and live Forecast schema/licence [10], with ERA5 excluded from primary features. Five proposal variables have good coverage; GFS Global weather code has two missing hours (0.07%), while Seamless/HRRR/Best Match have no missing core values. Strict historical request-time availability cannot be certified from stitched hourly valid times alone, so weather remains **optional / excluded from the certified causal baseline**. See [reference update](docs/proposal_references.md) and [methodology](reports/weather_audit/licensing_and_causality.md).

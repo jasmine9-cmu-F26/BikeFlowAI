@@ -1,0 +1,5 @@
+model,returned_study_hours,expected_study_hours,median_interval_seconds,p90_interval_seconds,UTC_offset_seconds,timezone,first_study_time_utc,last_study_time_utc,run_issue_time_present,generationtime_ms_is_issue_time
+gfs_global,2856,2856,3600.0,3600.0,0,GMT,2021-05-03T05:00:00Z,2021-08-30T04:00:00Z,False,False
+gfs_seamless,2856,2856,3600.0,3600.0,0,GMT,2021-05-03T05:00:00Z,2021-08-30T04:00:00Z,False,False
+gfs_hrrr,2856,2856,3600.0,3600.0,0,GMT,2021-05-03T05:00:00Z,2021-08-30T04:00:00Z,False,False
+best_match,2856,2856,3600.0,3600.0,0,GMT,2021-05-03T05:00:00Z,2021-08-30T04:00:00Z,False,False

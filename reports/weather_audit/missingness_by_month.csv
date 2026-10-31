@@ -1,0 +1,129 @@
+model,month,variable,role,expected_hours,returned_study_timestamps,nonmissing_hours,missing_hours,missing_fraction,minimum,maximum,unit
+gfs_global,2021-05,temperature_2m,core_candidate,691,691,691,0,0.0,1.9,29.1,°C
+gfs_global,2021-05,relative_humidity_2m,core_candidate,691,691,691,0,0.0,20,98,%
+gfs_global,2021-05,precipitation,core_candidate,691,691,691,0,0.0,0.0,5.2,mm
+gfs_global,2021-05,wind_speed_10m,core_candidate,691,691,691,0,0.0,0.32,8.7,m/s
+gfs_global,2021-05,apparent_temperature,diagnostic,691,691,691,0,0.0,-2.6,29.9,°C
+gfs_global,2021-05,weather_code,core_candidate,691,691,691,0,0.0,0,81,wmo code
+gfs_global,2021-05,cloud_cover,diagnostic,691,691,691,0,0.0,0,101,%
+gfs_global,2021-05,precipitation_probability,diagnostic,691,691,0,691,1.0,,,%
+gfs_global,2021-06,temperature_2m,core_candidate,720,720,720,0,0.0,12.0,30.5,°C
+gfs_global,2021-06,relative_humidity_2m,core_candidate,720,720,720,0,0.0,25,99,%
+gfs_global,2021-06,precipitation,core_candidate,720,720,720,0,0.0,0.0,11.2,mm
+gfs_global,2021-06,wind_speed_10m,core_candidate,720,720,720,0,0.0,0.2,7.38,m/s
+gfs_global,2021-06,apparent_temperature,diagnostic,720,720,720,0,0.0,10.7,32.1,°C
+gfs_global,2021-06,weather_code,core_candidate,720,720,720,0,0.0,0,95,wmo code
+gfs_global,2021-06,cloud_cover,diagnostic,720,720,720,0,0.0,0,100,%
+gfs_global,2021-06,precipitation_probability,diagnostic,720,720,0,720,1.0,,,%
+gfs_global,2021-07,temperature_2m,core_candidate,744,744,744,0,0.0,14.9,31.9,°C
+gfs_global,2021-07,relative_humidity_2m,core_candidate,744,744,744,0,0.0,27,98,%
+gfs_global,2021-07,precipitation,core_candidate,744,744,744,0,0.0,0.0,1.9,mm
+gfs_global,2021-07,wind_speed_10m,core_candidate,744,744,744,0,0.0,0.36,7.38,m/s
+gfs_global,2021-07,apparent_temperature,diagnostic,744,744,744,0,0.0,13.4,36.8,°C
+gfs_global,2021-07,weather_code,core_candidate,744,744,743,1,0.0013440860215053765,0,96,wmo code
+gfs_global,2021-07,cloud_cover,diagnostic,744,744,744,0,0.0,-1,101,%
+gfs_global,2021-07,precipitation_probability,diagnostic,744,744,0,744,1.0,,,%
+gfs_global,2021-08,temperature_2m,core_candidate,701,701,701,0,0.0,16.5,33.3,°C
+gfs_global,2021-08,relative_humidity_2m,core_candidate,701,701,701,0,0.0,34,97,%
+gfs_global,2021-08,precipitation,core_candidate,701,701,701,0,0.0,0.0,4.2,mm
+gfs_global,2021-08,wind_speed_10m,core_candidate,701,701,701,0,0.0,0.1,7.76,m/s
+gfs_global,2021-08,apparent_temperature,diagnostic,701,701,701,0,0.0,15.8,38.3,°C
+gfs_global,2021-08,weather_code,core_candidate,701,701,700,1,0.0014265335235378032,0,96,wmo code
+gfs_global,2021-08,cloud_cover,diagnostic,701,701,701,0,0.0,-1,100,%
+gfs_global,2021-08,precipitation_probability,diagnostic,701,701,0,701,1.0,,,%
+gfs_seamless,2021-05,temperature_2m,core_candidate,691,691,691,0,0.0,1.6,31.1,°C
+gfs_seamless,2021-05,relative_humidity_2m,core_candidate,691,691,691,0,0.0,21,100,%
+gfs_seamless,2021-05,precipitation,core_candidate,691,691,691,0,0.0,0.0,11.5,mm
+gfs_seamless,2021-05,wind_speed_10m,core_candidate,691,691,691,0,0.0,0.14,10.18,m/s
+gfs_seamless,2021-05,apparent_temperature,diagnostic,691,691,691,0,0.0,-1.8,31.0,°C
+gfs_seamless,2021-05,weather_code,core_candidate,691,691,691,0,0.0,0,65,wmo code
+gfs_seamless,2021-05,cloud_cover,diagnostic,691,691,691,0,0.0,0,100,%
+gfs_seamless,2021-05,precipitation_probability,diagnostic,691,691,0,691,1.0,,,%
+gfs_seamless,2021-06,temperature_2m,core_candidate,720,720,720,0,0.0,10.1,32.3,°C
+gfs_seamless,2021-06,relative_humidity_2m,core_candidate,720,720,720,0,0.0,24,100,%
+gfs_seamless,2021-06,precipitation,core_candidate,720,720,720,0,0.0,0.0,111.2,mm
+gfs_seamless,2021-06,wind_speed_10m,core_candidate,720,720,720,0,0.0,0.1,7.9,m/s
+gfs_seamless,2021-06,apparent_temperature,diagnostic,720,720,720,0,0.0,8.1,33.3,°C
+gfs_seamless,2021-06,weather_code,core_candidate,720,720,720,0,0.0,0,82,wmo code
+gfs_seamless,2021-06,cloud_cover,diagnostic,720,720,720,0,0.0,0,100,%
+gfs_seamless,2021-06,precipitation_probability,diagnostic,720,720,0,720,1.0,,,%
+gfs_seamless,2021-07,temperature_2m,core_candidate,744,744,744,0,0.0,13.1,32.5,°C
+gfs_seamless,2021-07,relative_humidity_2m,core_candidate,744,744,744,0,0.0,26,100,%
+gfs_seamless,2021-07,precipitation,core_candidate,744,744,744,0,0.0,0.0,13.3,mm
+gfs_seamless,2021-07,wind_speed_10m,core_candidate,744,744,744,0,0.0,0.14,11.4,m/s
+gfs_seamless,2021-07,apparent_temperature,diagnostic,744,744,744,0,0.0,11.2,37.1,°C
+gfs_seamless,2021-07,weather_code,core_candidate,744,744,744,0,0.0,0,82,wmo code
+gfs_seamless,2021-07,cloud_cover,diagnostic,744,744,744,0,0.0,0,100,%
+gfs_seamless,2021-07,precipitation_probability,diagnostic,744,744,0,744,1.0,,,%
+gfs_seamless,2021-08,temperature_2m,core_candidate,701,701,701,0,0.0,15.2,34.1,°C
+gfs_seamless,2021-08,relative_humidity_2m,core_candidate,701,701,701,0,0.0,36,100,%
+gfs_seamless,2021-08,precipitation,core_candidate,701,701,701,0,0.0,0.0,67.0,mm
+gfs_seamless,2021-08,wind_speed_10m,core_candidate,701,701,701,0,0.0,0.0,11.24,m/s
+gfs_seamless,2021-08,apparent_temperature,diagnostic,701,701,701,0,0.0,15.1,39.5,°C
+gfs_seamless,2021-08,weather_code,core_candidate,701,701,701,0,0.0,0,95,wmo code
+gfs_seamless,2021-08,cloud_cover,diagnostic,701,701,701,0,0.0,0,100,%
+gfs_seamless,2021-08,precipitation_probability,diagnostic,701,701,0,701,1.0,,,%
+gfs_hrrr,2021-05,temperature_2m,core_candidate,691,691,691,0,0.0,1.6,31.1,°C
+gfs_hrrr,2021-05,relative_humidity_2m,core_candidate,691,691,691,0,0.0,21,100,%
+gfs_hrrr,2021-05,precipitation,core_candidate,691,691,691,0,0.0,0.0,11.5,mm
+gfs_hrrr,2021-05,wind_speed_10m,core_candidate,691,691,691,0,0.0,0.14,10.18,m/s
+gfs_hrrr,2021-05,apparent_temperature,diagnostic,691,691,691,0,0.0,-1.8,31.0,°C
+gfs_hrrr,2021-05,weather_code,core_candidate,691,691,691,0,0.0,0,65,wmo code
+gfs_hrrr,2021-05,cloud_cover,diagnostic,691,691,691,0,0.0,0,100,%
+gfs_hrrr,2021-05,precipitation_probability,diagnostic,691,691,0,691,1.0,,,%
+gfs_hrrr,2021-06,temperature_2m,core_candidate,720,720,720,0,0.0,10.1,32.3,°C
+gfs_hrrr,2021-06,relative_humidity_2m,core_candidate,720,720,720,0,0.0,24,100,%
+gfs_hrrr,2021-06,precipitation,core_candidate,720,720,720,0,0.0,0.0,111.2,mm
+gfs_hrrr,2021-06,wind_speed_10m,core_candidate,720,720,720,0,0.0,0.1,7.9,m/s
+gfs_hrrr,2021-06,apparent_temperature,diagnostic,720,720,720,0,0.0,8.1,33.3,°C
+gfs_hrrr,2021-06,weather_code,core_candidate,720,720,720,0,0.0,0,82,wmo code
+gfs_hrrr,2021-06,cloud_cover,diagnostic,720,720,720,0,0.0,0,100,%
+gfs_hrrr,2021-06,precipitation_probability,diagnostic,720,720,0,720,1.0,,,%
+gfs_hrrr,2021-07,temperature_2m,core_candidate,744,744,744,0,0.0,13.1,32.5,°C
+gfs_hrrr,2021-07,relative_humidity_2m,core_candidate,744,744,744,0,0.0,26,100,%
+gfs_hrrr,2021-07,precipitation,core_candidate,744,744,744,0,0.0,0.0,13.3,mm
+gfs_hrrr,2021-07,wind_speed_10m,core_candidate,744,744,744,0,0.0,0.14,11.4,m/s
+gfs_hrrr,2021-07,apparent_temperature,diagnostic,744,744,744,0,0.0,11.2,37.1,°C
+gfs_hrrr,2021-07,weather_code,core_candidate,744,744,744,0,0.0,0,82,wmo code
+gfs_hrrr,2021-07,cloud_cover,diagnostic,744,744,744,0,0.0,0,100,%
+gfs_hrrr,2021-07,precipitation_probability,diagnostic,744,744,0,744,1.0,,,%
+gfs_hrrr,2021-08,temperature_2m,core_candidate,701,701,701,0,0.0,15.2,34.1,°C
+gfs_hrrr,2021-08,relative_humidity_2m,core_candidate,701,701,701,0,0.0,36,100,%
+gfs_hrrr,2021-08,precipitation,core_candidate,701,701,701,0,0.0,0.0,67.0,mm
+gfs_hrrr,2021-08,wind_speed_10m,core_candidate,701,701,701,0,0.0,0.0,11.24,m/s
+gfs_hrrr,2021-08,apparent_temperature,diagnostic,701,701,701,0,0.0,15.1,39.5,°C
+gfs_hrrr,2021-08,weather_code,core_candidate,701,701,701,0,0.0,0,95,wmo code
+gfs_hrrr,2021-08,cloud_cover,diagnostic,701,701,701,0,0.0,0,100,%
+gfs_hrrr,2021-08,precipitation_probability,diagnostic,701,701,0,701,1.0,,,%
+best_match,2021-05,temperature_2m,core_candidate,691,691,691,0,0.0,1.6,31.1,°C
+best_match,2021-05,relative_humidity_2m,core_candidate,691,691,691,0,0.0,21,100,%
+best_match,2021-05,precipitation,core_candidate,691,691,691,0,0.0,0.0,11.5,mm
+best_match,2021-05,wind_speed_10m,core_candidate,691,691,691,0,0.0,0.14,10.18,m/s
+best_match,2021-05,apparent_temperature,diagnostic,691,691,691,0,0.0,-1.8,31.0,°C
+best_match,2021-05,weather_code,core_candidate,691,691,691,0,0.0,0,65,wmo code
+best_match,2021-05,cloud_cover,diagnostic,691,691,691,0,0.0,0,100,%
+best_match,2021-05,precipitation_probability,diagnostic,691,691,0,691,1.0,,,%
+best_match,2021-06,temperature_2m,core_candidate,720,720,720,0,0.0,10.1,32.3,°C
+best_match,2021-06,relative_humidity_2m,core_candidate,720,720,720,0,0.0,24,100,%
+best_match,2021-06,precipitation,core_candidate,720,720,720,0,0.0,0.0,111.2,mm
+best_match,2021-06,wind_speed_10m,core_candidate,720,720,720,0,0.0,0.1,7.9,m/s
+best_match,2021-06,apparent_temperature,diagnostic,720,720,720,0,0.0,8.1,33.3,°C
+best_match,2021-06,weather_code,core_candidate,720,720,720,0,0.0,0,82,wmo code
+best_match,2021-06,cloud_cover,diagnostic,720,720,720,0,0.0,0,100,%
+best_match,2021-06,precipitation_probability,diagnostic,720,720,0,720,1.0,,,%
+best_match,2021-07,temperature_2m,core_candidate,744,744,744,0,0.0,13.1,32.5,°C
+best_match,2021-07,relative_humidity_2m,core_candidate,744,744,744,0,0.0,26,100,%
+best_match,2021-07,precipitation,core_candidate,744,744,744,0,0.0,0.0,13.3,mm
+best_match,2021-07,wind_speed_10m,core_candidate,744,744,744,0,0.0,0.14,11.4,m/s
+best_match,2021-07,apparent_temperature,diagnostic,744,744,744,0,0.0,11.2,37.1,°C
+best_match,2021-07,weather_code,core_candidate,744,744,744,0,0.0,0,82,wmo code
+best_match,2021-07,cloud_cover,diagnostic,744,744,744,0,0.0,0,100,%
+best_match,2021-07,precipitation_probability,diagnostic,744,744,0,744,1.0,,,%
+best_match,2021-08,temperature_2m,core_candidate,701,701,701,0,0.0,15.2,34.1,°C
+best_match,2021-08,relative_humidity_2m,core_candidate,701,701,701,0,0.0,36,100,%
+best_match,2021-08,precipitation,core_candidate,701,701,701,0,0.0,0.0,67.0,mm
+best_match,2021-08,wind_speed_10m,core_candidate,701,701,701,0,0.0,0.0,11.24,m/s
+best_match,2021-08,apparent_temperature,diagnostic,701,701,701,0,0.0,15.1,39.5,°C
+best_match,2021-08,weather_code,core_candidate,701,701,701,0,0.0,0,95,wmo code
+best_match,2021-08,cloud_cover,diagnostic,701,701,701,0,0.0,0,100,%
+best_match,2021-08,precipitation_probability,diagnostic,701,701,0,701,1.0,,,%

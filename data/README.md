@@ -57,3 +57,7 @@ Earlier code, numeric reports and manifests are archived under [legacy/baywheels
 ## Current collection handoff
 
 Google Apps Script is now the active collector at a nominal **five-minute** cadence; the original Windows two-minute task is **disabled** and local files are preserved. Laptop uptime is no longer required. Cloud files stay in private personal Drive until explicitly downloaded to a separate external `google_validation/` folder. Google files contain gzip poll envelopes; their format differs from local status/metadata files. Initial verification uses user-supplied scheduled-run logs, not an independent audit of raw Google bytes. See [current operations](../docs/gbfs_collector.md).
+
+## Weather data audit
+
+Historical forecast responses, source evidence and normalized Parquet stay in external `weather_open_meteo_audit/`. The [small 2021 audit](../reports/weather_audit/weather_audit.md) checks hourly missingness, units, schema and backward valid-time matching to the fixed app32 cohort. Weather remains optional because forecast issue/publication provenance is unresolved; a successful timestamp join is not a certified causal feature. No ERA5 was requested or substituted. Reproduce with `python scripts/data/audit_weather_data.py --data-root EXTERNAL_DIVVY_ROOT/weather_open_meteo_audit`; add `--offline` to verify/re-audit saved responses without network. No weather calls were added to the live GBFS collector.

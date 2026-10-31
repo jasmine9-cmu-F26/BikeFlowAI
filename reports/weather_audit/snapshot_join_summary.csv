@@ -1,0 +1,21 @@
+model,split,station_snapshot_rows,backward_valid_time_joined_core_rows,valid_time_join_rate,maximum_join_age_seconds,certified_request_time_available_rows,availability_status,join_interpretation
+gfs_global,sample,547968,547584,0.9992992291520673,3425,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+gfs_global,train,322368,322368,1.0,3425,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+gfs_global,tune,64320,64128,0.9970149253731343,3405,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+gfs_global,calibration,64192,64192,1.0,3420,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+gfs_global,test,96512,96320,0.9980106100795756,3410,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+gfs_seamless,sample,547968,547968,1.0,3425,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+gfs_seamless,train,322368,322368,1.0,3425,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+gfs_seamless,tune,64320,64320,1.0,3405,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+gfs_seamless,calibration,64192,64192,1.0,3420,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+gfs_seamless,test,96512,96512,1.0,3410,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+gfs_hrrr,sample,547968,547968,1.0,3425,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+gfs_hrrr,train,322368,322368,1.0,3425,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+gfs_hrrr,tune,64320,64320,1.0,3405,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+gfs_hrrr,calibration,64192,64192,1.0,3420,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+gfs_hrrr,test,96512,96512,1.0,3410,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+best_match,sample,547968,547968,1.0,3425,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+best_match,train,322368,322368,1.0,3425,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+best_match,tune,64320,64320,1.0,3405,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+best_match,calibration,64192,64192,1.0,3420,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time
+best_match,test,96512,96512,1.0,3410,0,NOT_CERTIFIABLE_MISSING_ISSUE_AND_PUBLICATION_TIMES,Calendar alignment only; valid_time <= request_time is not forecast available_at <= request_time

@@ -1,0 +1,33 @@
+model,variable,historical_key_present,live_key_present,historical_unit,live_unit,units_equal,live_nonmissing
+gfs_global,temperature_2m,True,True,°C,°C,True,48
+gfs_global,relative_humidity_2m,True,True,%,%,True,48
+gfs_global,precipitation,True,True,mm,mm,True,48
+gfs_global,wind_speed_10m,True,True,m/s,m/s,True,48
+gfs_global,apparent_temperature,True,True,°C,°C,True,48
+gfs_global,weather_code,True,True,wmo code,wmo code,True,48
+gfs_global,cloud_cover,True,True,%,%,True,48
+gfs_global,precipitation_probability,True,True,%,%,True,48
+gfs_seamless,temperature_2m,True,True,°C,°C,True,48
+gfs_seamless,relative_humidity_2m,True,True,%,%,True,48
+gfs_seamless,precipitation,True,True,mm,mm,True,48
+gfs_seamless,wind_speed_10m,True,True,m/s,m/s,True,48
+gfs_seamless,apparent_temperature,True,True,°C,°C,True,48
+gfs_seamless,weather_code,True,True,wmo code,wmo code,True,48
+gfs_seamless,cloud_cover,True,True,%,%,True,48
+gfs_seamless,precipitation_probability,True,True,%,%,True,48
+gfs_hrrr,temperature_2m,True,True,°C,°C,True,48
+gfs_hrrr,relative_humidity_2m,True,True,%,%,True,48
+gfs_hrrr,precipitation,True,True,mm,mm,True,48
+gfs_hrrr,wind_speed_10m,True,True,m/s,m/s,True,48
+gfs_hrrr,apparent_temperature,True,True,°C,°C,True,48
+gfs_hrrr,weather_code,True,True,wmo code,wmo code,True,48
+gfs_hrrr,cloud_cover,True,True,%,%,True,48
+gfs_hrrr,precipitation_probability,True,True,%,%,True,48
+best_match,temperature_2m,True,True,°C,°C,True,48
+best_match,relative_humidity_2m,True,True,%,%,True,48
+best_match,precipitation,True,True,mm,mm,True,48
+best_match,wind_speed_10m,True,True,m/s,m/s,True,48
+best_match,apparent_temperature,True,True,°C,°C,True,48
+best_match,weather_code,True,True,wmo code,wmo code,True,48
+best_match,cloud_cover,True,True,%,%,True,48
+best_match,precipitation_probability,True,True,%,%,True,48

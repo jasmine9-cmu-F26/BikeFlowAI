@@ -1,0 +1,17 @@
+{
+  "source_name": "BikeFlow AI - Milestone 2 System Design Proposal (3).docx",
+  "source_sha256": "be2c2b8089f60146a815c039596e268b8bf5e8231fdb5bc5b9ea8a90e6469c17",
+  "review_copy_sha256": "ba0ae12b16525b929848339989cb9e6cdaf8768db2fb90ffe78b0f10b6a3728e",
+  "original_preserved": true,
+  "changes": [
+    "Do not claim weather is required before causal gate passes",
+    "Replace unverified causal-join table claim",
+    "Correct stale calibration in-text citation [5] -> [8] (bibliography already uses [8])",
+    "Qualify forecaster weather inputs using audit findings",
+    "Update Maskable PPO in-text citation to [11]",
+    "Report actual coverage and unresolved causal availability",
+    "Align current collection cadence with verified Google handoff",
+    "Replace reference [9] and insert [10]",
+    "Move Maskable PPO reference to [11]"
+  ]
+}
