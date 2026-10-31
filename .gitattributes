@@ -1,2 +1,9 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Preserve exact hashed source/evidence bytes across Windows and Linux.
+# Disabling text normalization still permits ordinary textual diffs.
+scripts/data/** -text
+legacy/** -text
+reports/** -text
+data/manifests/** -text

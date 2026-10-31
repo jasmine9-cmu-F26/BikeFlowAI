@@ -8,6 +8,7 @@
 *.duckdb
 *.duckdb.*
 *.zip
+*.json.gz
 
 # Python
 .venv/
