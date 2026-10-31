@@ -34,6 +34,18 @@ Get-ScheduledTask -TaskName 'BikeFlowAI-Divvy-Full-GBFS-Collector'
 
 The standard-library [local collector](../scripts/data/collect_divvy_gbfs.py) and [installer](../scripts/data/install_divvy_collector.ps1) remain available for a deliberate fallback. Re-enabling/installing it would require this computer to stay logged in, awake and online. Do not run parallel collectors accidentally.
 
+### Linux fallback
+
+[install_divvy_collector.sh](../scripts/data/install_divvy_collector.sh) schedules the same collector on Linux. It uses a systemd user timer if one is reachable and cron otherwise. It runs one smoke poll first and schedules nothing unless that poll returns `ok`. It does not use sudo:
+
+```bash
+scripts/data/install_divvy_collector.sh --data-root ~/BikeFlowAI-data/divvy --dry-run   # preview only
+scripts/data/install_divvy_collector.sh --data-root ~/BikeFlowAI-data/divvy             # 2-minute default
+scripts/data/install_divvy_collector.sh --uninstall                                     # data kept
+```
+
+Options are `--interval-minutes 1-5`, `--mode systemd|cron`, `--python` and `--stop-at`. With systemd, polls stop after logout unless you run `loginctl enable-linger $USER` yourself. Logs go to `current_validation/scheduler.log`. The same machine-awake/online caveats apply, and a Linux run does not replace the Google provenance.
+
 Historical training data, station selection, splits and model timing rules are unchanged. Raw source terms remain documented in [DATA_SOURCES.md](../DATA_SOURCES.md).
 
 ## Rolling health metrics active
