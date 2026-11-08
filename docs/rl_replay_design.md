@@ -51,7 +51,14 @@ Reward: `+1` for a completed pickup and return, `−λ` per extra walking minute
 
 ## Evaluation
 
-All policies run the same tune requests with the same λ, μ, c. Report trip success, pickup and return failure, failed attempts, extra walk (mean, median, p90), waiting, mean reward, and unobservable episodes. Paired differences (RL − B3, RL − B1, B3 − B1, B3 − B2) on success, reward and walk use requests observed under both policies, with Chicago-day bootstrap intervals; `comparisons.csv` lists the number of days, because an interval over a handful of days means little. Test is used once, with frozen settings (`make rl-eval-final`).
+All policies run the same tune requests with the same λ, μ, c. Report trip success, pickup and return failure, failed attempts, extra walk (mean, median, p90), waiting, mean reward, and unobservable episodes. Paired differences (RL − B3, RL − B1, B3 − B1, B3 − B2) on success, reward, walk and wait use requests observed under both policies, with Chicago-day bootstrap intervals; `comparisons.csv` lists the number of days, because an interval over a handful of days means little. Test is used once, with frozen settings (`make rl-eval-final`).
+
+### λ sweep
+
+Mean reward ranks policies only for one λ, and λ is a product choice, not a fact. `make rl-sweep` ([`sweep.py`](../scripts/rl/sweep.py)) therefore retrains PPO with seeds 0, 1, 2 for each λ in {0, 0.005, 0.01, 0.02, 0.04, 0.08, 0.16, 0.32}, reruns B1/B2/B3 with the same λ on the same grid requests, and plots failed trips against walking and against walking plus waiting (`reports/rl_eval/lambda_sweep/frontier.png`). Seeded runs reproduce exactly. On tune (20,071 grid requests, μ = 0.01, c = 0.5):
+
+- B3 fails 3.89% to 3.94% of trips for every λ up to 0.08, while its mean walk falls from 6.4 to 1.2 minutes; walking beyond that buys nothing. At λ = 0.08 it walks as much as B1 (−0.03 minutes, interval −0.06 to 0.00), fails 1.0 point less (0.67 to 1.34), i.e. 21% fewer failed trips (interval 14% to 27%), and waits 1.1 minutes more. Above 0.08 it trades walking for waiting and starts to fail more (4.38% at 0.32).
+- RL fails 3.94% to 4.22% across λ (seed spread up to 0.2 points), walks 0.8 to 1.1 minutes for λ ≥ 0.005, and has a higher mean reward than B3 for every seed at λ from 0.005 to 0.08 (two of three seeds at 0.16, none at 0 or 0.32). Its best points sit next to B3 at λ = 0.08 on both plots, so RL beats a greedy rule tuned for the same λ but not B3 at its best λ. RL−B3 success differences below about 0.3 points change sign or significance with the seed.
 
 ## Known limits
 
@@ -71,6 +78,7 @@ make forward           # training weeks 2+   -> .../forward_train_predictions.pa
 make rl-train          # MaskablePPO         -> $DATA_ROOT/models/rl_dev/ppo.zip (+ .json manifest)
 make rl-eval           # B1/B2/B3/RL on tune -> reports/rl_eval/tune/
 make pipeline          # the four steps above in order
+make rl-sweep          # 8 λ x 3 PPO seeds   -> reports/rl_eval/lambda_sweep/ (about 10 minutes, 8 jobs)
 ```
 
 `rl-train` needs `pip install -r scripts/rl/requirements-ppo.txt` (torch); CI installs only `requirements.txt` and skips the PPO tests.

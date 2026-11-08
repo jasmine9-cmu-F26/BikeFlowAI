@@ -1,0 +1,29 @@
+{
+  "split": "tune",
+  "lams": [
+    0.0,
+    0.005,
+    0.01,
+    0.02,
+    0.04,
+    0.08,
+    0.16,
+    0.32
+  ],
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "steps": 300000,
+  "mu": 0.01,
+  "c": 0.5,
+  "walk_limit_minutes": 10,
+  "requests": "grid",
+  "demand_scale": 5.0,
+  "request_seed": 0,
+  "models": "/Users/y65ng/Developer/_school/cmu/18668-dse/BikeFlowAI-data/divvy/chicago_historical_2021_sample/models/rl_dev/lambda_sweep",
+  "bootstrap": 1000,
+  "seed": 0,
+  "test_opened": false
+}
