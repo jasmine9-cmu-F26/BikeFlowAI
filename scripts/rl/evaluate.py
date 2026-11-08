@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 
 from policies import SOURCES, greedy
-from replay_data import load_replay
+from replay_data import add_request_args, load_replay, request_provenance
 from replay_env import ReplayEnv
 
 OBSERVED = ("success", "failure")
@@ -194,9 +194,18 @@ def main():
     p.add_argument("--bootstrap", type=int, default=1000)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--reports", type=Path)
+    add_request_args(p)
     a = p.parse_args()
     split = "test" if a.final else "tune"
-    replay = load_replay(a.data_root, a.project_root, split, a.scores)
+    replay = load_replay(
+        a.data_root,
+        a.project_root,
+        split,
+        a.scores,
+        a.requests,
+        a.demand_scale,
+        a.request_seed,
+    )
     policies = {s: greedy(s, a.lam, a.mu, a.c) for s in SOURCES}
     pairs = [("B3", "B1"), ("B3", "B2")]
     if a.rl_model:
@@ -207,7 +216,8 @@ def main():
     rows = evaluate(replay, policies, a.lam, a.mu, a.c, a.walk_limit)
     manifest = dict(
         split=split,
-        requests=len(replay.requests),
+        **request_provenance(a),
+        n_requests=len(replay.requests),
         lam=a.lam,
         mu=a.mu,
         c=a.c,

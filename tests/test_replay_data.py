@@ -2,6 +2,8 @@
 
 from pathlib import Path
 import csv, json, math, shutil, sys, tempfile, unittest
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -9,7 +11,9 @@ import pyarrow.parquet as pq
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT / "scripts/rl"))
 from replay_data import load_replay
-from replay_env import BIKES, DOCKS, P_BIKE, B2_BIKE, B2_DOCK, HORIZONS
+from replay_env import BIKES, DOCKS, P_BIKE, B2_BIKE, B2_DOCK, HORIZONS, STEP
+
+ZONE = ZoneInfo("America/Chicago")
 
 DAY, WEEK = 86400, 7 * 86400
 T0 = 1620018000  # 2021-05-03 05:00 UTC, train start
@@ -53,7 +57,11 @@ def build(root):
         json.dumps(
             {
                 "chronological_splits": [
-                    {"split": "train", "start_utc": "2021-05-03T05:00:00Z"}
+                    {
+                        "split": "train",
+                        "start_utc": "2021-05-03T05:00:00Z",
+                        "end_utc_exclusive": "2021-05-31T05:00:00Z",
+                    }
                 ]
             }
         )
@@ -227,7 +235,11 @@ class LoadReplayTests(unittest.TestCase):
 
     def load(self, split):
         return load_replay(
-            self.data, self.project, split, self.data / f"scores_{split}.parquet"
+            self.data,
+            self.project,
+            split,
+            self.data / f"scores_{split}.parquet",
+            requests="trips",
         )
 
     def test_decision_and_outcome_rows_land_on_their_grid_cell(self):
@@ -316,6 +328,107 @@ class LoadReplayTests(unittest.TestCase):
                 "calibration",
                 self.data / "scores_tune.parquet",
             )
+
+
+def morning(week, origin, dest, n):
+    """n trips at 08:10 Chicago time on each weekday of a training week."""
+    return [
+        (origin, dest, T0 + week * WEEK + day * DAY + 8 * 3600 + 600, "train")
+        for day in range(5)
+        for _ in range(n)
+    ]
+
+
+class GridRequestTests(unittest.TestCase):
+    """Requests drawn from training demand, not from trips that happened to succeed."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.project, self.data = build(Path(self.tmp.name))
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def trips(self, rows):
+        pq.write_table(
+            pa.Table.from_pylist(
+                [
+                    dict(
+                        start_station_id=a,
+                        end_station_id=b,
+                        request_time=t,
+                        split=s,
+                        replay_15min_request_retained=True,
+                    )
+                    for a, b, t, s in rows
+                ]
+            ),
+            self.data / "processed/final_pipeline_v1/mapped_app32_requests.parquet",
+        )
+
+    def load(self, split, **kw):
+        return load_replay(
+            self.data,
+            self.project,
+            split,
+            self.data / f"scores_{split}.parquet",
+            **kw,
+        )
+
+    def test_tune_requests_follow_heldout_training_demand(self):
+        rows = []
+        for week in range(4):
+            rows += morning(week, "chicago:1", "chicago:2", 4)
+            rows += morning(week, "chicago:1", "chicago:1", 2)
+        rows += [("chicago:3", "chicago:1", TUNE0 + 8 * 3600, "tune")] * 50
+        self.trips(rows)
+        r = self.load("tune", demand_scale=20, seed=1)
+        # 6 departures per weekday 08:00-09:00 is one per 10-minute slot; tune has
+        # three weekday mornings of six slots each.
+        self.assertAlmostEqual(len(r.requests) / (20 * 18), 1, delta=0.2)
+        self.assertEqual({q.origin for q in r.requests}, {0})
+        self.assertAlmostEqual(
+            np.mean([q.dest == 1 for q in r.requests]), 2 / 3, delta=0.1
+        )
+        for q in r.requests:
+            decided = datetime.fromtimestamp(q.time - STEP, ZONE)
+            self.assertEqual((decided.hour, q.version), (8, "heldout"))
+            self.assertEqual((q.time - STEP - r.grid0) % STEP, 0)
+            self.assertEqual(q.day, decided.date().toordinal())
+
+    def test_training_weeks_use_only_earlier_trips(self):
+        self.trips(
+            morning(0, "chicago:1", "chicago:2", 6)
+            + morning(1, "chicago:1", "chicago:2", 6)
+            + morning(3, "chicago:3", "chicago:2", 6)
+        )
+        r = self.load("train", demand_scale=20, seed=1)
+        by_week = {}
+        for q in r.requests:
+            by_week.setdefault(q.version, []).append(q)
+        self.assertEqual(set(by_week), {"train_week_2", "train_week_3"})
+        self.assertEqual({q.origin for q in r.requests}, {0})
+        # Week 2 sees 6 per weekday morning (weeks 0-1); week 3 sees 60 trips over
+        # 15 weekdays (weeks 0-2), i.e. 4 per morning.
+        self.assertAlmostEqual(len(by_week["train_week_2"]) / (20 * 30), 1, delta=0.2)
+        self.assertAlmostEqual(
+            len(by_week["train_week_3"]) / (20 * 30 * 4 / 6), 1, delta=0.2
+        )
+
+    def test_grid_requests_are_seeded(self):
+        self.trips(morning(0, "chicago:1", "chicago:2", 6) * 4)
+
+        def draw(seed):
+            return [
+                (q.origin, q.dest, q.time) for q in self.load("tune", seed=seed).requests
+            ]
+
+        self.assertEqual(draw(3), draw(3))
+        self.assertNotEqual(draw(3), draw(4))
+
+    def test_unknown_request_mode_is_refused(self):
+        with self.assertRaisesRegex(ValueError, "requests"):
+            self.load("tune", requests="survey")
 
 
 if __name__ == "__main__":

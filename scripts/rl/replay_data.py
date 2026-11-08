@@ -23,6 +23,7 @@ WEEK = 7 * 86400
 FIRST_SCORED_WEEK = 2
 DETOUR, RIDE_SPEED = 1.3, 4.0  # geometric ride-time fallback, as in planner_od.csv
 SPLITS = ("train", "tune", "test")
+REQUEST_MODES = ("grid", "trips")
 
 
 def default_scores(data_root, split):
@@ -48,16 +49,22 @@ def score_column(path, target):
     raise KeyError(f"{path} has no {target} probability column")
 
 
-def train_start(project):
+def train_window(project):
+    """[start, end) of the train split in the pipeline contract, epoch seconds."""
     contract = json.loads(
         (
             Path(project) / "data/manifests/chicago/final_pipeline_contract.json"
         ).read_text()
     )
-    start = next(s for s in contract["chronological_splits"] if s["split"] == "train")[
-        "start_utc"
-    ]
-    return int(datetime.fromisoformat(start.replace("Z", "+00:00")).timestamp())
+    train = next(s for s in contract["chronological_splits"] if s["split"] == "train")
+    return tuple(
+        int(datetime.fromisoformat(train[k].replace("Z", "+00:00")).timestamp())
+        for k in ("start_utc", "end_utc_exclusive")
+    )
+
+
+def train_start(project):
+    return train_window(project)[0]
 
 
 def files(table, kind, split):
@@ -88,6 +95,83 @@ def local_cells(epochs):
     return cells[inverse].reshape(-1, 2)
 
 
+def trip_requests(split, trips, index, probe, K, start):
+    """Completed trips of the split, decided 10 minutes before checkout."""
+    req = [
+        r for r in trips if r["split"] == split and r["replay_15min_request_retained"]
+    ]
+    requests = []
+    for r, day in zip(req, local_days([r["request_time"] for r in req]) if req else []):
+        q0 = first_decision_time(probe, r["request_time"])
+        if not 0 <= (q0 - probe.grid0) // STEP < K:
+            continue
+        version = "heldout"
+        if split == "train":
+            week = (int(r["request_time"]) - start) // WEEK
+            if week < FIRST_SCORED_WEEK:
+                continue
+            version = f"train_week_{week}"
+        requests.append(
+            Request(
+                index[r["start_station_id"]],
+                index[r["end_station_id"]],
+                int(r["request_time"]),
+                int(day),
+                version,
+            )
+        )
+    return requests
+
+
+def demand(trips, index, lo, hi):
+    """Departures per hour by (origin, weekend, Chicago hour) and destination shares
+    per origin, from trips that started in [lo, hi)."""
+    n = len(index)
+    rate, od = np.zeros((n, 2, 24)), np.zeros((n, n))
+    chosen = [r for r in trips if lo <= r["request_time"] < hi]
+    cells = local_cells([r["request_time"] for r in chosen]) if chosen else []
+    for r, (weekday, hour) in zip(chosen, cells):
+        o, d = index[r["start_station_id"]], index[r["end_station_id"]]
+        rate[o, int(weekday >= 5), hour] += 1
+        od[o, d] += 1
+    dates = {datetime.fromtimestamp(t, ZONE).date() for t in range(lo, hi, 3600)}
+    days = np.array(
+        [sum(d.weekday() < 5 for d in dates), sum(d.weekday() >= 5 for d in dates)]
+    )
+    rate /= np.maximum(days, 1)[None, :, None]
+    total = od.sum(1, keepdims=True)
+    return rate, np.divide(od, total, out=np.zeros_like(od), where=total > 0)
+
+
+def grid_requests(split, trips, index, grid0, K, window, scale, seed):
+    """At every decision time q and station o, Poisson(scale x hourly departures / 6)
+    riders who would check out at q + 10 minutes, with destinations drawn from o's
+    destination shares. Demand comes from training trips only: all of them for
+    tune and test, those before week k for training week k. Nothing conditions on
+    whether a bike was there."""
+    start, end = window
+    train = [r for r in trips if r["split"] == "train"]
+    rng = np.random.default_rng(seed)
+    q = grid0 + STEP * np.arange(K, dtype=np.int64)
+    models, requests = {}, []
+    for t, (weekday, hour), day in zip(q, local_cells(q), local_days(q)):
+        if split == "train":
+            week = (int(t) - start) // WEEK
+            if week < FIRST_SCORED_WEEK:
+                continue
+            version, hi = f"train_week_{week}", start + week * WEEK
+        else:
+            version, hi = "heldout", end
+        if version not in models:
+            models[version] = demand(train, index, start, hi)
+        rate, share = models[version]
+        counts = rng.poisson(scale * rate[:, int(weekday >= 5), hour] * STEP / 3600)
+        for o in np.flatnonzero(counts):
+            for d in rng.choice(len(index), counts[o], p=share[o]):
+                requests.append(Request(int(o), int(d), int(t) + STEP, int(day), version))
+    return requests
+
+
 def week_version(t, start):
     return f"train_week_{(int(t) - start) // WEEK}"
 
@@ -105,11 +189,40 @@ def ride_matrix(rows, index, meters):
     return ride
 
 
-def load_replay(data_root, project, split, scores=None):
+def add_request_args(parser):
+    parser.add_argument(
+        "--requests",
+        choices=REQUEST_MODES,
+        default="grid",
+        help="grid: riders drawn from training demand (default); trips: completed trips",
+    )
+    parser.add_argument(
+        "--demand-scale",
+        type=float,
+        default=5.0,
+        help="grid riders per historical departure",
+    )
+    parser.add_argument("--request-seed", type=int, default=0)
+
+
+def request_provenance(args):
+    out = dict(requests=args.requests)
+    if args.requests == "grid":
+        out.update(demand_scale=args.demand_scale, request_seed=args.request_seed)
+    return out
+
+
+def load_replay(
+    data_root, project, split, scores=None, requests="grid", demand_scale=5.0, seed=0
+):
+    """requests="grid" draws riders from training demand (grid_requests); "trips"
+    replays completed trips, whose origins are biased towards having a bike."""
     if split not in SPLITS:
         raise ValueError(
             f"replay is defined for {SPLITS}; {split} is reserved for forecaster calibration"
         )
+    if requests not in REQUEST_MODES:
+        raise ValueError(f"requests must be one of {REQUEST_MODES}, not {requests!r}")
     data_root, project = Path(data_root), Path(project)
     table = data_root / "processed/final_pipeline_v1"
     scores = Path(scores or default_scores(data_root, split))
@@ -120,7 +233,8 @@ def load_replay(data_root, project, split, scores=None):
     coords = np.array(
         [[float(r["historical_lat"]), float(r["historical_lon"])] for r in meta]
     )
-    start = train_start(project)
+    window = train_window(project)
+    start = window[0]
 
     cols = (
         duckdb.connect()
@@ -198,34 +312,17 @@ def load_replay(data_root, project, split, scores=None):
     )
 
     probe = Replay(stations, coords, grid0, decision[:, :1], outcome[:, :1], {}, [])
-    req = [
+    trips = [
         r
         for r in pq.read_table(table / "mapped_app32_requests.parquet").to_pylist()
-        if r["split"] == split
-        and r["replay_15min_request_retained"]
-        and r["start_station_id"] in index
-        and r["end_station_id"] in index
+        if r["start_station_id"] in index and r["end_station_id"] in index
     ]
-    requests = []
-    for r, day in zip(req, local_days([r["request_time"] for r in req]) if req else []):
-        q0 = first_decision_time(probe, r["request_time"])
-        if not 0 <= (q0 - grid0) // STEP < K:
-            continue
-        version = "heldout"
-        if split == "train":
-            week = (int(r["request_time"]) - start) // WEEK
-            if week < FIRST_SCORED_WEEK:
-                continue
-            version = f"train_week_{week}"
-        requests.append(
-            Request(
-                index[r["start_station_id"]],
-                index[r["end_station_id"]],
-                int(r["request_time"]),
-                int(day),
-                version,
-            )
+    if requests == "grid":
+        requests = grid_requests(
+            split, trips, index, grid0, K, window, demand_scale, seed
         )
+    else:
+        requests = trip_requests(split, trips, index, probe, K, start)
     requests.sort(key=lambda q: (q.time, q.origin, q.dest))
 
     meters = probe.meters

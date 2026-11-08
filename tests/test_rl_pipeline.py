@@ -156,7 +156,7 @@ def add_replay_tables(table):
     )
     times = [
         (T0 + d * DAY + 600 * m + 700, split)
-        for d, split in ((15, "train"), (22, "train"), (29, "train"), (36, "tune"))
+        for d, split in ((1, "train"), (15, "train"), (22, "train"), (29, "train"), (36, "tune"))
         for m in range(0, 120, 7)
     ]
     pq.write_table(
@@ -250,6 +250,8 @@ class PipelineSmokeTests(unittest.TestCase):
         self.assertGreater(int(summary["B3"]["observed"]), 0)
         self.assertEqual(manifest["split"], "tune")
         self.assertFalse(manifest["test_opened"])
+        self.assertEqual(manifest["requests"], "grid")
+        self.assertEqual(training["requests"], "grid")
         self.assertEqual(
             training["versions"], ["train_week_2", "train_week_3", "train_week_4"]
         )

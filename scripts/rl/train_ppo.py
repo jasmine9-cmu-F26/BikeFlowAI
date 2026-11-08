@@ -23,7 +23,9 @@ PPO_SETTINGS = dict(
 )
 
 
-def train(replay, out, steps, lam=0.02, mu=0.01, c=0.5, walk_limit=10, seed=0):
+def train(
+    replay, out, steps, lam=0.02, mu=0.01, c=0.5, walk_limit=10, seed=0, provenance=None
+):
     from sb3_contrib import MaskablePPO
 
     env = ReplayEnv(replay, lam=lam, mu=mu, c=c, walk_limit=walk_limit, seed=seed)
@@ -47,6 +49,7 @@ def train(replay, out, steps, lam=0.02, mu=0.01, c=0.5, walk_limit=10, seed=0):
                 observation_size=OBS_SIZE,
                 training_requests=len(replay.requests),
                 versions=sorted({q.version for q in replay.requests}),
+                **(provenance or {}),
                 ppo=PPO_SETTINGS,
                 seconds=round(time.time() - started, 1),
             ),
@@ -72,7 +75,7 @@ def load_policy(path):
 
 
 def main():
-    from replay_data import load_replay
+    from replay_data import add_request_args, load_replay, request_provenance
 
     p = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -91,10 +94,29 @@ def main():
     p.add_argument("--walk-limit", type=float, default=10)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--out", type=Path)
+    add_request_args(p)
     a = p.parse_args()
-    replay = load_replay(a.data_root, a.project_root, "train", a.scores)
+    replay = load_replay(
+        a.data_root,
+        a.project_root,
+        "train",
+        a.scores,
+        a.requests,
+        a.demand_scale,
+        a.request_seed,
+    )
     out = a.out or a.data_root / "models/rl_dev/ppo.zip"
-    train(replay, out, a.steps, a.lam, a.mu, a.c, a.walk_limit, a.seed)
+    train(
+        replay,
+        out,
+        a.steps,
+        a.lam,
+        a.mu,
+        a.c,
+        a.walk_limit,
+        a.seed,
+        provenance=request_provenance(a),
+    )
     print(
         json.dumps(dict(out=str(out), training_requests=len(replay.requests)), indent=2)
     )
