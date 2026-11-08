@@ -24,7 +24,12 @@ B2 and ride times follow the same rule: `train_week_k` versions for training wee
 
 ## Episode
 
-Requests are completed trips from `mapped_app32_requests.parquet` with `replay_15min_request_retained`. Origin is the trip's start station, destination its end station, checkout time *T*.
+Each request is an origin station, a destination station and a checkout time *T*. There are two request sets (`--requests`):
+
+- **`grid`** (default, the main evaluation): at every decision time *q* and every station, a Poisson number of riders with mean `demand_scale` × (training departures per hour from that station at that Chicago hour, weekday or weekend) / 6, each checking out at *T* = *q* + 10 minutes, with a destination drawn from that station's training destination shares. Rates and shares come from training trips only: all of them for tune and test, and only the weeks before week *k* for training week *k*. Nothing conditions on whether a bike was there, which is the situation of a rider who opens the app. `demand_scale` (default 5) only multiplies the number of draws; `--request-seed` fixes them.
+- **`trips`** (secondary): completed trips from `mapped_app32_requests.parquet` with `replay_15min_request_retained`, origin the start station, destination the end station. This is the real-trip replay the proposal promised, but it is conditional on the trip having succeeded (see Known limits).
+
+On tune, the origin is empty at the first pickup horizon for 18.3% of grid requests and 3.4% of trip requests.
 
 - First decision time *q0*: the last 10-minute grid point (phase 360 s) at least 10 minutes before *T*.
 - Pickup candidates: the origin station plus stations within **10 minutes** of extra walking (straight line at 1.3 m/s), nearest first, at most 3. The proposal's product default is 5 minutes; with only 15 of 32 stations having any alternative within 5 minutes, replay uses 10 minutes and reports say so.
@@ -52,7 +57,9 @@ All policies run the same tune requests with the same λ, μ, c. Report trip suc
 
 Replay snapshots already contain the real rider's own checkout and other riders' unmet demand is invisible; one simulated rider cannot change station stock. Ten-minute quantization of walking and riding. A row whose label is missing stays in the decision view, so a policy can choose it and end unobservable; at the audited 99.8% retention this is a small effect, reported per policy. The trip/OD audit asks for fallback geometry from metadata as of each request; replay uses the fixed historical coordinates of the 32-station manifest instead, which do not move with time but are summaries over the whole window.
 
-Requests are completed trips, so the rider did find a bike at the origin. On tune, the origin was empty at the first pickup horizon for 3.4% of requests, against 16.3% over all station-times, and the forecaster (calibrated on all station-times) gives these origins 9.1% on average. Greedy rules that trust the forecaster therefore walk to alternatives more than this request set rewards, and policies that stay at the origin look better than they would for a rider who opens the app without knowing. Results on these requests answer "does the planner hurt riders who would have succeeded?", not "how many failures does it prevent?".
+Trip requests are completed trips, so the rider did find a bike at the origin. On tune, the origin was empty at the first pickup horizon for 3.4% of them, against 16.3% over all station-times, and the forecaster (calibrated on all station-times) gives these origins 9.1% on average. Greedy rules that trust the forecaster therefore walk to alternatives more than this request set rewards, and policies that stay at the origin look better than they would for a rider who opens the app without knowing. Results on trip requests answer "does the planner hurt riders who would have succeeded?", not "how many failures does it prevent?"; grid requests answer the second question.
+
+Grid requests are synthetic. Their departure rates come from completed trips, so demand at stations that were often empty is undercounted; grid riders are independent episodes and do not compete for the same bike; and destinations follow the origin's average shares, not the hour's.
 
 LightGBM/sklearn and torch each bundle libomp, and two OpenMP runtimes in one macOS process crash or deadlock. Forecasting and RL therefore run in separate processes (`make pipeline` already does), the replay modules never import lightgbm or sklearn, and tests that train PPO do so in a child process.
 
