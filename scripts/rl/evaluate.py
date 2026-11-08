@@ -161,11 +161,24 @@ def report(rows, out, manifest, pairs, n, seed):
     comparisons = [
         compare(rows, a, b, m, n, seed)
         for a, b in pairs
-        for m in ("success", "reward", "walk_minutes")
+        for m in ("success", "reward", "walk_minutes", "wait_minutes")
     ]
     write_csv(out / "comparisons.csv", comparisons)
     (out / "run_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     return comparisons
+
+
+def rl_names(paths):
+    """RL for one model; RL_seed<k> per model when several are compared."""
+    if len(paths) <= 1:
+        return {"RL": p for p in paths}
+    names = {}
+    for p in paths:
+        seed = json.loads(Path(p).with_suffix(".json").read_text())["seed"]
+        if f"RL_seed{seed}" in names:
+            raise ValueError(f"two RL models were trained with seed {seed}")
+        names[f"RL_seed{seed}"] = p
+    return names
 
 
 def main():
@@ -185,7 +198,10 @@ def main():
     p.add_argument(
         "--rl-model",
         type=Path,
-        help="MaskablePPO .zip to evaluate next to the greedy baselines",
+        action="append",
+        default=[],
+        help="MaskablePPO .zip to evaluate next to the greedy baselines; repeat for "
+        "several seeds, which are then named RL_seed<k> from the model's .json",
     )
     p.add_argument("--lam", type=float, default=0.02)
     p.add_argument("--mu", type=float, default=0.01)
@@ -208,11 +224,13 @@ def main():
     )
     policies = {s: greedy(s, a.lam, a.mu, a.c) for s in SOURCES}
     pairs = [("B3", "B1"), ("B3", "B2")]
-    if a.rl_model:
+    rl = rl_names(a.rl_model)
+    if rl:
         from train_ppo import load_policy
 
-        policies["RL"] = load_policy(a.rl_model)
-        pairs = [("RL", "B3"), ("RL", "B1")] + pairs
+        for name, path in rl.items():
+            policies[name] = load_policy(path)
+        pairs = [(n, b) for n in rl for b in ("B3", "B1")] + pairs
     rows = evaluate(replay, policies, a.lam, a.mu, a.c, a.walk_limit)
     manifest = dict(
         split=split,
@@ -222,7 +240,7 @@ def main():
         mu=a.mu,
         c=a.c,
         walk_limit_minutes=a.walk_limit,
-        rl_model=str(a.rl_model) if a.rl_model else None,
+        rl_models={n: str(p) for n, p in rl.items()},
         bootstrap=a.bootstrap,
         seed=a.seed,
         test_opened=split == "test",

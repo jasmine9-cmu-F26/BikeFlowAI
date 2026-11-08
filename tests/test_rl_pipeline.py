@@ -256,6 +256,89 @@ class PipelineSmokeTests(unittest.TestCase):
             training["versions"], ["train_week_2", "train_week_3", "train_week_4"]
         )
 
+    def test_lambda_sweep_retrains_and_compares_every_lambda(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            add_replay_tables(write_tables(root))
+            project = replay_project(root)
+            reports, models = root / "sweep", root / "models/sweep"
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(PROJECT / "scripts/rl/sweep.py"),
+                    "--data-root",
+                    str(root),
+                    "--project-root",
+                    str(project),
+                    "--lams",
+                    "0.01",
+                    "0.04",
+                    "--seeds",
+                    "0",
+                    "1",
+                    "--steps",
+                    "2048",
+                    "--jobs",
+                    "2",
+                    "--bootstrap",
+                    "20",
+                    "--models",
+                    str(models),
+                    "--reports",
+                    str(reports),
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=900,
+            )
+            with open(reports / "sweep_summary.csv", newline="") as f:
+                summary = list(csv.DictReader(f))
+            with open(reports / "sweep_comparisons.csv", newline="") as f:
+                comparisons = list(csv.DictReader(f))
+            manifest = json.loads((reports / "sweep_manifest.json").read_text())
+            trained = {
+                p.stem: json.loads(p.read_text())["lam"] for p in models.glob("*.json")
+            }
+            plotted = (reports / "frontier.png").exists()
+        self.assertEqual(
+            sorted((r["lam"], r["policy"], r["seed"]) for r in summary),
+            sorted(
+                (lam, p, s)
+                for lam in ("0.01", "0.04")
+                for p, s in (("B1", ""), ("B2", ""), ("B3", ""), ("RL", "0"), ("RL", "1"))
+            ),
+        )
+        rl_vs_b3 = {
+            (r["lam"], r["seed"], r["metric"])
+            for r in comparisons
+            if (r["policy_a"], r["policy_b"]) == ("RL", "B3")
+        }
+        self.assertEqual(
+            rl_vs_b3,
+            {
+                (lam, s, m)
+                for lam in ("0.01", "0.04")
+                for s in ("0", "1")
+                for m in ("success", "reward", "walk_minutes", "wait_minutes")
+            },
+        )
+        self.assertEqual(
+            trained,
+            {
+                "lam_0.01_seed_0": 0.01,
+                "lam_0.01_seed_1": 0.01,
+                "lam_0.04_seed_0": 0.04,
+                "lam_0.04_seed_1": 0.04,
+            },
+        )
+        self.assertEqual(
+            (manifest["lams"], manifest["seeds"], manifest["requests"], manifest["split"]),
+            ([0.01, 0.04], [0, 1], "grid", "tune"),
+        )
+        if importlib.util.find_spec("matplotlib"):
+            self.assertTrue(plotted)
+
 
 if __name__ == "__main__":
     unittest.main()
