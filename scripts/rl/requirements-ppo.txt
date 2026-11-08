@@ -1,0 +1,5 @@
+# MaskablePPO training only; not installed in CI (torch is large). PPO tests skip without it.
+-r requirements.txt
+sb3-contrib==2.9.2
+stable-baselines3==2.9.2
+torch==2.15.0
