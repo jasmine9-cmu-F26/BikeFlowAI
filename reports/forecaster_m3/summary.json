@@ -1,0 +1,184 @@
+{
+  "status": "M3_preliminary_tune_split_results",
+  "model_version": "forecaster_v0_m3",
+  "rows": {
+    "fit": 1543748,
+    "inner": 385368,
+    "tune": 384582
+  },
+  "tune_days": 14,
+  "class_balance": {
+    "train": {
+      "bike": 0.07579433595814669,
+      "dock": 0.04647505321828097
+    },
+    "tune": {
+      "bike": 0.1632369689689065,
+      "dock": 0.02254135658975199
+    }
+  },
+  "best_iteration": {
+    "bike": 132,
+    "dock": 99
+  },
+  "calibrator": {
+    "bike": {
+      "a": 0.9585863730001326,
+      "b": 0.20419168016203387
+    },
+    "dock": {
+      "a": 0.9846862816533128,
+      "b": -0.08042881800153909
+    }
+  },
+  "overall": [
+    {
+      "target": "bike",
+      "horizon": "all",
+      "comparison": "proposal_B1_B2",
+      "reference": "B1",
+      "reference_brier": 0.11837007452246855,
+      "model_brier": 0.0781446329872732,
+      "days": 14,
+      "n_boot": 2000,
+      "seed": 668,
+      "brier_diff": -0.04022544153519539,
+      "brier_diff_ci95": [
+        -0.04576562539153825,
+        -0.03469145902143921
+      ],
+      "relative_change": -0.3398277959819984,
+      "relative_change_ci95": [
+        -0.34944810101533863,
+        -0.32862848174608494
+      ],
+      "p_model_not_better": 0.0,
+      "meets_10pct_goal": true,
+      "meets_ece_goal": true
+    },
+    {
+      "target": "bike",
+      "horizon": "all",
+      "comparison": "strong_incl_B1cal",
+      "reference": "B1cal",
+      "reference_brier": 0.08637120763053825,
+      "model_brier": 0.0781446329872732,
+      "days": 14,
+      "n_boot": 2000,
+      "seed": 668,
+      "brier_diff": -0.008226574643269369,
+      "brier_diff_ci95": [
+        -0.00927347831204683,
+        -0.007039503910584933
+      ],
+      "relative_change": -0.0952467247935097,
+      "relative_change_ci95": [
+        -0.10340216538328617,
+        -0.08648874276592926
+      ],
+      "p_model_not_better": 0.0,
+      "meets_10pct_goal": false,
+      "meets_ece_goal": true
+    },
+    {
+      "target": "dock",
+      "horizon": "all",
+      "comparison": "proposal_B1_B2",
+      "reference": "B1",
+      "reference_brier": 0.014485857372419926,
+      "model_brier": 0.010209842707170852,
+      "days": 14,
+      "n_boot": 2000,
+      "seed": 668,
+      "brier_diff": -0.004276014665248986,
+      "brier_diff_ci95": [
+        -0.005402553001090453,
+        -0.0032081864526214434
+      ],
+      "relative_change": -0.2951854733424494,
+      "relative_change_ci95": [
+        -0.32391389186843345,
+        -0.25925278307775557
+      ],
+      "p_model_not_better": 0.0,
+      "meets_10pct_goal": true,
+      "meets_ece_goal": true
+    },
+    {
+      "target": "dock",
+      "horizon": "all",
+      "comparison": "strong_incl_B1cal",
+      "reference": "B1cal",
+      "reference_brier": 0.011378325779782003,
+      "model_brier": 0.010209842707170852,
+      "days": 14,
+      "n_boot": 2000,
+      "seed": 668,
+      "brier_diff": -0.0011684830726114964,
+      "brier_diff_ci95": [
+        -0.0016513979066063351,
+        -0.000709197569166303
+      ],
+      "relative_change": -0.1026937613869093,
+      "relative_change_ci95": [
+        -0.13527326081736832,
+        -0.06977387298687929
+      ],
+      "p_model_not_better": 0.0,
+      "meets_10pct_goal": true,
+      "meets_ece_goal": true
+    }
+  ],
+  "examples": {
+    "bike_success": [
+      "chicago:46",
+      "2021-07-25"
+    ],
+    "bike_failure": [
+      "chicago:38",
+      "2021-07-15"
+    ],
+    "dock_success": [
+      "chicago:38",
+      "2021-07-14"
+    ],
+    "dock_failure": [
+      "chicago:23",
+      "2021-07-19"
+    ]
+  },
+  "runtime_seconds": 39.2,
+  "model_dir": "/Users/zhouheng/Documents/BikeFlowAI-data/divvy/chicago_historical_2021_sample/models/forecaster_v0_m3",
+  "params": {
+    "objective": "binary",
+    "learning_rate": 0.05,
+    "num_leaves": 63,
+    "min_data_in_leaf": 200,
+    "feature_fraction": 0.9,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 1,
+    "lambda_l2": 1.0,
+    "seed": 668,
+    "deterministic": true,
+    "force_row_wise": true,
+    "num_threads": 4,
+    "verbose": -1
+  },
+  "library_versions": {
+    "lightgbm": "4.7.0",
+    "sklearn": "1.9.1",
+    "numpy": "2.5.4",
+    "pandas": "3.1.1",
+    "python": "3.14.8"
+  },
+  "splits_read": [
+    "train",
+    "tune"
+  ],
+  "splits_not_read": [
+    "calibration",
+    "test"
+  ],
+  "calibration_note": "Provisional sigmoid fit on last 14 train days; the final calibrator will be refit on the frozen calibration split",
+  "feature_schema_sha256": "abcc8d5af94a2301f148dfcff4d0725aeb0f489513cffd65745a1a2637d2b81f"
+}

@@ -1,0 +1,11 @@
+{
+  "status": "train_pool_forward_probabilities_for_policy_training",
+  "folds": 8,
+  "first_week": 2,
+  "rows_with_forward_probabilities": 1543088,
+  "train_rows": 1929788,
+  "coverage": 0.7996152945297618,
+  "cold_start": "weeks before first_week have no forward model; planner uses B2/B1 there",
+  "output": "/Users/zhouheng/Documents/BikeFlowAI-data/divvy/chicago_historical_2021_sample/models/forecaster_v0_m3/forward_train_predictions.parquet",
+  "runtime_seconds": 41.4
+}
