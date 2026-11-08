@@ -1,0 +1,2 @@
+-r ../data/requirements.txt
+gymnasium==1.4.0

@@ -1,3 +1,4 @@
-# Dependencies for the data audit and the forecaster.
+# Dependencies for the data audit, the forecaster and the replay environment.
 -r scripts/data/requirements.txt
 -r scripts/model/requirements.txt
+-r scripts/rl/requirements.txt
