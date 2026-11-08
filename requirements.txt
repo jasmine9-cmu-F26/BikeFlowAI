@@ -1,3 +1,3 @@
-# Dependencies for the currently implemented data audit.
+# Dependencies for the data audit and the forecaster.
 -r scripts/data/requirements.txt
-
+-r scripts/model/requirements.txt
