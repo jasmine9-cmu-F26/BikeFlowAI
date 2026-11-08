@@ -1,0 +1,69 @@
+# RL planner on causal replay: design
+
+Status: implemented 2026-11-08 in `scripts/rl/`, on top of the forecaster in `scripts/model/` (`train_forecaster.py`, `build_forward_predictions.py`); tested on synthetic tables and run on the real tune split. Owner role C (RL) with E (evaluation).
+
+## Intent
+
+The proposal adds a MaskablePPO policy on top of the forecaster and evaluates it against greedy ranking (B3) on identical requests. RL can only add value through sequential choices: waiting, backups after a failure, and keeping a near alternative in reserve. This design builds the replay environment, the greedy baselines and the PPO policy so that the whole chain runs as soon as the audited tables exist locally.
+
+Non-goals for this version: crowd effects (many riders sent to one station), road routing, live serving, the API/UI.
+
+## Decision view and outcome view
+
+The environment reuses the audited tables instead of re-reading raw snapshots.
+
+- **Decision view**, keyed by `(station_id, request_time, horizon_minutes)`: current bikes/docks/capacity from `features/`, the calibrated forecaster probabilities for that row, and B2 rates for the arrival hour. This is everything a policy may see.
+- **Outcome view**, same key: `bike_unavailable` / `dock_unavailable` from `labels/`. The environment reads it only after an action is fixed, to decide success or failure. Policies and observations never receive it.
+
+Forecaster probabilities come from models that never saw the scored week:
+
+- training weeks 2 to 9: forward-chaining (`make forward`), week *w* is scored by a model fitted on rows whose target time is before week *w*−1, early-stopped and provisionally calibrated on week *w*−1. Weeks 0 and 1 have no scores and are not used for policy training.
+- tune: the calibrated `LGBM` columns of `tune_predictions.parquet` from `make train` (provisional calibration on the last 14 training days). Test: the final forecaster only, with its calibrator refit on the calibration split; nothing writes `forecaster_final/predictions_test.parquet` yet, so `make rl-eval-final` cannot run.
+
+B2 and ride times follow the same rule: `train_week_k` versions for training weeks, held-out versions for tune and later.
+
+## Episode
+
+Requests are completed trips from `mapped_app32_requests.parquet` with `replay_15min_request_retained`. Origin is the trip's start station, destination its end station, checkout time *T*.
+
+- First decision time *q0*: the last 10-minute grid point (phase 360 s) at least 10 minutes before *T*.
+- Pickup candidates: the origin station plus stations within **10 minutes** of extra walking (straight line at 1.3 m/s), nearest first, at most 3. The proposal's product default is 5 minutes; with only 15 of 32 stations having any alternative within 5 minutes, replay uses 10 minutes and reports say so.
+- Return candidates: the destination station plus stations within 10 minutes' walk of it, at most 3.
+- Arrival horizon for a pickup slot: walking time rounded up to 10 minutes, at least 10. For a return slot: ride time from the pickup station, rounded up, at least 10. Ride time is the training median (≥20 trips) else 1.3 × haversine / 4 m/s.
+- Actions: `0..2` choose slot, `3` wait 10 minutes. Waiting is allowed only in the pickup phase, at most twice.
+- After a failed pickup the rider stands at the failed station; remaining candidates are re-measured from there. After a failed return the rider rides on to a remaining return candidate.
+- Mask: empty slot, station already tried, horizon above 60 minutes, decision row (or its forecaster score) missing, or a third wait.
+- The trip fails (`−c`) once every candidate of the current phase has been tried. If actions are all masked before that, or a chosen action's outcome row is missing, the episode ends as unobservable with no failure penalty; evaluation reports the count per policy.
+- A masked action ends the episode as `invalid` with `−c`, so the environment accepts any action as the Gymnasium API requires. MaskablePPO never samples one, and the evaluator raises if a policy does.
+- Station geometry (walking and the ride-time fallback) uses the fixed `historical_lat/lon` in `app_stations.csv` for every split.
+
+Reward: `+1` for a completed pickup and return, `−λ` per extra walking minute, `−μ` per waiting minute, `−c` on failure. Pickup walking is charged on every attempt (the rider really walked to a failed station); the walk from the return station to the destination is charged once, on success. Defaults λ = 0.02, μ = 0.01, c = 0.5; evaluation sweeps λ.
+
+## Policies
+
+- **Greedy family** (one rule, three probability sources): score each valid slot by its expected one-step reward `1 − (1 + c)·p_fail − λ·walk`; score waiting by the best slot's value with `p_fail` at horizon + 10, minus `μ·10`; take the best. B1 uses hard current emptiness (so waiting never helps), B2 uses historical rates, B3 uses the calibrated forecaster.
+- **RL**: MaskablePPO (sb3-contrib) on a 31-number observation: per slot (valid, walk, horizon, current count share, currently empty, forecaster p_fail at horizon and at horizon + 10, B2 p_fail, tried) plus phase, waits used, minutes elapsed, failures so far.
+
+## Evaluation
+
+All policies run the same tune requests with the same λ, μ, c. Report trip success, pickup and return failure, failed attempts, extra walk (mean, median, p90), waiting, mean reward, and unobservable episodes. Paired differences (RL − B3, RL − B1, B3 − B1, B3 − B2) on success, reward and walk use requests observed under both policies, with Chicago-day bootstrap intervals; `comparisons.csv` lists the number of days, because an interval over a handful of days means little. Test is used once, with frozen settings (`make rl-eval-final`).
+
+## Known limits
+
+Replay snapshots already contain the real rider's own checkout and other riders' unmet demand is invisible; one simulated rider cannot change station stock. Ten-minute quantization of walking and riding. A row whose label is missing stays in the decision view, so a policy can choose it and end unobservable; at the audited 99.8% retention this is a small effect, reported per policy. The trip/OD audit asks for fallback geometry from metadata as of each request; replay uses the fixed historical coordinates of the 32-station manifest instead, which do not move with time but are summaries over the whole window.
+
+Requests are completed trips, so the rider did find a bike at the origin. On tune, the origin was empty at the first pickup horizon for 3.4% of requests, against 16.3% over all station-times, and the forecaster (calibrated on all station-times) gives these origins 9.1% on average. Greedy rules that trust the forecaster therefore walk to alternatives more than this request set rewards, and policies that stay at the origin look better than they would for a rider who opens the app without knowing. Results on these requests answer "does the planner hurt riders who would have succeeded?", not "how many failures does it prevent?".
+
+LightGBM/sklearn and torch each bundle libomp, and two OpenMP runtimes in one macOS process crash or deadlock. Forecasting and RL therefore run in separate processes (`make pipeline` already does), the replay modules never import lightgbm or sklearn, and tests that train PPO do so in a child process.
+
+## Commands
+
+```
+make train             # tune probabilities  -> $DATA_ROOT/models/forecaster_v0_m3/tune_predictions.parquet
+make forward           # training weeks 2+   -> .../forward_train_predictions.parquet
+make rl-train          # MaskablePPO         -> $DATA_ROOT/models/rl_dev/ppo.zip (+ .json manifest)
+make rl-eval           # B1/B2/B3/RL on tune -> reports/rl_eval/tune/
+make pipeline          # the four steps above in order
+```
+
+`rl-train` needs `pip install -r scripts/rl/requirements-ppo.txt` (torch); CI installs only `requirements.txt` and skips the PPO tests.
