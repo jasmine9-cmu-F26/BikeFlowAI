@@ -1,0 +1,8 @@
+{
+  "scope": "Synthetic Parquet replay with real B2 serving, in-process TestClient; not team-model or browser performance",
+  "cached_requests": 500,
+  "cached_p95_ms": 5.56,
+  "valid_requests": 1000,
+  "server_errors": 0,
+  "seed": 7
+}
