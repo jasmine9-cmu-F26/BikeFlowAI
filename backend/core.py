@@ -106,6 +106,8 @@ class Planner:
                     raise ValueError('RL requires calibrated forecaster probabilities')
                 if not isinstance(request['origin'], str) or abs(lead) > 0.1:
                     raise ValueError('RL current-action serving requires a station origin and departure at the decision grid time')
+                if request.get('failed_station_ids'):
+                    raise ValueError('Failure-state slot history is not available in this request; using greedy replanning')
                 slots = self.policy_slots(pickups, states, 'pickup')
                 action = policy.choose(slots, request['walk_limit_minutes'])
                 if action == 3:

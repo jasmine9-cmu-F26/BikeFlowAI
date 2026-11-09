@@ -20,6 +20,7 @@ export default function RideMap(props:Props){
   {route&&<>
    {route.pickup&&a&&<Polyline positions={[[a.lat,a.lon],[route.pickup.lat,route.pickup.lon]]} pathOptions={{color:'#538b78',dashArray:'5 7',weight:3}}/>}
    {route.pickup&&<Polyline positions={[[route.pickup.lat,route.pickup.lon],[route.dropoff.lat,route.dropoff.lon]]} pathOptions={{color:'#174e40',weight:5,opacity:.85}}/>}
+   {!route.pickup&&a&&<Polyline positions={[[a.lat,a.lon],[route.dropoff.lat,route.dropoff.lon]]} pathOptions={{color:'#174e40',weight:5,opacity:.85}}/>}
    {b&&<Polyline positions={[[route.dropoff.lat,route.dropoff.lon],[b.lat,b.lon]]} pathOptions={{color:'#538b78',dashArray:'5 7',weight:3}}/>}
   </>}
   {[a,b].map((p,i)=>p&&<CircleMarker key={i} center={[p.lat,p.lon]} radius={7} pathOptions={{color:'#fff',weight:3,fillColor:i?'#d78b54':'#343e38',fillOpacity:1}}><Popup>{i?'Destination':'Origin'}</Popup></CircleMarker>)}

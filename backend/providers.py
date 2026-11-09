@@ -2,18 +2,20 @@
 from __future__ import annotations
 
 import json
+import copy
 import math
 import os
 import sys
 import threading
 import time
 import urllib.request
-from collections import deque
+import urllib.parse
+from collections import deque, OrderedDict
 from datetime import datetime, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from .core import HORIZONS, PROJECT, registry
+from .core import HORIZONS, PROJECT, registry, distance
 from .policy import Policy
 
 ZONE = ZoneInfo('America/Chicago')
@@ -38,6 +40,11 @@ class Providers:
         self.history = deque()
         self.last_fetch = 0
         self.live_error = 'Live feed has not been fetched yet.'
+        self.feeds = {}
+        self.feed_discovery_time = 0
+        self.metadata = {}
+        self.metadata_time = 0
+        self.replay_cache = OrderedDict()
         self.stop = threading.Event()
         self.thread = None
         self._load()
@@ -45,9 +52,20 @@ class Providers:
     def _load(self):
         try:
             sys.path.insert(0, str(PROJECT / 'scripts/model'))
-            from replay_forecast import build_service
+            import pandas as pd
             from bikeflow_model.forecaster import ForecasterService
-            self.service = build_service(self.root, None)
+            rates = None
+            path = self.root / 'processed/final_pipeline_v1/B2/heldout_training_fit_rates.parquet'
+            if path.exists():
+                try:
+                    rates = pd.read_parquet(path)
+                    required = ['station_id', 'weekday', 'hour', 'bike_available_rate', 'dock_available_rate']
+                    if not set(required) <= set(rates.columns) or rates.duplicated(required[:3]).any():
+                        raise ValueError('B2 schema or unique-key check failed')
+                except Exception as exc:
+                    self.error = f'B2 disabled: {type(exc).__name__}'
+                    rates = None
+            self.service = ForecasterService(self.root / 'models/forecaster_v0_m3', rates)
             self.b2 = ForecasterService(None, self.service.b2)
         except Exception as exc:
             self.error = f'Model runtime unavailable: {type(exc).__name__}: {exc}'
@@ -82,35 +100,59 @@ class Providers:
             self.stop.wait(60)
 
     def refresh(self):
-        url = 'https://gbfs.divvybikes.com/gbfs/en/station_status.json'
-        payload = None
-        for attempt in range(2):
-            try:
-                with urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'BikeFlow-course-demo/1.0'}), timeout=2) as response:
-                    payload = json.load(response)
-                break
-            except Exception:
-                if attempt:
-                    raise
         now = time.time()
+        if not self.feeds or now-self.feed_discovery_time > 86400:
+            discovery = self.fetch('https://gbfs.divvybikes.com/gbfs/2.3/gbfs.json')
+            self.feeds = {r['name']: r['url'] for r in discovery['data']['en']['feeds']}
+            self.feed_discovery_time = now
+        if not self.metadata or now-self.metadata_time > 3600:
+            info = self.fetch(self.feeds['station_information'])
+            self.metadata = {r['station_id']: r for r in info['data']['stations']}
+            self.metadata_time = now
+        payload = self.fetch(self.feeds['station_status'])
         raw = {s['station_id']: s for s in payload['data']['stations']}
         fetched = {}
         for st in self.stations:
             r = raw.get(st['live_id'])
-            if r is None:
+            meta = self.metadata.get(st['live_id'])
+            if r is None or meta is None:
                 continue
             stamp = r.get('last_reported', payload.get('last_updated', 0))
+            published = payload.get('last_updated', stamp)
             if isinstance(stamp, str):
                 stamp = local_time(stamp).timestamp()
-            stamp = min(float(stamp), now)
-            fetched[st['id']] = dict(id=st['id'], bikes=int(r['num_bikes_available']), docks=int(r['num_docks_available']),
-                                    snapshot_time=stamp, pickup=bool(r.get('is_installed') and r.get('is_renting')),
-                                    return_=bool(r.get('is_installed') and r.get('is_returning')))
+            if isinstance(published, str):
+                published = local_time(published).timestamp()
+            if float(stamp) > now+30 or float(published) > now+30:
+                continue
+            stamp = min(float(stamp), float(published), now)
+            bikes, docks, capacity = int(r['num_bikes_available']), int(r['num_docks_available']), int(meta['capacity'])
+            if min(bikes, docks, capacity) < 0:
+                continue
+            mapped = distance(st, meta) <= 50
+            fetched[st['id']] = dict(id=st['id'], bikes=bikes, docks=docks, capacity=capacity,
+                                    snapshot_time=stamp, pickup=bool(mapped and r.get('is_installed') and r.get('is_renting')),
+                                    return_=bool(mapped and r.get('is_installed') and r.get('is_returning')))
+        if not fetched:
+            raise ValueError('No valid app-cohort stations in feed')
         with self.lock:
             self.history.append((now, fetched))
             self.last_fetch = now
             while self.history and self.history[0][0] < now-4500:
                 self.history.popleft()
+
+    @staticmethod
+    def fetch(url):
+        parsed = urllib.parse.urlparse(url)
+        if parsed.scheme != 'https' or parsed.hostname not in ('gbfs.divvybikes.com', 'gbfs.lyft.com'):
+            raise ValueError('Only official Divvy/Lyft HTTPS feeds are supported')
+        for attempt in range(2):
+            try:
+                with urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'BikeFlow-course-demo/1.0'}), timeout=2) as response:
+                    return json.load(response)
+            except Exception:
+                if attempt:
+                    raise
 
     def snapshot(self, mode, when, scenario='normal'):
         if mode == 'fixture':
@@ -172,19 +214,38 @@ class Providers:
             raise ValueError('Replay data not prepared. Set BIKEFLOW_DATA_ROOT to the audited data directory; example mode is available separately.')
         if self.service is None:
             raise ValueError(self.error)
+        when = local_time(when)
+        if when >= local_time('2021-07-26T00:00:00-05:00'):
+            raise ValueError('The app uses the development model. Calibration and final-test dates are reserved; choose a train/tune date before July 26.')
+        key = when.isoformat()
+        with self.lock:
+            if key in self.replay_cache:
+                self.replay_cache.move_to_end(key)
+                return copy.deepcopy(self.replay_cache[key])
         from replay_forecast import load_request
         import pandas as pd
         try:
             df = load_request(self.root, pd.Timestamp(local_time(when)), with_labels=False)
         except SystemExit as exc:
             raise ValueError(str(exc)) from exc
+        except Exception as exc:
+            raise ValueError(f'Replay feature data is unreadable or incompatible: {type(exc).__name__}') from exc
         if df.empty:
             raise ValueError('No causal station history at the selected time.')
         # q is the feature grid time, not the requested wall clock.
         q = datetime.fromtimestamp(int(df.request_time.iloc[0]), ZONE)
-        return dict(mode='replay', decision_time=q.isoformat(), stations=self._predict(df, 900), stale=False,
+        try:
+            predicted = self._predict(df, 900)
+        except Exception as exc:
+            raise ValueError(f'Replay inference unavailable: {type(exc).__name__}') from exc
+        result = dict(mode='replay', decision_time=q.isoformat(), stations=predicted, stale=False,
                     active_method=self.service.status()['active_method'], model_version=getattr(self.service, 'version', None),
                     warnings=['Historical replay of summer 2021; travel times and availability are estimates.'])
+        with self.lock:
+            self.replay_cache[key] = result
+            while len(self.replay_cache) > 32:
+                self.replay_cache.popitem(last=False)
+        return copy.deepcopy(result)
 
     def live(self):
         q = datetime.now(ZONE)
@@ -198,7 +259,7 @@ class Providers:
         for st in self.stations:
             r = current.get(st['id'])
             if r:
-                stations.append(dict(**st, bikes=r['bikes'], docks=r['docks'], pickup=r['pickup'],
+                stations.append(dict(**st, bikes=r['bikes'], docks=r['docks'], capacity=r['capacity'], pickup=r['pickup'],
                                      return_=r['return_'], data_age_seconds=int(q.timestamp()-r['snapshot_time']), forecast={}, b2={}))
         for s in stations:
             s['return'] = s.pop('return_')
@@ -228,11 +289,12 @@ class Providers:
         rows = []
         now = q.timestamp()
         for sid, current in history[-1][1].items():
-            capacity = current['bikes'] + current['docks']
+            in_service = current['bikes'] + current['docks']
+            capacity = current['capacity']
             base = dict(station_id=sid, request_time=int(now), base_age_seconds=now-current['snapshot_time'],
                         num_bikes_available=current['bikes'], num_docks_available=current['docks'], capacity=capacity,
-                        docks_in_service=capacity, is_in_service=current['pickup'] or current['return_'],
-                        hour=q.hour, weekday=q.weekday(), is_weekend=q.weekday() >= 5, capacity_inconsistent=False)
+                        docks_in_service=in_service, is_in_service=current['pickup'] or current['return_'],
+                        hour=q.hour, weekday=q.weekday(), is_weekend=q.weekday() >= 5, capacity_inconsistent=in_service > capacity)
             for lag in (10, 30, 60):
                 # Match by observation timestamp, never by poll timestamp or a future value.
                 candidates = [batch[sid] for _, batch in history if sid in batch and batch[sid]['snapshot_time'] <= now-lag*60]
@@ -245,3 +307,29 @@ class Providers:
                              f'lag_{lag}m_in_service': math.nan if missing else previous['pickup'] or previous['return_']})
             rows.extend(dict(**base, horizon_minutes=h) for h in HORIZONS)
         return add_derived(pd.DataFrame(rows))
+
+    def reveal(self, when, attempts):
+        """Explicit post-plan scoring; never called by planning."""
+        import pandas as pd
+        from replay_forecast import load_request
+        q = local_time(when)
+        if not local_time('2021-07-12T01:00:00-05:00') <= q < local_time('2021-07-26T00:00:00-05:00'):
+            raise ValueError('Outcome reveal is limited to the tune split. Calibration and final-test outcomes are reserved.')
+        try:
+            df = load_request(self.root, pd.Timestamp(q), with_labels=True)
+        except SystemExit as exc:
+            raise ValueError(str(exc)) from exc
+        results = []
+        for attempt in attempts:
+            row = df[(df.station_id == attempt['station_id']) & (df.horizon_minutes == attempt['horizon_minutes'])]
+            if row.empty:
+                results.append(dict(**attempt, observed=None, status='unobservable'))
+                continue
+            r = row.iloc[0]
+            count = r.target_num_bikes if attempt['phase'] == 'pickup' else r.target_num_docks
+            unavailable = r.bike_unavailable if attempt['phase'] == 'pickup' else r.dock_unavailable
+            missing = pd.isna(count) or pd.isna(unavailable)
+            results.append(dict(**attempt, observed=None if missing else int(count),
+                                status='unobservable' if missing else 'unavailable' if unavailable else 'available'))
+        return dict(mode='replay', decision_time=q.isoformat(), outcomes=results,
+                    warning='Observed at the quantized prediction horizon (±5 min); not exact stock at the estimated arrival. This does not simulate inventory changes caused by the rider.')

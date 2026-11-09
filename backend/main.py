@@ -55,6 +55,19 @@ class ReplanRequest(PlanRequest):
     phase: Literal['pickup', 'return'] = 'pickup'
 
 
+class Attempt(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    station_id: str
+    horizon_minutes: Literal[10, 20, 30, 40, 50, 60]
+    phase: Literal['pickup', 'return']
+
+
+class RevealRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    historical_timestamp: datetime
+    attempts: list[Attempt] = Field(min_length=1, max_length=2)
+
+
 @app.exception_handler(RequestValidationError)
 async def invalid_request(_, exc):
     # Do not reflect or log raw coordinates / inputs from Pydantic errors.
@@ -178,6 +191,8 @@ def return_replan(values, snap):
                 raise ValueError('Real forecasts and a station current position are required')
             if abs((values['departure_time']-q).total_seconds()) > 6:
                 raise ValueError('PPO requires departure at the current decision grid')
+            if values.get('failed_station_ids'):
+                raise ValueError('Failure-state PPO requires original slot history; using greedy replanning')
             action = app.state.providers.policy.choose(planner.policy_slots(candidates, states, 'return', source),
                                                        values['walk_limit_minutes'], phase='return')
             rl_station = candidates[action]['id']
@@ -214,3 +229,14 @@ def plan(req: PlanRequest):
 @app.post('/replan')
 def replan(req: ReplanRequest):
     return execute(req, True)
+
+
+@app.post('/replay/reveal')
+def reveal(req: RevealRequest):
+    for attempt in req.attempts:
+        if attempt.station_id not in planner.by_id:
+            error('attempts.station_id', 'Unknown station ID.')
+    try:
+        return app.state.providers.reveal(req.historical_timestamp, [a.model_dump() for a in req.attempts])
+    except (ValueError, FileNotFoundError) as exc:
+        error('historical_timestamp', str(exc))

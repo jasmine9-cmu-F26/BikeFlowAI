@@ -28,7 +28,7 @@ export default function App(){
  const [destination,setDestination]=useState<Endpoint>('chicago:21');
  const [when,setWhen]=useState(HIST);
  const [offset,setOffset]=useState(0);
- const [walk,setWalk]=useState(10);
+ const [walk,setWalk]=useState(5);
  const [scenario,setScenario]=useState('normal');
  const [snap,setSnap]=useState<Snapshot|null>(null);
  const [health,setHealth]=useState<Health|null>(null);
@@ -43,15 +43,18 @@ export default function App(){
  const [shownRoute,setShownRoute]=useState<Route|null>(null);
  const [reload,setReload]=useState(0);
  const [failed,setFailed]=useState<string[]>([]);
+ const [routeOrigin,setRouteOrigin]=useState<Endpoint>(origin);
+ const [revealed,setRevealed]=useState<{outcomes:{phase:string;observed:number|null;status:string}[];warning:string}|null>(null);
  const requestRef=useRef<AbortController|null>(null);
  const [didPlan,setDidPlan]=useState(false);
  useEffect(()=>{api<Health>('/health').then(setHealth).catch(()=>{});api<{stations:Station[]}>('/registry').then(d=>setRegistry(d.stations)).catch(()=>{});},[reload]);
- useEffect(()=>{const ctrl=new AbortController();setLoadingMap(true);setError('');setSnap(null);
+ useEffect(()=>{const ctrl=new AbortController();setLoadingMap(true);setError('');setSnap(null);setSelected(null);
   const query=new URLSearchParams({mode,scenario});if(mode!=='live')query.set('historical_timestamp',historical(when));
   api<Snapshot>('/stations?'+query,undefined,ctrl.signal).then(setSnap).catch(e=>{if(e.name!=='AbortError')setError(e.message);}).finally(()=>{if(!ctrl.signal.aborted)setLoadingMap(false);});
   return()=>ctrl.abort();
  },[mode,when,scenario,reload]);
- useEffect(()=>{requestRef.current?.abort();setLoading(false);setPlan(null);setShownRoute(null);setFailed([]);setDidPlan(false);},[mode,when,offset,walk,method,origin,destination,scenario]);
+ useEffect(()=>{requestRef.current?.abort();setLoading(false);setPlan(null);setShownRoute(null);setFailed([]);setDidPlan(false);setRouteOrigin(origin);setRevealed(null);},[mode,when,offset,walk,method,origin,destination,scenario]);
+ useEffect(()=>setRevealed(null),[shownRoute]);
  useEffect(()=>()=>requestRef.current?.abort(),[]);
  const stations=snap?.stations.length?snap.stations:registry;
  const body=():Request=>{
@@ -62,7 +65,7 @@ export default function App(){
  };
  async function submit(){
   requestRef.current?.abort();const ctrl=new AbortController();requestRef.current=ctrl;
-  setLoading(true);setError('');setDidPlan(true);setFailed([]);
+  setLoading(true);setError('');setDidPlan(true);setFailed([]);setRevealed(null);setRouteOrigin(origin);
   try{const p=await api<Plan>('/plan',body(),ctrl.signal);setPlan(p);setShownRoute(p.primary);setTab('recommended');}
   catch(e){if(!ctrl.signal.aborted){setError((e as Error).message);setPlan(null);setShownRoute(null);}}
   finally{if(!ctrl.signal.aborted)setLoading(false);}
@@ -79,9 +82,18 @@ export default function App(){
   const request={...body(),origin:station.id,
     ...(mode==='live'?{departure_time:new Date().toISOString()}:{departure_time:nextClock.toISOString(),historical_timestamp:nextClock.toISOString()}),
     failed_station_ids:failedIds,phase};
-  try{const p=await api<Plan>('/replan',request,ctrl.signal);setPlan(p);setShownRoute(p.primary);setFailed(failedIds);setTab('recommended');}
+  try{const p=await api<Plan>('/replan',request,ctrl.signal);setPlan(p);setShownRoute(p.primary);setRouteOrigin(station.id);setFailed(failedIds);setTab('recommended');
+   const params=new URLSearchParams({mode,scenario,historical_timestamp:request.departure_time});
+   api<Snapshot>('/stations?'+params,undefined,ctrl.signal).then(setSnap).catch(()=>{});
+  }
   catch(e){if(!ctrl.signal.aborted)setError((e as Error).message);}
   finally{if(!ctrl.signal.aborted)setLoading(false);}
+ }
+ async function reveal(){
+  if(!plan||!shownRoute)return;
+  const attempts=[...(shownRoute.pickup?[{station_id:shownRoute.pickup.id,horizon_minutes:shownRoute.pickup.horizon_minutes,phase:'pickup'}]:[]),{station_id:shownRoute.dropoff.id,horizon_minutes:shownRoute.dropoff.horizon_minutes,phase:'return'}];
+  try{setError('');setRevealed(await api('/replay/reveal',{historical_timestamp:plan.decision_time,attempts}));}
+  catch(e){setError((e as Error).message);}
  }
  function endpointInput(field:'origin'|'destination',value:Endpoint,set:(v:Endpoint)=>void){
   return <div className="endpoint-field"><label htmlFor={field}>{field==='origin'?'From':'To'}</label><div className="endpoint-control"><span className={'endpoint-dot '+(field==='destination'?'end':'')}/><select id={field} value={typeof value==='string'?value:'custom'} onChange={e=>set(e.target.value)}>
@@ -103,12 +115,12 @@ export default function App(){
      <label className="field-label">Planning method<select value={method} onChange={e=>setMethod(e.target.value as Method)}>{Object.entries(methods).map(([k,v])=><option key={k} value={k}>{k} · {v}</option>)}</select></label>
      <button className="primary-btn" disabled={loading||loadingMap||!stations.length} type="submit">{loading?<><RefreshCw size={18} className="spin"/>Finding your way…</>:<>Find my ride <ArrowRight size={18}/></>}</button>
     </form>
-    <div className="walk-note"><Footprints size={16}/><span>Limit applies at each end. Product default is 5 min; the example starts at 10 min to show more alternatives.</span></div>
+    <div className="walk-note"><Footprints size={16}/><span>Limit applies at each end. The 32-station area is sparse; try 10 min for more alternatives.</span></div>
     {mode==='fixture'&&<div className="demo-controls"><label className="field-label">Demo scenario<select value={scenario} onChange={e=>setScenario(e.target.value)}><option value="normal">Morning commute</option><option value="model-missing">Missing model → B2</option><option value="stale">Stale station data</option></select></label></div>}
     <div className="panel-footer"><ShieldCheck size={16}/><span>Estimates, never a reservation.<br/>Check station availability before riding.</span></div>
    </aside>
    <section className="map-panel" aria-label="Chicago station map">
-    <RideMap stations={snap?.stations||[]} route={shownRoute} origin={origin} destination={destination} selecting={selecting} onPick={p=>{if(selecting==='origin')setOrigin(p);else setDestination(p);setSelecting(null);}} onStation={setSelected}/>
+    <RideMap stations={snap?.stations||[]} route={shownRoute} origin={shownRoute?routeOrigin:origin} destination={destination} selecting={selecting} onPick={p=>{if(selecting==='origin')setOrigin(p);else setDestination(p);setSelecting(null);}} onStation={setSelected}/>
     <div className="map-top"><span className="map-chip"><span className="live-dot"/>{mode==='fixture'?'EXAMPLE DATA':mode==='replay'?'HISTORICAL REPLAY':'LIVE STATIONS'}</span><button className="map-refresh" aria-label="Refresh station data" onClick={()=>{setPlan(null);setShownRoute(null);setReload(r=>r+1);}}><RefreshCw size={16} className={loadingMap?'spin':''}/></button></div>
     {selecting&&<div className="select-toast">Click the map to set your {selecting}<button className="icon-btn" onClick={()=>setSelecting(null)} aria-label="Cancel map selection"><X size={16}/></button></div>}
     {mode==='fixture'&&<div className="example-watermark">EXAMPLE<br/><small>Synthetic station data</small></div>}
@@ -124,6 +136,7 @@ export default function App(){
     {plan&&!loading&&<>
      <div className="result-tabs"><button className={tab==='recommended'?'active':''} onClick={()=>{setTab('recommended');setShownRoute(plan.primary);}}>Recommended</button><button className={tab==='alternatives'?'active':''} onClick={()=>setTab('alternatives')}>Alternatives <span>{plan.backups.length}</span></button></div>
      {plan.status==='no_plan'?<div className="no-plan"><TriangleAlert size={30}/><h3>No feasible ride yet</h3><p>{plan.no_plan_reason}</p><p>Try another endpoint, a shorter departure offset, or a larger walking limit.</p></div>:tab==='recommended'&&shownRoute?<><div className="route-summary"><div><span className="eyebrow">ESTIMATED JOURNEY</span><strong>{shownRoute.total_minutes}<small> min</small></strong></div><span className="method-badge">{plan.mode==='fixture'?'Example · ':''}{plan.actual_method}</span></div><Journey route={shownRoute}/><details className="failure-controls"><summary>Attempt failed? Find the next option</summary><p>For replay, this advances the decision clock to the attempted arrival. It is a hypothetical failure, not a revealed outcome.</p>{shownRoute.pickup&&<button disabled={loading} onClick={()=>replan('pickup')}>No bike at pickup <ChevronRight size={14}/></button>}<button disabled={loading} onClick={()=>replan('return')}>No dock at return <ChevronRight size={14}/></button></details></>:<div className="alternatives"><p>Other plans available at the initial decision time. Replan after an actual failed attempt.</p>{plan.backups.map((r,i)=><button className="alternative" key={i} onClick={()=>{setShownRoute(r);setTab('recommended');}}><div><span className="eyebrow">OPTION {i+2} · {r.total_minutes} MIN</span><strong>{r.pickup?.name||'Continue riding'}</strong><small>to {r.dropoff.name}</small><span>{r.pickup?`${pct(r.pickup.probability)} bike · `:''}{pct(r.dropoff.probability)} dock</span></div><ArrowRight size={18}/></button>)}{!plan.backups.length&&<p>No additional station pairs fit your limits.</p>}</div>}
+     {mode==='replay'&&shownRoute&&<div className="failure-controls"><button onClick={reveal}>Reveal historical outcomes <ChevronRight size={14}/></button>{revealed&&<><p>{revealed.outcomes.map(o=>`${o.phase}: ${o.status}${o.observed===null?'':` (${o.observed})`}`).join(' · ')}</p><p>{revealed.warning}</p></>}</div>}
      <div className="warnings">{plan.warnings.map((w,i)=><div key={i}><Info size={14}/><span>{w}</span></div>)}</div><details className="diagnostics"><summary>Plan details</summary><dl><dt>Decision clock</dt><dd>{clock(plan.decision_time)} Chicago</dd><dt>Requested / used</dt><dd>{plan.requested_method} / {plan.actual_method}</dd><dt>Model</dt><dd>{plan.model_version||'No model loaded'}</dd><dt>Data age</dt><dd>{plan.data_age_seconds??'—'} seconds</dd><dt>API time</dt><dd>{plan.latency_ms} ms</dd><dt>Request</dt><dd>{plan.request_id}</dd></dl></details>
     </>}
     {!didPlan&&snap?.warnings.map((w,i)=><div className="initial-warning" key={i}><Info size={14}/>{w}</div>)}
