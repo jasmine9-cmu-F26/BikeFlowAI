@@ -17,9 +17,9 @@ from zoneinfo import ZoneInfo
 
 from .core import HORIZONS, PROJECT, registry, distance
 from .policy import Policy
+from .artifacts import resolve_data_root
 
 ZONE = ZoneInfo('America/Chicago')
-DATA_ROOT = Path(os.environ.get('BIKEFLOW_DATA_ROOT', str(Path.home() / 'Documents/BikeFlowAI-data/divvy/chicago_historical_2021_sample')))
 
 
 def local_time(value):
@@ -30,11 +30,11 @@ def local_time(value):
 
 
 class Providers:
-    def __init__(self, root=DATA_ROOT):
-        self.root = root
+    def __init__(self, root=None):
+        self.root, self.data_source = resolve_data_root(root)
         self.stations = registry()
         self.service = self.b2 = None
-        self.policy = Policy(root)
+        self.policy = Policy(self.root)
         self.error = None
         self.lock = threading.RLock()
         self.history = deque()
@@ -76,7 +76,12 @@ class Providers:
                     fixture_available=True, live_enabled=os.environ.get('BIKEFLOW_LIVE', '1') != '0',
                     live_cache_ready=bool(self.history), live_error=self.live_error,
                     model_version=getattr(self.service, 'version', None), planner_version='decision-pair-v1',
-                    rl_ready=self.policy.ready(), rl_reason='Current-action PPO bridge; station origin, matching walk limit and decision-grid departure required.',
+                    data_source=self.data_source,
+                    default_replay_time='2021-07-20T08:06:00-05:00',
+                    replay_window=dict(start='2021-07-12T01:00:00-05:00', end_exclusive='2021-07-26T00:00:00-05:00') if self.data_source == 'bundled_m3_tune' else None,
+                    rl_ready=self.policy.ready() and self.policy.runtime_ready(), rl_artifacts_ready=self.policy.ready(),
+                    rl_runtime_ready=self.policy.runtime_ready(),
+                    rl_reason='Current-action PPO bridge; install PPO dependencies, use a station origin, matching 10-minute walk limit and decision-grid departure.',
                     timezone='America/Chicago')
 
     def start(self):

@@ -1,0 +1,3 @@
+# Full demo runtime, including the optional CPU PPO policy bridge.
+-r requirements.txt
+-r ../scripts/rl/requirements-ppo.txt

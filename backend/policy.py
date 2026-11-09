@@ -4,6 +4,7 @@ A future return recommendation stays provisional B3. Do not feed future replay
 features to PPO just to build an initial itinerary.
 """
 import json
+import importlib.util
 import subprocess
 import sys
 
@@ -33,6 +34,10 @@ class Policy:
 
     def ready(self):
         return self.path.exists() and self.manifest.exists()
+
+    @staticmethod
+    def runtime_ready():
+        return all(importlib.util.find_spec(name) is not None for name in ('torch', 'sb3_contrib'))
 
     def choose(self, slots, walk_limit, phase='pickup', waits=0, elapsed_minutes=0, failures=0):
         if not self.ready():

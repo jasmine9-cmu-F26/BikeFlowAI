@@ -32,7 +32,7 @@ import {
   type Station,
 } from "./api";
 
-const HIST = "2021-07-20T08:00";
+const HIST = "2021-07-20T08:06";
 const pct = (p: number | null) =>
   p === null ? "Unavailable" : Math.round(p * 100) + "%";
 const labels: Record<Mode, string> = {
@@ -167,9 +167,21 @@ export default function App() {
   } | null>(null);
   const requestRef = useRef<AbortController | null>(null);
   const [didPlan, setDidPlan] = useState(false);
+  const initialModeSelected = useRef(false);
   useEffect(() => {
     api<Health>("/health")
-      .then(setHealth)
+      .then((status) => {
+        setHealth(status);
+        if (!initialModeSelected.current) {
+          initialModeSelected.current = true;
+          if (status.status === "ready" && status.replay_data_ready) {
+            setMode("replay");
+            setWhen(
+              (status.default_replay_time || "2021-07-20T08:06").slice(0, 16),
+            );
+          }
+        }
+      })
       .catch(() => {});
     api<{ stations: Station[] }>("/registry")
       .then((d) => setRegistry(d.stations))
@@ -401,7 +413,10 @@ export default function App() {
               <button
                 key={m}
                 className={mode === m ? "selected" : ""}
-                onClick={() => setMode(m)}
+                onClick={() => {
+                  initialModeSelected.current = true;
+                  setMode(m);
+                }}
               >
                 {m === "live" && <span className="live-dot" />}
                 {labels[m]}
@@ -450,8 +465,13 @@ export default function App() {
                 <input
                   type="datetime-local"
                   value={when}
-                  min="2021-05-03T00:00"
-                  max="2021-08-29T23:59"
+                  min={
+                    mode === "replay" &&
+                    health?.data_source === "bundled_m3_tune"
+                      ? "2021-07-12T01:00"
+                      : "2021-05-03T00:00"
+                  }
+                  max="2021-07-25T23:59"
                   required
                   onChange={(e) => setWhen(e.target.value)}
                 />

@@ -6,7 +6,7 @@ Divvy / Chicago trip planning with predicted pickup/return availability and back
 
 ## Run the application
 
-After installing `backend/requirements.txt` into `.venv` and running `npm ci` in `frontend`, run `./scripts/start_demo.ps1` on Windows, or `docker compose up --build` with Docker Desktop running. Open **http://127.0.0.1:3000**. The initial Example mode uses visibly labeled synthetic data; real replay and predictive live serving require the team's external data/model package via `BIKEFLOW_DATA_ROOT`. See [the full startup guide, API contract and demo rehearsal](docs/app_demo.md).
+The repository now includes a **5.7 MB real M3 demo bundle**: calibrated LightGBM weights, B2 rates, PPO weights and 32-station tune replay features/labels. No separate dataset download or local data-path configuration is needed. After installing `backend/requirements-demo.txt` into `.venv` and running `npm ci` in `frontend`, run `./scripts/start_demo.ps1` on Windows. Open **http://127.0.0.1:3000**; a ready model selects Replay at **July 20, 2021, 08:06 Chicago time**. For PPO choose a station origin, departure at the replay clock and a 10-minute walk limit. The lighter `backend/requirements.txt` supports B1/B2/B3 without the optional PPO runtime. Docker Compose also includes the bundle; set `BIKEFLOW_INSTALL_PPO=true` in `.env` to include PPO in its image. See [startup and verification](docs/app_demo.md) and [bundle contents/provenance](artifacts/README.md).
 
 | Source | Role |
 |---|---|

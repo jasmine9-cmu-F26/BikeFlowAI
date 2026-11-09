@@ -1,0 +1,41 @@
+{
+  "verification_date": "2026-11-09",
+  "scope": "Actual team M3 artifacts, local Vite proxy to FastAPI; not a quality evaluation",
+  "data_source": "bundled_m3_tune",
+  "model_version": "forecaster_v0_m3",
+  "service_status": "ready",
+  "replay_data_ready": true,
+  "rl_ready": true,
+  "cases": [
+    {
+      "requested_method": "B1",
+      "actual_method": "B1",
+      "status": "ok",
+      "latency_ms": 330.8
+    },
+    {
+      "requested_method": "B2",
+      "actual_method": "B2",
+      "status": "ok",
+      "latency_ms": 4.0
+    },
+    {
+      "requested_method": "B3",
+      "actual_method": "B3",
+      "status": "ok",
+      "latency_ms": 4.9
+    },
+    {
+      "requested_method": "RL",
+      "actual_method": "RL_pickup+B3_return",
+      "status": "ok",
+      "latency_ms": 5148.0
+    }
+  ],
+  "reveal_statuses": [
+    "available",
+    "available"
+  ],
+  "return_replan_status": "ok",
+  "bundle_sha256": "ce5c81da29fe215ed673a8951a54480434999f9537bd6c7a9c739de0046c998a"
+}
