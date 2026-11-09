@@ -1,5 +1,3 @@
-fastapi>=0.115,<1
-uvicorn>=0.30,<1
-httpx>=0.28,<1
-tzdata>=2024.1
-# Install ../requirements.txt as well for real model / Parquet replay.
+# Use the same pinned serving / Parquet dependencies as the existing pipeline.
+-r ../scripts/data/requirements.txt
+-r ../scripts/model/requirements.txt

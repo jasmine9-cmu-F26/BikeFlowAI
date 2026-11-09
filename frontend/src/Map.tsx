@@ -11,6 +11,7 @@ import {
 import type { LatLngBoundsExpression } from "leaflet";
 import type { Endpoint, Route, Station, Point } from "./api";
 type Props = {
+  ageLimit: number;
   stations: Station[];
   route: Route | null;
   origin: Endpoint;
@@ -73,7 +74,7 @@ export default function RideMap(props: Props) {
               weight: 2,
               fillColor: chosen
                 ? "#174e40"
-                : !s.pickup || s.data_age_seconds > 900
+                : !s.pickup || s.data_age_seconds > props.ageLimit
                   ? "#aaa"
                   : s.bikes === 0
                     ? "#db9157"

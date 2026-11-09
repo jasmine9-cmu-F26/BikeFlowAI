@@ -18,6 +18,12 @@ from .core import Planner, distance, horizon
 from .providers import Providers, ZONE, local_time
 
 logger = logging.getLogger('bikeflow.requests')
+logger.setLevel(logging.INFO)
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter('%(message)s'))
+    logger.addHandler(handler)
+logger.propagate = False
 planner = Planner()
 
 
@@ -125,7 +131,7 @@ def validate(req):
             planner.endpoint(values[field])
         except ValueError as exc:
             error(field, str(exc))
-    if values['origin'] == values['destination'] and not (isinstance(req, ReplanRequest) and req.phase == 'return'):
+    if distance(planner.endpoint(values['origin']), planner.endpoint(values['destination'])) < 1 and not (isinstance(req, ReplanRequest) and req.phase == 'return'):
         error('destination', 'Choose a different destination.')
     values['departure_time'] = max(departure, q)
     return q, values
@@ -137,6 +143,8 @@ def execute(req, replan=False):
     outcome = 'error'
     actual = 'unavailable'
     age = None
+    actions = []
+    model_version = None
     try:
         q, values = validate(req)
         try:
@@ -144,6 +152,7 @@ def execute(req, replan=False):
         except ValueError as exc:
             error('historical_timestamp', str(exc))
         max_age = 300 if req.mode == 'live' else 900
+        model_version = snap['model_version']
         age = max((s['data_age_seconds'] for s in snap['stations']), default=None)
         # Preserve old counts for map display, but never plan with stale stations.
         for s in snap['stations']:
@@ -161,12 +170,16 @@ def execute(req, replan=False):
         except ValueError as exc:
             error('destination', str(exc))
         outcome, actual = result['status'], result['actual_method']
+        if result['primary']:
+            route = result['primary']
+            actions = [dict(phase=k, station_id=route[k]['id']) for k in ('pickup','dropoff') if route[k]]
         return dict(**result, request_id=request_id, mode=req.mode, decision_time=snap['decision_time'],
                     model_version=snap['model_version'], data_age_seconds=age,
                     latency_ms=round((time.perf_counter()-started)*1000, 1))
     finally:
         logger.info(json.dumps(dict(request_id=request_id, mode=req.mode, requested_method=req.method, actual_method=actual,
                                     status=outcome, planner_version='decision-pair-v1',
+                                    actions=actions, model_version=model_version,
                                     latency_ms=round((time.perf_counter()-started)*1000, 1), data_age_seconds=age)))
 
 

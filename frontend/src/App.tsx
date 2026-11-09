@@ -202,7 +202,7 @@ export default function App() {
     setDidPlan(false);
     setRouteOrigin(origin);
     setRevealed(null);
-  }, [mode, when, offset, walk, method, origin, destination, scenario]);
+  }, [mode, when, offset, walk, method, origin, destination, scenario, reload]);
   useEffect(() => setRevealed(null), [shownRoute]);
   useEffect(() => () => requestRef.current?.abort(), []);
   const stations = snap?.stations.length ? snap.stations : registry;
@@ -545,6 +545,7 @@ export default function App() {
         </aside>
         <section className="map-panel" aria-label="Chicago station map">
           <RideMap
+            ageLimit={mode === "live" ? 300 : 900}
             stations={snap?.stations || []}
             route={shownRoute}
             origin={shownRoute ? routeOrigin : origin}
