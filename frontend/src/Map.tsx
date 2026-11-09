@@ -68,7 +68,8 @@ export default function RideMap(props: Props) {
           <CircleMarker
             key={s.id}
             center={[s.lat, s.lon]}
-            radius={chosen ? 10 : 5}
+            radius={chosen ? 11 : 7}
+            bubblingMouseEvents={false}
             pathOptions={{
               color: chosen ? "#fff" : "#fff",
               weight: 2,
@@ -102,6 +103,7 @@ export default function RideMap(props: Props) {
         <>
           {route.pickup && a && (
             <Polyline
+              interactive={false}
               positions={[
                 [a.lat, a.lon],
                 [route.pickup.lat, route.pickup.lon],
@@ -111,6 +113,7 @@ export default function RideMap(props: Props) {
           )}
           {route.pickup && (
             <Polyline
+              interactive={false}
               positions={[
                 [route.pickup.lat, route.pickup.lon],
                 [route.dropoff.lat, route.dropoff.lon],
@@ -120,6 +123,7 @@ export default function RideMap(props: Props) {
           )}
           {!route.pickup && a && (
             <Polyline
+              interactive={false}
               positions={[
                 [a.lat, a.lon],
                 [route.dropoff.lat, route.dropoff.lon],
@@ -129,6 +133,7 @@ export default function RideMap(props: Props) {
           )}
           {b && (
             <Polyline
+              interactive={false}
               positions={[
                 [route.dropoff.lat, route.dropoff.lon],
                 [b.lat, b.lon],
@@ -143,6 +148,7 @@ export default function RideMap(props: Props) {
           p && (
             <CircleMarker
               key={i}
+              interactive={false}
               center={[p.lat, p.lon]}
               radius={7}
               pathOptions={{
@@ -151,9 +157,7 @@ export default function RideMap(props: Props) {
                 fillColor: i ? "#d78b54" : "#343e38",
                 fillOpacity: 1,
               }}
-            >
-              <Popup>{i ? "Destination" : "Origin"}</Popup>
-            </CircleMarker>
+            />
           ),
       )}
     </MapContainer>
