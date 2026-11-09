@@ -5,6 +5,10 @@ COPY scripts/data/requirements.txt scripts/data/requirements.txt
 COPY scripts/model/requirements.txt scripts/model/requirements.txt
 COPY backend/requirements.txt backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt
+ARG INSTALL_PPO=false
+COPY scripts/rl/requirements.txt scripts/rl/requirements.txt
+COPY scripts/rl/requirements-ppo.txt scripts/rl/requirements-ppo.txt
+RUN if [ "$INSTALL_PPO" = "true" ]; then pip install --no-cache-dir -r scripts/rl/requirements-ppo.txt; fi
 COPY backend backend
 COPY artifacts artifacts
 COPY scripts/model scripts/model

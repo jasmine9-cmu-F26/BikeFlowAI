@@ -1,4 +1,4 @@
-# MaskablePPO training only; not installed in CI (torch is large). PPO tests skip without it.
+# Optional MaskablePPO training and app inference runtime. CI may skip PPO tests without it.
 -r requirements.txt
 sb3-contrib==2.9.2
 stable-baselines3==2.9.2

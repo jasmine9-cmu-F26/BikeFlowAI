@@ -31,6 +31,8 @@ try {
     }
     if (-not $Ready) { throw 'Demo startup timed out. Inspect .local/*.log.' }
     Write-Host 'BikeFlow is ready: http://127.0.0.1:3000'
+    $Readiness = $ApiStatus.Content | ConvertFrom-Json
+    Write-Host ("Forecast: {0} | Data: {1} | PPO runtime ready: {2}" -f $Readiness.active_method, $Readiness.data_source, $Readiness.rl_ready)
     Write-Host 'API docs: http://127.0.0.1:8000/docs | Stop: ./scripts/stop_demo.ps1'
 } catch {
     if (-not $ApiProcess.HasExited) { $ApiProcess.Kill() }

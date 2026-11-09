@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
+      args:
+        INSTALL_PPO: ${BIKEFLOW_INSTALL_PPO:-false}
     environment:
       BIKEFLOW_MOUNTED_DATA_ROOT: /data
       BIKEFLOW_LIVE: ${BIKEFLOW_LIVE:-1}

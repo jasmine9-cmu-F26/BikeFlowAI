@@ -8,7 +8,7 @@ The application is local-first: React / TypeScript / Vite / Leaflet, with a Fast
 | Replay | Audited causal feature Parquet, development forecaster or B2 | Yes, or B2 rates for degraded serving |
 | Live | Official GBFS, an independent 60-second in-memory cache and up to 75 minutes of look-back | Counts work without models; predictions require model/B2 files |
 
-Missing replay data never silently switches to examples. The initial page selects Example so a fresh clone can demonstrate the interaction without redistributing historical data.
+The repository includes a **5.7 MB M3 serving bundle** under `artifacts/`: real calibrated model weights, PPO weights, B2 rates and tune-only features/labels for all 32 stations. A fresh clone needs **no private download or machine-specific data path**. Startup verifies its checksum and extracts an ignored `.local/data/` cache. When the model and replay data are ready, the page automatically selects **Replay** at **2021-07-20 08:06 Chicago time**. Example remains available as a separate, visibly synthetic mode. Explicit Replay requests never silently switch to examples.
 
 ## Start on Windows
 
@@ -16,7 +16,7 @@ From the repository root (Node 22+, Python 3.14 for the existing pinned pipeline
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r backend/requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r backend/requirements-demo.txt
 Push-Location frontend
 npm.cmd ci
 Pop-Location
@@ -28,6 +28,8 @@ Open <http://127.0.0.1:3000>. Interactive API documentation is at <http://127.0.
 ```powershell
 .\scripts\stop_demo.ps1
 ```
+
+The full requirements include PyTorch and the CPU PPO bridge. To run only the forecast/greedy demo with a smaller installation, use `backend/requirements.txt` instead; PPO requests will be explicitly downgraded until its optional dependencies are installed. Model files are included either way. For an existing installation, install the full requirements once and restart the API to pick up this bundle.
 
 If this machine blocks `.ps1` files, use a process-scoped invocation (it does not change the saved execution policy), or use the two-terminal commands below:
 
@@ -46,15 +48,17 @@ npm.cmd run dev
 
 `--no-access-log` is intentional: the application's JSON logs exclude raw inputs and exact coordinates. Keep this flag if changing the launch command.
 
-## Connect the team's trained artifacts
+## Included artifacts and optional external overrides
 
-Set this environment variable **before** starting the API:
+No environment variable is needed for the Git-tracked bundle. It contains 70 serving files and covers **July 12–25, 2021 (tune only)**. Training/calibration/final-test tables, raw data and forward-training predictions remain outside Git. See [bundle provenance and contents](../artifacts/README.md).
+
+To use a different complete external package, set this environment variable **before** starting the API:
 
 ```powershell
 $env:BIKEFLOW_DATA_ROOT='D:/data/chicago_historical_2021_sample'
 ```
 
-The application expects the existing pipeline's layout, without copying files into Git:
+An external override uses the existing pipeline's layout:
 
 ```text
 <data-root>/
@@ -87,6 +91,7 @@ The app currently loads the development forecaster. Calibration and final-test d
 - Alternatives are feasible **initial plans**, not predictions that the primary will fail. `/replan` accepts the rider's current location/time, failed stations and pickup/return phase, excludes tried stations and recomputes a plan. The UI's failure buttons explicitly simulate a failed attempt and advance the replay clock. They do not claim to reveal an actual observed failure.
 - PPO runs in an isolated CPU subprocess to avoid mixing torch and LightGBM OpenMP runtimes. Install `scripts/rl/requirements-ppo.txt` in the API environment to enable it. The bridge checks the 31-feature observation layout, walking limit and reward settings against `ppo.json`, and validates the action mask. It serves current station-anchored decisions at the decision-grid time. A current pickup action can be RL while the future return itinerary stays provisional B3; `actual_method` explicitly reports `RL_pickup+B3_return` or `RL_wait+B3_provisional`. A return-only current-state request can use `RL_return`. Arbitrary-location, offset-departure, missing/incompatible artifact and failure-history requests explicitly fall back to B3, then B2. There is no end-to-end online PPO performance claim.
 - PPO worker cold-start can take seconds (15-second timeout). The proposal's cached p95 target should be measured separately for greedy serving; this process bridge is not a low-latency PPO deployment.
+- With the supplied policy, use **2021-07-20 08:06**, a station origin, departure **At replay clock**, and **10 min max** walking. Default 5-minute or offset-departure requests still work through the documented fallback. The real serialized PPO artifact is exercised by integration tests when the optional runtime is installed.
 - Live polling discovers official feed URLs, validates station identities within 50 m, reads current capacity and installed/renting/returning flags, and applies two-second timeouts with one retry per feed. Requests read memory and never block on network. Poll frequency is 60 seconds; observation freshness must be ≤5 minutes. Stale counts remain visible but are excluded from planning and from **all** predictive methods.
 - Live features use report timestamps for lag matching and keep missing history as missing. Restarting the app starts a cold history buffer. The external Google collector is independent and is never read by the app.
 - `/replay/reveal` is an explicit post-plan operation: it reads future labels for the selected quantized horizons. Missing outcomes remain unobservable. Counts are approximate (±5 minutes), not exact arrival-time stock or a simulated rider's effect on stock.
@@ -128,12 +133,13 @@ No-plan is a successful response with `status: "no_plan"` and an explanation. Ma
 docker compose up --build
 ```
 
-Open <http://127.0.0.1:3000>. Default empty `demo-data/` supports examples; an external data directory is mounted **read-only** when configured. Only loopback ports are published. `docker compose down` stops the containers. Docker Desktop must be running. Image builds require internet; map tiles and live GBFS also need internet. Replay inference can run offline, but map tiles will be unavailable without a cache.
+Open <http://127.0.0.1:3000>. The image includes the same real M3 bundle; the default empty `demo-data/` mount does not override it. An external data directory is mounted **read-only** when configured. To include PPO dependencies in the image, set `BIKEFLOW_INSTALL_PPO=true` in `.env` before building; the default lighter image serves real B1/B2/B3 forecasts and clearly downgrades RL requests. Only loopback ports are published. `docker compose down` stops the containers. Docker Desktop must be running. Image builds require internet; map tiles and live GBFS also need internet. Replay inference can run offline, but map tiles will be unavailable without a cache.
 
 ## Verification and demo rehearsal
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p 'test_app*.py' -v
+.\.venv\Scripts\python.exe -m unittest discover -s tests -p 'test_bundled_artifacts.py' -v
 Push-Location frontend
 npm.cmd run build
 Pop-Location

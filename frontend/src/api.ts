@@ -27,6 +27,11 @@ export type Health = {
   replay_data_ready: boolean;
   rl_ready: boolean;
   live_cache_ready: boolean;
+  data_source?: string;
+  default_replay_time?: string;
+  replay_window?: { start: string; end_exclusive: string } | null;
+  rl_artifacts_ready?: boolean;
+  rl_runtime_ready?: boolean;
 };
 export type Stop = Point & {
   id: string;
