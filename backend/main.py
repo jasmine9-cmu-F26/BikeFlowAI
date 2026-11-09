@@ -108,7 +108,7 @@ def stations(mode: Literal['fixture', 'replay', 'live'] = 'replay', historical_t
 
 @app.get('/demo/scenarios')
 def scenarios():
-    return dict(default_time='2021-07-20T08:00:00-05:00', timezone='America/Chicago', scenarios=[
+    return dict(default_time='2021-07-20T08:06:00-05:00', timezone='America/Chicago', scenarios=[
         dict(id='normal', name='Morning commute', description='Synthetic station risk and alternative plans.'),
         dict(id='model-missing', name='Model fallback', description='Synthetic B2 fallback, clearly labeled.'),
         dict(id='stale', name='Stale data', description='Old counts remain visible; all predictions suppressed.')],
