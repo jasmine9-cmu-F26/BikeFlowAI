@@ -22,6 +22,10 @@ htmlcov/
 # Node / frontend output
 node_modules/
 /frontend/dist/
+*.tsbuildinfo
+/.local/
+/demo-data/*
+!/demo-data/.gitkeep
 
 # Environment / secrets
 .env
