@@ -140,6 +140,8 @@ class Planner:
                     pd = self.probability(states[r['id']], rh, 'return', method)
                     if pb is None or pd is None:
                         continue
+                    if method == 'B1' and (pb == 0 or pd == 0):
+                        continue
                     # Same one-step reward terms as policies.greedy; no independence claim.
                     score = (1 - 1.5*(1-pb) - .02*p['walk_minutes'] +
                              1 - 1.5*(1-pd) - .02*r['walk_minutes'] - .01*wait)

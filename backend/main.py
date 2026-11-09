@@ -222,7 +222,7 @@ def return_replan(values, snap):
             continue
         h = horizon(arrival)
         p = planner.probability(states[st['id']], h, 'return', method)
-        if p is not None:
+        if p is not None and (method != 'B1' or p > 0):
             choices.append((1-1.5*(1-p)-.02*st['walk_minutes'], dict(pickup=None,
                            dropoff=planner.stop(st, states, p, h, arrival, q), wait_minutes=0,
                            ride_minutes=round(ride, 1), ride_method=source_method, total_minutes=round(ride+st['walk_minutes'], 1))))

@@ -29,6 +29,13 @@ Open <http://127.0.0.1:3000>. Interactive API documentation is at <http://127.0.
 .\scripts\stop_demo.ps1
 ```
 
+If this machine blocks `.ps1` files, use a process-scoped invocation (it does not change the saved execution policy), or use the two-terminal commands below:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/start_demo.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/stop_demo.ps1
+```
+
 For no outbound GBFS polling, start with `-NoLive`. Alternatively run each process in its own terminal:
 
 ```powershell
@@ -133,5 +140,7 @@ Pop-Location
 ```
 
 The repository's existing Python CI includes these app tests; a separate app workflow builds the frontend. Provider tests generate temporary Parquet and a tiny actual LightGBM bundle. They verify the serving plumbing, not the team's model quality. The tests corrupt outcome data and still require planning to succeed, and separately check reveal permissions, causal live lags, missing/stale data, field validation and PPO action masks.
+
+For a reproducible synthetic cached-replay smoke benchmark, run `python scripts/benchmark_app.py` after installing the test/model dependencies. It records aggregate results in `reports/app_demo/synthetic_smoke.json`. See [recorded checks and remaining verification limits](../reports/app_demo/README.md).
 
 Rehearse: Example normal → 10-minute walking limit → recommended plan → alternatives → failure replan → missing-model scenario → stale-data scenario. After installing real data: Replay tune date → plan → explicit historical reveal. Live: wait for cache → inspect real flags/counts → plan → check model/freshness warnings. The footer includes the City of Chicago disclaimer and map attribution.

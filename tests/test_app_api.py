@@ -126,6 +126,15 @@ class AppAPI(unittest.TestCase):
             p = self.post().json()
             self.assertNotEqual(p['primary']['pickup']['id'], 'chicago:15')
 
+    def test_b1_does_not_send_rider_to_known_empty_pickup(self):
+        provider = app.state.providers
+        snap = provider.fixture(local_time(BASE['historical_timestamp']), 'normal')
+        for st in snap['stations']:
+            st['bikes'] = 0
+        with patch.object(provider, 'snapshot', return_value=snap):
+            p = self.post(method='B1').json()
+            self.assertEqual(p['status'], 'no_plan')
+
 
 class PolicyBridge(unittest.TestCase):
     def test_vector_and_masks_match_training_layout(self):

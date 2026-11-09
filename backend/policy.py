@@ -15,6 +15,9 @@ def observation(slots, phase='pickup', waits=0, elapsed_minutes=0, failures=0):
     mask = [False] * 4
     for j, slot in enumerate(slots[:3]):
         mask[j] = slot['valid']
+        if not slot['valid']:
+            obs[j*9+8] = float(slot.get('tried', False))
+            continue
         obs[j*9:j*9+9] = [float(slot['valid']), slot['walk_minutes']/10, slot['horizon']/60,
                           slot['share'], float(slot['empty_now']), slot['p_fail'], slot['p_next'],
                           slot['p_b2'], float(slot.get('tried', False))]
