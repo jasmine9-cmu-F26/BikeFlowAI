@@ -11,6 +11,7 @@ const source = fs.readFileSync(path.resolve(__dirname,'../deploy/apps_script/Cod
 function fixture() {
   const properties = new Map();const files=[];const triggers=[];const logs=[];
   let offline=false, numeric=false, redirect=false, locked=false, serial=0;
+  let sharingAccess='PRIVATE', editors=[], viewers=[];
   const stamp = Date.parse('2026-10-30T23:00:00Z');
   class Clock extends Date {
     constructor(...args){super(...(args.length?args:[stamp]));}
@@ -18,7 +19,7 @@ function fixture() {
   }
   const folder = {
     getId(){return 'private-synthetic-folder';},
-    getSharingAccess(){return 'PRIVATE';},getEditors(){return [];},getViewers(){return [];},
+    getSharingAccess(){return sharingAccess;},getEditors(){return editors;},getViewers(){return viewers;},
     getFoldersByName(){return {hasNext(){return true;},next(){return folder;}};},
     createFolder(){return folder;},
     createFile(blob){files.push(blob);return {getId(){return 'file-'+files.length;},getSize(){return blob.bytes.length;}};}
@@ -47,6 +48,7 @@ function fixture() {
   };
   vm.createContext(sandbox);vm.runInContext(source,sandbox);
   return {sandbox,properties,files,triggers,logs,offline(){offline=true;},numeric(){numeric=true;},redirect(){redirect=true;},lock(){locked=true;},
+    sharing(access,editorCount=0,viewerCount=0){sharingAccess=access;editors=Array(editorCount).fill({});viewers=Array(viewerCount).fill({});},
     records(){return files.map(f=>JSON.parse(zlib.gunzipSync(f.bytes).toString('utf8')));}};
 }
 
@@ -110,4 +112,25 @@ test('health tolerates small five-minute trigger jitter without false missing sl
   const entries=[0,299000,600000].map(d=>({t:t+d,r:t+d,s:'ok',saved:true,scheduled:true,n:2,provider:d,age:5}));
   const h=x.sandbox.summarizeHealth_(entries,t+601000,0);
   assert.equal(h.expected_poll_slots,3);assert.equal(h.successful_slots,3);assert.equal(h.slots_without_success,0);
+});
+
+
+test('explicitly invited viewers can access the folder without interrupting full scheduled captures',()=>{
+  const x=fixture();x.sandbox.setupCollector();x.sandbox.startCollector();
+  x.sharing('PRIVATE',0,2);
+  const result=x.sandbox.captureDivvySnapshot({triggerUid:'existing-trigger'});
+  assert.equal(result.status,'ok');assert.equal(x.triggers.length,1);
+  assert.equal(x.records().length,2);assert.equal(x.records().at(-1).full_snapshot,true);
+});
+test('public, link and domain-wide sharing are rejected before fetching or saving',()=>{
+  for(const access of ['ANYONE','ANYONE_WITH_LINK','DOMAIN','DOMAIN_WITH_LINK']){
+    const x=fixture();x.sandbox.setupCollector();x.sharing(access);
+    assert.throws(()=>x.sandbox.captureDivvySnapshot({triggerUid:'t'}),/Restricted general access/);
+    assert.equal(x.files.length,1);
+  }
+});
+test('additional editors remain blocked to protect original captures',()=>{
+  const x=fixture();x.sandbox.setupCollector();x.sharing('PRIVATE',1,2);
+  assert.throws(()=>x.sandbox.captureDivvySnapshot({triggerUid:'t'}),/no additional editors/);
+  assert.equal(x.files.length,1);
 });

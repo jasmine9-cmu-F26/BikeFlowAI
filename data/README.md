@@ -65,3 +65,13 @@ Historical forecast responses, source evidence and normalized Parquet stay in ex
 ## Audited final model tables
 
 [Final pipeline results](../reports/final_pipeline_audit/README.md) and [model handoff](../docs/forecaster_data_handoff.md) describe the external `processed/final_pipeline_v1/` feature/label, mapped-request, B2 and within-training OD tables. Only aggregate reports and manifests are committed. Features and outcomes are separate; original 32-station protocol remains immutable and is extended by [final_pipeline_contract.json](manifests/chicago/final_pipeline_contract.json).
+
+
+## Team access to current cloud snapshots
+
+[Open the team snapshot folder in Google Drive](https://drive.google.com/drive/folders/1tXEWkhX9AaFADR0T9C5aC6vIO9rzjfO_?usp=sharing).
+Sign in with the Google account the owner has explicitly invited as a **Viewer**. This GitHub link does not grant Drive access or sync data automatically. Ask the owner for access if needed; keep **General access: Restricted**, rather than anyone-with-link or organization-wide access. Additional editors are rejected by the collector.
+
+Before sharing, the collector owner must save the reviewed `apps-script-v2-health-team-viewers` Code.gs in the existing Apps Script project. Keep its current trigger; do not rerun setup/start. Until that source is installed, the older cloud code rejects invited viewers. Verify a successful scheduled poll and collectorHealth after the update. Repository edits alone do not update Google.
+
+Snapshots are complete gzip JSON poll envelopes, grouped by UTC date. Download the needed date folders, unzip the Drive download if applicable, and retain the original `.json.gz` captures under `Documents/BikeFlowAI-data/divvy/google_validation/`, outside the checkout. New captures appear in the same shared folder; raw snapshots should not be committed to GitHub. Team access is for project work under the source terms in [DATA_SOURCES.md](../DATA_SOURCES.md).

@@ -3,7 +3,7 @@
  * Five-minute triggers are best-effort; actual source/request/receipt times win.
  */
 const BIKEFLOW = Object.freeze({
-  version: 'apps-script-v2-health',
+  version: 'apps-script-v2-health-team-viewers',
   discovery: 'https://gbfs.divvybikes.com/gbfs/2.3/gbfs.json',
   hosts: ['gbfs.divvybikes.com', 'gbfs.lyft.com'],
   intervalMinutes: 5,
@@ -71,8 +71,10 @@ function privateFolder_() {
   const id = PropertiesService.getScriptProperties().getProperty(BIKEFLOW.folderProperty);
   if (!id) throw new Error('Run setupCollector first');
   const folder = DriveApp.getFolderById(id);
-  if (folder.getSharingAccess() !== DriveApp.Access.PRIVATE || folder.getEditors().length || folder.getViewers().length) {
-    throw new Error('Collector folder must be private and unshared');
+  // PRIVATE permits people explicitly invited by the owner, including team viewers.
+  // Keep general access Restricted; readers may download but cannot alter captures.
+  if (folder.getSharingAccess() !== DriveApp.Access.PRIVATE || folder.getEditors().length) {
+    throw new Error('Collector folder must have Restricted general access and no additional editors; explicitly invited viewers are allowed');
   }
   return folder;
 }
