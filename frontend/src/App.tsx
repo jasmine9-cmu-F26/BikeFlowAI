@@ -4,6 +4,7 @@ import {
   ArrowUpDown,
   Bike,
   Check,
+  ChevronLeft,
   ChevronRight,
   Clock3,
   Footprints,
@@ -136,6 +137,54 @@ function Journey({ route }: { route: Route }) {
   );
 }
 
+function RouteDetails({
+  route,
+  plan,
+  loading,
+  label = "ESTIMATED JOURNEY",
+  onReplan,
+}: {
+  route: Route;
+  plan: Plan;
+  loading: boolean;
+  label?: string;
+  onReplan: (phase: "pickup" | "return") => void;
+}) {
+  return (
+    <>
+      <div className="route-summary">
+        <div>
+          <span className="eyebrow">{label}</span>
+          <strong>
+            {route.total_minutes}
+            <small> min</small>
+          </strong>
+        </div>
+        <span className="method-badge">
+          {plan.mode === "fixture" ? "Example · " : ""}
+          {plan.actual_method}
+        </span>
+      </div>
+      <Journey route={route} />
+      <details className="failure-controls">
+        <summary>Attempt failed? Find the next option</summary>
+        <p>
+          For replay, this advances the decision clock to the attempted arrival.
+          It is a hypothetical failure, not a revealed outcome.
+        </p>
+        {route.pickup && (
+          <button disabled={loading} onClick={() => onReplan("pickup")}>
+            No bike at pickup <ChevronRight size={14} />
+          </button>
+        )}
+        <button disabled={loading} onClick={() => onReplan("return")}>
+          No dock at return <ChevronRight size={14} />
+        </button>
+      </details>
+    </>
+  );
+}
+
 export default function App() {
   const [mode, setMode] = useState<Mode>("fixture");
   const [method, setMethod] = useState<Method>("B3");
@@ -158,6 +207,9 @@ export default function App() {
   );
   const [tab, setTab] = useState<"recommended" | "alternatives">("recommended");
   const [shownRoute, setShownRoute] = useState<Route | null>(null);
+  const [selectedAlternativeIndex, setSelectedAlternativeIndex] = useState<
+    number | null
+  >(null);
   const [reload, setReload] = useState(0);
   const [failed, setFailed] = useState<string[]>([]);
   const [routeOrigin, setRouteOrigin] = useState<Endpoint>(origin);
@@ -210,6 +262,7 @@ export default function App() {
     setLoading(false);
     setPlan(null);
     setShownRoute(null);
+    setSelectedAlternativeIndex(null);
     setFailed([]);
     setDidPlan(false);
     setRouteOrigin(origin);
@@ -245,12 +298,14 @@ export default function App() {
       const p = await api<Plan>("/plan", body(), ctrl.signal);
       setPlan(p);
       setShownRoute(p.primary);
+      setSelectedAlternativeIndex(null);
       setTab("recommended");
     } catch (e) {
       if (!ctrl.signal.aborted) {
         setError((e as Error).message);
         setPlan(null);
         setShownRoute(null);
+        setSelectedAlternativeIndex(null);
       }
     } finally {
       if (!ctrl.signal.aborted) setLoading(false);
@@ -285,6 +340,7 @@ export default function App() {
       const p = await api<Plan>("/replan", request, ctrl.signal);
       setPlan(p);
       setShownRoute(p.primary);
+      setSelectedAlternativeIndex(null);
       setRouteOrigin(station.id);
       setFailed(failedIds);
       setTab("recommended");
@@ -746,6 +802,7 @@ export default function App() {
                   className={tab === "recommended" ? "active" : ""}
                   onClick={() => {
                     setTab("recommended");
+                    setSelectedAlternativeIndex(null);
                     setShownRoute(plan.primary);
                   }}
                 >
@@ -753,7 +810,11 @@ export default function App() {
                 </button>
                 <button
                   className={tab === "alternatives" ? "active" : ""}
-                  onClick={() => setTab("alternatives")}
+                  onClick={() => {
+                    setTab("alternatives");
+                    setSelectedAlternativeIndex(null);
+                    setShownRoute(null);
+                  }}
                 >
                   Alternatives <span>{plan.backups.length}</span>
                 </button>
@@ -769,97 +830,96 @@ export default function App() {
                   </p>
                 </div>
               ) : tab === "recommended" && shownRoute ? (
-                <>
-                  <div className="route-summary">
-                    <div>
-                      <span className="eyebrow">ESTIMATED JOURNEY</span>
-                      <strong>
-                        {shownRoute.total_minutes}
-                        <small> min</small>
-                      </strong>
-                    </div>
-                    <span className="method-badge">
-                      {plan.mode === "fixture" ? "Example · " : ""}
-                      {plan.actual_method}
-                    </span>
-                  </div>
-                  <Journey route={shownRoute} />
-                  <details className="failure-controls">
-                    <summary>Attempt failed? Find the next option</summary>
-                    <p>
-                      For replay, this advances the decision clock to the
-                      attempted arrival. It is a hypothetical failure, not a
-                      revealed outcome.
-                    </p>
-                    {shownRoute.pickup && (
-                      <button
-                        disabled={loading}
-                        onClick={() => replan("pickup")}
-                      >
-                        No bike at pickup <ChevronRight size={14} />
-                      </button>
-                    )}
-                    <button disabled={loading} onClick={() => replan("return")}>
-                      No dock at return <ChevronRight size={14} />
-                    </button>
-                  </details>
-                </>
+                <RouteDetails
+                  route={shownRoute}
+                  plan={plan}
+                  loading={loading}
+                  onReplan={replan}
+                />
               ) : (
                 <div className="alternatives">
-                  <p>
-                    Other plans available at the initial decision time. Replan
-                    after an actual failed attempt.
-                  </p>
-                  {plan.backups.map((r, i) => (
-                    <button
-                      className="alternative"
-                      key={i}
-                      onClick={() => {
-                        setShownRoute(r);
-                        setTab("recommended");
-                      }}
-                    >
-                      <div>
-                        <span className="eyebrow">
-                          OPTION {i + 2} · {r.total_minutes} MIN
-                        </span>
-                        <strong>{r.pickup?.name || "Continue riding"}</strong>
-                        <small>to {r.dropoff.name}</small>
-                        <span>
-                          {r.pickup
-                            ? `${pct(r.pickup.probability)} bike · `
-                            : ""}
-                          {pct(r.dropoff.probability)} dock
-                        </span>
-                      </div>
-                      <ArrowRight size={18} />
-                    </button>
-                  ))}
-                  {!plan.backups.length && (
-                    <p>No additional station pairs fit your limits.</p>
-                  )}
-                </div>
-              )}
-              {mode === "replay" && shownRoute && (
-                <div className="failure-controls">
-                  <button onClick={reveal}>
-                    Reveal historical outcomes <ChevronRight size={14} />
-                  </button>
-                  {revealed && (
+                  {selectedAlternativeIndex !== null && shownRoute ? (
+                    <>
+                      <button
+                        className="alternative-back"
+                        onClick={() => {
+                          setSelectedAlternativeIndex(null);
+                          setShownRoute(null);
+                        }}
+                      >
+                        <ChevronLeft size={15} /> Back to alternatives
+                      </button>
+                      <RouteDetails
+                        route={shownRoute}
+                        plan={plan}
+                        loading={loading}
+                        label={`ALTERNATIVE OPTION ${selectedAlternativeIndex + 2}`}
+                        onReplan={replan}
+                      />
+                    </>
+                  ) : (
                     <>
                       <p>
-                        {revealed.outcomes
-                          .map(
-                            (o) =>
-                              `${o.phase}: ${o.status}${o.observed === null ? "" : ` (${o.observed})`}`,
-                          )
-                          .join(" · ")}
+                        Other plans available at the initial decision time.
+                        Replan after an actual failed attempt.
                       </p>
-                      <p>{revealed.warning}</p>
+                      {plan.backups.map((r, i) => (
+                        <button
+                          className="alternative"
+                          key={i}
+                          onClick={() => {
+                            setSelectedAlternativeIndex(i);
+                            setShownRoute(r);
+                          }}
+                        >
+                          <div>
+                            <span className="eyebrow">
+                              OPTION {i + 2} · {r.total_minutes} MIN
+                            </span>
+                            <strong>
+                              {r.pickup?.name || "Continue riding"}
+                            </strong>
+                            <small>to {r.dropoff.name}</small>
+                            <span>
+                              {r.pickup
+                                ? `${pct(r.pickup.probability)} bike · `
+                                : ""}
+                              {pct(r.dropoff.probability)} dock
+                            </span>
+                          </div>
+                          <ArrowRight size={18} />
+                        </button>
+                      ))}
+                      {!plan.backups.length && (
+                        <p>No additional station pairs fit your limits.</p>
+                      )}
                     </>
                   )}
                 </div>
               )}
+              {mode === "replay" &&
+                shownRoute &&
+                (tab === "recommended" ||
+                  selectedAlternativeIndex !== null) && (
+                  <div className="failure-controls">
+                    <button onClick={reveal}>
+                      Reveal historical outcomes <ChevronRight size={14} />
+                    </button>
+                    {revealed && (
+                      <>
+                        <p>
+                          {revealed.outcomes
+                            .map(
+                              (o) =>
+                                `${o.phase}: ${o.status}${o.observed === null ? "" : ` (${o.observed})`}`,
+                            )
+                            .join(" · ")}
+                        </p>
+                        <p>{revealed.warning}</p>
+                      </>
+                    )}
+                  </div>
+                )}
               <div className="warnings">
                 {plan.warnings.map((w, i) => (
                   <div key={i}>

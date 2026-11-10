@@ -876,6 +876,18 @@ h1 > span {
   line-height: 1.8;
   color: #8b9680;
 }
+.alternative-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  background: none;
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0;
+  margin: 0 0 20px;
+}
 .alternative {
   background: #fffefb;
   border: 1px solid var(--line);
