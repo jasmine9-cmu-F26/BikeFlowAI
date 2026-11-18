@@ -30,7 +30,9 @@ class BundledArtifacts(unittest.TestCase):
     def test_bundle_is_complete_but_excludes_training_and_final_test_data(self):
         with zipfile.ZipFile(BUNDLE) as archive:
             names = archive.namelist()
-        self.assertEqual(len(names), 70)
+        self.assertEqual(len(names), 72)
+        self.assertIn('models/rl_conditioned/ppo.zip', names)
+        self.assertIn('models/rl_dev/ppo.zip', names)
         self.assertEqual(sum('/features/' in name for name in names), 32)
         self.assertEqual(sum('/labels/' in name for name in names), 32)
         self.assertFalse(any(token in name for name in names for token in ('_train.parquet', '_test.parquet', '_calibration.parquet', 'current_validation/', 'forward_train_predictions')))

@@ -14,8 +14,8 @@ import zipfile
 
 from .core import PROJECT
 
-BUNDLE = PROJECT / 'artifacts/m3-demo.zip'
-BUNDLE_MANIFEST = PROJECT / 'artifacts/m3-demo.json'
+BUNDLE = PROJECT / 'artifacts/m3-demo-v2.zip'
+BUNDLE_MANIFEST = PROJECT / 'artifacts/m3-demo-v2.json'
 DEFAULT_EXTERNAL = Path.home() / 'Documents/BikeFlowAI-data/divvy/chicago_historical_2021_sample'
 
 
@@ -23,7 +23,7 @@ def materialize_bundle(bundle=BUNDLE, manifest_path=BUNDLE_MANIFEST, cache_root=
     manifest = json.loads(Path(manifest_path).read_text(encoding='utf-8'))
     digest = hashlib.sha256(Path(bundle).read_bytes()).hexdigest()
     if digest != manifest['sha256']:
-        raise ValueError('Bundled demo checksum mismatch; restore artifacts/m3-demo.zip from Git.')
+        raise ValueError('Bundled demo checksum mismatch; restore artifacts/m3-demo-v2.zip from Git.')
     cache_root = Path(cache_root or PROJECT / '.local/data').resolve()
     target = cache_root / ('m3-demo-' + digest[:16])
     marker = target / '.bundle-sha256'

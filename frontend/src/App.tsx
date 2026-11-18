@@ -20,6 +20,14 @@ import {
 import RideMap, { COLORS, RISK_HORIZON, type MapLayer } from "./Map";
 import DockInsight from "./DockInsight";
 import {
+  MethodNotice,
+  WALK_CHOICES,
+  WalkSuggestion,
+  needsWiderWalk,
+  nextWalk,
+  widerIsBetter,
+} from "./PlanNotices";
+import {
   api,
   clock,
   historical,
@@ -59,6 +67,16 @@ const STORIES: Story[] = [
     layer: "dock",
   },
   {
+    id: "walk-more",
+    name: "Empty station · walk a bit more",
+    when: "2021-07-21T17:36",
+    origin: "chicago:28",
+    destination: "chicago:31",
+    walk: 5,
+    method: "B3",
+    layer: "bike",
+  },
+  {
     id: "weekday",
     name: "Weekday ride · Pilsen → West Loop",
     when: "2021-07-20T08:06",
@@ -75,8 +93,11 @@ type Outcome = {
   observed: number | null;
   status: string;
 };
+// Never round a probability up to a certainty.
 const pct = (p: number | null) =>
-  p === null ? "Unavailable" : Math.round(p * 100) + "%";
+  p === null
+    ? "Unavailable"
+    : Math.min(Math.round(p * 100), p < 1 ? 99 : 100) + "%";
 const labels: Record<Mode, string> = {
   fixture: "Example",
   replay: "Replay",
@@ -272,7 +293,8 @@ export default function App() {
   } | null>(null);
   const [layer, setLayer] = useState<MapLayer>("bike");
   const [story, setStory] = useState("");
-  const [pendingStory, setPendingStory] = useState(false);
+  const [pendingRun, setPendingRun] = useState(false);
+  const [wider, setWider] = useState<{ walk: number; plan: Plan } | null>(null);
   const [baseline, setBaseline] = useState<Plan | null>(null);
   const [comparing, setComparing] = useState(false);
   const requestRef = useRef<AbortController | null>(null);
@@ -326,15 +348,16 @@ export default function App() {
     setRouteOrigin(origin);
     setRevealed(null);
     setBaseline(null);
+    setWider(null);
   }, [mode, when, offset, walk, method, origin, destination, scenario, reload]);
   useEffect(() => setRevealed(null), [shownRoute]);
   useEffect(() => () => requestRef.current?.abort(), []);
-  // Run a selected story once its inputs are applied (after the reset effect above).
+  // Plan once new inputs (a story, a longer walk) are applied, after the reset effect above.
   useEffect(() => {
-    if (!pendingStory) return;
-    setPendingStory(false);
+    if (!pendingRun) return;
+    setPendingRun(false);
     submit();
-  }, [pendingStory]);
+  }, [pendingRun]);
   function applyStory(id: string) {
     setStory(id);
     const s = STORIES.find((x) => x.id === id);
@@ -348,7 +371,7 @@ export default function App() {
     setWalk(s.walk);
     setMethod(s.method);
     setLayer(s.layer);
-    setPendingStory(true);
+    setPendingRun(true);
   }
   async function compareBaseline() {
     if (!plan) return;
@@ -395,6 +418,7 @@ export default function App() {
     setFailed([]);
     setRevealed(null);
     setBaseline(null);
+    setWider(null);
     setRouteOrigin(origin);
     try {
       const p = await api<Plan>("/plan", body(), ctrl.signal);
@@ -402,6 +426,16 @@ export default function App() {
       setShownRoute(p.primary);
       setSelectedAlternativeIndex(null);
       setTab("recommended");
+      // Sparse short-walk result: quietly check the next limit and offer it only if it clearly helps.
+      const w = nextWalk(walk);
+      if (w !== null && needsWiderWalk(p)) {
+        api<Plan>("/plan", { ...body(), walk_limit_minutes: w }, ctrl.signal)
+          .then((wp) => {
+            if (!ctrl.signal.aborted && widerIsBetter(p, wp))
+              setWider({ walk: w, plan: wp });
+          })
+          .catch(() => {});
+      }
     } catch (e) {
       if (!ctrl.signal.aborted) {
         setError((e as Error).message);
@@ -682,7 +716,7 @@ export default function App() {
               <label className="field-label">
                 Extra walking
                 <select value={walk} onChange={(e) => setWalk(+e.target.value)}>
-                  {[0, 5, 10, 15, 20].map((n) => (
+                  {WALK_CHOICES.map((n) => (
                     <option key={n} value={n}>
                       {n} min max
                     </option>
@@ -723,8 +757,8 @@ export default function App() {
           <div className="walk-note">
             <Footprints size={16} />
             <span>
-              Limit applies at each end. The 32-station area is sparse; try 10
-              min for more alternatives.
+              Limit applies at each end. One RL policy adapts to 5, 10 or 15
+              min; we suggest walking more only when it clearly helps.
             </span>
           </div>
           {mode === "fixture" && (
@@ -981,9 +1015,32 @@ export default function App() {
                     Try another endpoint, a shorter departure offset, or a
                     larger walking limit.
                   </p>
+                  {wider && (
+                    <WalkSuggestion
+                      current={plan}
+                      wider={wider.plan}
+                      walk={wider.walk}
+                      onUse={() => {
+                        setWalk(wider.walk);
+                        setPendingRun(true);
+                      }}
+                    />
+                  )}
                 </div>
               ) : tab === "recommended" && shownRoute ? (
                 <>
+                  <MethodNotice plan={plan} walk={walk} />
+                  {wider && !failed.length && (
+                    <WalkSuggestion
+                      current={plan}
+                      wider={wider.plan}
+                      walk={wider.walk}
+                      onUse={() => {
+                        setWalk(wider.walk);
+                        setPendingRun(true);
+                      }}
+                    />
+                  )}
                   <DockInsight
                     route={shownRoute}
                     plan={plan}

@@ -1343,3 +1343,55 @@ h1 > span {
   background: #f0f0ee;
   color: #777;
 }
+
+/* ---- Walking-limit suggestion and RL method notice (M4) ---- */
+.walk-suggestion {
+  border: 1px dashed #c9b37a;
+  background: #fdf8ec;
+  border-radius: 8px;
+  padding: 12px 13px;
+  margin: 4px 0 14px;
+  text-align: left;
+}
+.walk-suggestion .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.walk-suggestion strong {
+  display: block;
+  font:
+    700 14px "Manrope",
+    sans-serif;
+  margin: 6px 0 6px;
+  color: #6b5317;
+}
+.walk-suggestion ul {
+  margin: 0 0 4px;
+  padding-left: 16px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #5d5442;
+}
+.method-notice {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  font-size: 10.5px;
+  line-height: 1.5;
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin: 4px 0 12px;
+}
+.method-notice svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.method-notice.rl {
+  background: #e8f0f6;
+  color: #2f5470;
+}
+.method-notice.fallback {
+  background: #f6efe2;
+  color: #7a5a24;
+}
