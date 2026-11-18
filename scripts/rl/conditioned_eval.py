@@ -116,6 +116,9 @@ def main():
     p.add_argument("--lams", type=float, nargs="+", default=list(LAMS))
     p.add_argument("--mu", type=float, default=0.01)
     p.add_argument("--c", type=float, default=0.5)
+    p.add_argument(
+        "--f", type=float, default=0.0, help="penalty per failed attempt (0 = M3 reward)"
+    )
     p.add_argument("--bootstrap", type=int, default=1000)
     p.add_argument("--seed", type=int, default=0, help="bootstrap seed")
     p.add_argument(
@@ -144,6 +147,8 @@ def main():
         str(a.mu),
         "--c",
         str(a.c),
+        "--f",
+        str(a.f),
         "--requests",
         a.requests,
         "--demand-scale",
@@ -186,11 +191,15 @@ def main():
                 seeds=seeds,
                 models=[str(m) for m in models],
                 training=[
-                    {k: m[k] for k in ("steps", "lam_choices", "walk_choices", "seed")}
+                    {
+                        k: m.get(k, 0.0)
+                        for k in ("steps", "lam_choices", "walk_choices", "seed", "f")
+                    }
                     for m in metas
                 ],
                 mu=a.mu,
                 c=a.c,
+                f=a.f,
                 **request_provenance(a),
                 bootstrap=a.bootstrap,
                 seed=a.seed,

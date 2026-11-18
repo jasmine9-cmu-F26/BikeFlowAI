@@ -47,6 +47,7 @@ def train(
     conditioned=False,
     lam_choices=LAM_CHOICES,
     walk_choices=WALK_CHOICES,
+    f=0.0,
 ):
     """Fixed (lam, walk_limit), or with `conditioned` one policy sampling both per episode."""
     from sb3_contrib import MaskablePPO
@@ -61,6 +62,7 @@ def train(
         conditioned=conditioned,
         lam_choices=lam_choices if conditioned else None,
         walk_choices=walk_choices if conditioned else None,
+        f=f,
     )
     model = MaskablePPO(
         "MlpPolicy", env, seed=seed, verbose=0, device="cpu", **PPO_SETTINGS
@@ -77,6 +79,7 @@ def train(
                 lam=None if conditioned else lam,
                 mu=mu,
                 c=c,
+                f=f,
                 walk_limit_minutes=None if conditioned else walk_limit,
                 conditioned=conditioned,
                 **(
@@ -135,6 +138,9 @@ def main():
     p.add_argument("--lam", type=float, default=0.02)
     p.add_argument("--mu", type=float, default=0.01)
     p.add_argument("--c", type=float, default=0.5)
+    p.add_argument(
+        "--f", type=float, default=0.0, help="penalty per failed attempt (0 = M3 reward)"
+    )
     p.add_argument("--walk-limit", type=float, default=10)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument(
@@ -173,6 +179,7 @@ def main():
         conditioned=a.conditioned,
         lam_choices=a.lam_choices,
         walk_choices=a.walk_choices,
+        f=a.f,
     )
     print(
         json.dumps(dict(out=str(out), training_requests=len(replay.requests)), indent=2)

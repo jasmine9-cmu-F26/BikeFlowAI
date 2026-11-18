@@ -80,12 +80,14 @@ rl-sweep:
 
 RL_COND_STEPS ?= 1500000
 RL_SEEDS ?= 0 1 2
+# Penalty per failed pickup/return attempt (0 = M3 reward).
+RL_F ?= 0.1
 
 rl-train-conditioned:
-	pids=""; for s in $(RL_SEEDS); do OMP_NUM_THREADS=4 "$(PYTHON)" scripts/rl/train_ppo.py --data-root "$(DATA_ROOT)" --conditioned --steps $(RL_COND_STEPS) --seed $$s --out "$(DATA_ROOT)/models/rl_conditioned/seed$$s/ppo.zip" & pids="$$pids $$!"; done; for p in $$pids; do wait $$p || exit 1; done
+	pids=""; for s in $(RL_SEEDS); do OMP_NUM_THREADS=4 "$(PYTHON)" scripts/rl/train_ppo.py --data-root "$(DATA_ROOT)" --conditioned --f $(RL_F) --steps $(RL_COND_STEPS) --seed $$s --out "$(DATA_ROOT)/models/rl_conditioned_f$(RL_F)/seed$$s/ppo.zip" & pids="$$pids $$!"; done; for p in $$pids; do wait $$p || exit 1; done
 
 rl-eval-conditioned:
-	"$(PYTHON)" scripts/rl/conditioned_eval.py --data-root "$(DATA_ROOT)"
+	"$(PYTHON)" scripts/rl/conditioned_eval.py --data-root "$(DATA_ROOT)" --f $(RL_F) $(foreach s,$(RL_SEEDS),--rl-model "$(DATA_ROOT)/models/rl_conditioned_f$(RL_F)/seed$(s)/ppo.zip") --reports reports/rl_eval/conditioned_f$(RL_F)
 
 # Separate processes on purpose: torch and lightgbm each bundle libomp.
 pipeline: train forward rl-train rl-eval

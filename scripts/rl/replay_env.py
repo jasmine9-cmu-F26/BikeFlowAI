@@ -104,11 +104,14 @@ class ReplayEnv(gym.Env):
         conditioned=False,
         lam_choices=None,
         walk_choices=None,
+        f=0.0,
     ):
         """`conditioned` appends (lam, walk_limit) to the observation. With
         `lam_choices` / `walk_choices`, each reset samples them uniformly
         (training); otherwise the fixed `lam` / `walk_limit` are used (evaluation).
+        `f` is charged for every failed pickup / return attempt (0 = M3 reward).
         """
+        self.f = f
         self.replay, self.lam, self.mu, self.c, self.walk_limit = (
             replay,
             lam,
@@ -289,7 +292,7 @@ class ReplayEnv(gym.Env):
         if failed >= 0.5:
             self.failures += 1
             self.tried.add(s)
-            return self._continue(reward)
+            return self._continue(reward - self.f)
         if self.phase == "pickup":
             self.phase, self.tried = "return", set()
             self.candidates = self.replay.nearby(self.request.dest, self.walk_limit)

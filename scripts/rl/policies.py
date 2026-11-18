@@ -1,6 +1,7 @@
 """Myopic greedy policies: one scoring rule, three failure-probability sources.
 
-A slot is worth its expected one-step reward, 1 - (1 + c) * p_fail - lam * walk.
+A slot is worth its expected one-step reward, 1 - (1 + c + f) * p_fail - lam * walk,
+where f is the per-failed-attempt penalty (0 in the M3 reward).
 Waiting is worth the best slot's value with the probability for arriving ten
 minutes later, minus mu * 10. B1 uses current emptiness (so waiting never
 helps), B2 the training-period availability rate, B3 the calibrated forecaster.
@@ -26,7 +27,7 @@ def failure_probabilities(slot, source):
     raise ValueError(f"unknown probability source {source}; expected one of {SOURCES}")
 
 
-def greedy(source, lam, mu, c):
+def greedy(source, lam, mu, c, f=0.0):
     if source not in SOURCES:
         raise ValueError(
             f"unknown probability source {source}; expected one of {SOURCES}"
@@ -40,10 +41,10 @@ def greedy(source, lam, mu, c):
             if not slot["valid"]:
                 continue
             p, p_next = failure_probabilities(slot, source)
-            scores[j] = 1 - (1 + c) * p - lam * slot["walk_minutes"]
+            scores[j] = 1 - (1 + c + f) * p - lam * slot["walk_minutes"]
             if p_next is not None:
                 wait_value = max(
-                    wait_value, 1 - (1 + c) * p_next - lam * slot["walk_minutes"]
+                    wait_value, 1 - (1 + c + f) * p_next - lam * slot["walk_minutes"]
                 )
         if mask[WAIT]:
             scores[WAIT] = (

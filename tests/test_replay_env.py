@@ -107,6 +107,15 @@ class ReplayEnvTests(unittest.TestCase):
         self.assertEqual(info["failures"], 1)
         self.assertAlmostEqual(total, 1 - 0.02 * WALK_AB, places=2)
 
+    def test_failed_attempt_penalty_is_charged_per_failure(self):
+        replay = make_replay()
+        replay.outcome[A, 2, 0, 0] = 1  # A empty: one failed pickup, then B
+        base, _ = run(self.env(replay), [0, 1, 0])
+        penalized, info = run(self.env(replay, f=0.1), [0, 1, 0])
+        self.assertEqual(info["failures"], 1)
+        self.assertAlmostEqual(penalized, base - 0.1, places=6)
+        self.assertAlmostEqual(info["reward"], base - 0.1, places=6)
+
     def test_missing_outcome_row_ends_as_unobservable(self):
         replay = make_replay()
         replay.outcome[A, 2, 0, :] = np.nan
