@@ -39,3 +39,6 @@ node_modules/
 .DS_Store
 Thumbs.db
 
+
+# Per-cell evaluate.py outputs (episodes.csv is ~10 MB each); aggregates are tracked
+/reports/rl_eval/conditioned/walk_*/

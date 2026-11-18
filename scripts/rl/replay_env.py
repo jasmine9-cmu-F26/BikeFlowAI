@@ -20,6 +20,13 @@ WAIT = SLOTS  # action index
 MAX_WAITS = 2
 SLOT_FEATURES = 9
 OBS_SIZE = SLOTS * SLOT_FEATURES + 4
+# Preference-conditioned mode: one policy for every rider. The walking penalty
+# and walking limit are sampled per episode and appended to the observation,
+# scaled by these constants.
+CONDITION_FEATURES = 2
+LAM_SCALE = 0.08
+WALK_SCALE = 15.0
+CONDITIONED_OBS_SIZE = OBS_SIZE + CONDITION_FEATURES
 
 # decision fields
 BIKES, DOCKS, CAPACITY, IN_SERVICE, P_BIKE, P_DOCK, B2_BIKE, B2_DOCK = range(8)
@@ -86,7 +93,22 @@ def first_decision_time(replay, checkout):
 class ReplayEnv(gym.Env):
     metadata = {"render_modes": []}
 
-    def __init__(self, replay, lam=0.02, mu=0.01, c=0.5, walk_limit=10, seed=None):
+    def __init__(
+        self,
+        replay,
+        lam=0.02,
+        mu=0.01,
+        c=0.5,
+        walk_limit=10,
+        seed=None,
+        conditioned=False,
+        lam_choices=None,
+        walk_choices=None,
+    ):
+        """`conditioned` appends (lam, walk_limit) to the observation. With
+        `lam_choices` / `walk_choices`, each reset samples them uniformly
+        (training); otherwise the fixed `lam` / `walk_limit` are used (evaluation).
+        """
         self.replay, self.lam, self.mu, self.c, self.walk_limit = (
             replay,
             lam,
@@ -94,7 +116,13 @@ class ReplayEnv(gym.Env):
             c,
             walk_limit,
         )
-        self.observation_space = gym.spaces.Box(-1.0, 10.0, (OBS_SIZE,), np.float32)
+        if (lam_choices or walk_choices) and not conditioned:
+            raise ValueError("sampled lam / walk limit requires conditioned=True")
+        self.conditioned = conditioned
+        self.lam_choices = tuple(lam_choices) if lam_choices else None
+        self.walk_choices = tuple(walk_choices) if walk_choices else None
+        size = CONDITIONED_OBS_SIZE if conditioned else OBS_SIZE
+        self.observation_space = gym.spaces.Box(-1.0, 10.0, (size,), np.float32)
         self.action_space = gym.spaces.Discrete(SLOTS + 1)
         self._rng = np.random.default_rng(seed)
 
@@ -107,6 +135,10 @@ class ReplayEnv(gym.Env):
         if i is None:
             i = int(self._rng.integers(len(self.replay.requests)))
         self.request = self.replay.requests[i]
+        if self.lam_choices:
+            self.lam = float(self._rng.choice(self.lam_choices))
+        if self.walk_choices:
+            self.walk_limit = float(self._rng.choice(self.walk_choices))
         self.t0 = self.t = first_decision_time(self.replay, self.request.time)
         self.phase, self.here = "pickup", self.request.origin
         self.candidates = self.replay.nearby(self.request.origin, self.walk_limit)
@@ -177,7 +209,7 @@ class ReplayEnv(gym.Env):
         )
 
     def observation(self):
-        obs = np.zeros(OBS_SIZE, np.float32)
+        obs = np.zeros(self.observation_space.shape[0], np.float32)
         for j, s in enumerate(self.slots()):
             if not s["exists"]:
                 continue
@@ -201,12 +233,14 @@ class ReplayEnv(gym.Env):
                 p_next,
                 b2,
             ]
-        obs[-4:] = [
+        obs[OBS_SIZE - 4 : OBS_SIZE] = [
             float(self.phase == "return"),
             self.waits / MAX_WAITS,
             (self.t - self.t0) / 3600,
             self.failures / 3,
         ]
+        if self.conditioned:
+            obs[OBS_SIZE:] = [self.lam / LAM_SCALE, self.walk_limit / WALK_SCALE]
         return obs
 
     # ----- transitions -----

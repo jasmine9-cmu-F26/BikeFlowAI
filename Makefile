@@ -5,7 +5,7 @@ DATA_ROOT ?= $(DIVVY_ROOT)/chicago_historical_2021_sample
 RL_STEPS ?= 300000
 RL_MODEL ?= $(DATA_ROOT)/models/rl_dev/ppo.zip
 
-.PHONY: help data download audit app-audit audit-base trips collector-once test features train forward replay-demo rl-train rl-eval rl-eval-final rl-sweep pipeline demo-setup demo demo-stop
+.PHONY: help data download audit app-audit audit-base trips collector-once test features train forward replay-demo rl-train rl-eval rl-eval-final rl-sweep rl-train-conditioned rl-eval-conditioned pipeline demo-setup demo demo-stop
 
 help:
 	@echo "make data           - bounded download then separate app32 snapshot/trip audit"
@@ -23,6 +23,8 @@ help:
 	@echo "make rl-eval        - B1/B2/B3 greedy and RL on identical tune requests -> reports/rl_eval/tune"
 	@echo "make rl-eval-final  - frozen settings only: same comparison on test, once (needs final test scores)"
 	@echo "make rl-sweep       - retrain PPO and rerun B1/B2/B3 per walking penalty -> reports/rl_eval/lambda_sweep"
+	@echo "make rl-train-conditioned - one PPO per seed for every lambda / walking limit (3 seeds)"
+	@echo "make rl-eval-conditioned  - conditioned PPO vs B1/B2/B3 per walk limit x lambda -> reports/rl_eval/conditioned"
 	@echo "make pipeline       - train, forward, rl-train, rl-eval in one pass"
 	@echo "make demo-setup     - macOS/Linux: create .venv, install demo deps (incl. PPO) and frontend packages"
 	@echo "make demo           - macOS/Linux: start API :8000 + web :3000 in the background"
@@ -75,6 +77,15 @@ rl-eval-final:
 
 rl-sweep:
 	"$(PYTHON)" scripts/rl/sweep.py --data-root "$(DATA_ROOT)" --steps $(RL_STEPS)
+
+RL_COND_STEPS ?= 1500000
+RL_SEEDS ?= 0 1 2
+
+rl-train-conditioned:
+	pids=""; for s in $(RL_SEEDS); do OMP_NUM_THREADS=4 "$(PYTHON)" scripts/rl/train_ppo.py --data-root "$(DATA_ROOT)" --conditioned --steps $(RL_COND_STEPS) --seed $$s --out "$(DATA_ROOT)/models/rl_conditioned/seed$$s/ppo.zip" & pids="$$pids $$!"; done; for p in $$pids; do wait $$p || exit 1; done
+
+rl-eval-conditioned:
+	"$(PYTHON)" scripts/rl/conditioned_eval.py --data-root "$(DATA_ROOT)"
 
 # Separate processes on purpose: torch and lightgbm each bundle libomp.
 pipeline: train forward rl-train rl-eval

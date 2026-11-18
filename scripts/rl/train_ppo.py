@@ -9,7 +9,18 @@ import json
 import time
 from pathlib import Path
 
-from replay_env import OBS_SIZE, ReplayEnv
+from replay_env import (
+    CONDITIONED_OBS_SIZE,
+    LAM_SCALE,
+    OBS_SIZE,
+    WALK_SCALE,
+    ReplayEnv,
+)
+
+# Preference-conditioned defaults: the lambda range where policies still differ
+# (reports/rl_eval/lambda_sweep) and the app's walking-limit choices.
+LAM_CHOICES = (0.0, 0.005, 0.01, 0.02, 0.04, 0.08, 0.16)
+WALK_CHOICES = (5, 10, 15)
 
 PPO_SETTINGS = dict(
     n_steps=2048,
@@ -24,11 +35,33 @@ PPO_SETTINGS = dict(
 
 
 def train(
-    replay, out, steps, lam=0.02, mu=0.01, c=0.5, walk_limit=10, seed=0, provenance=None
+    replay,
+    out,
+    steps,
+    lam=0.02,
+    mu=0.01,
+    c=0.5,
+    walk_limit=10,
+    seed=0,
+    provenance=None,
+    conditioned=False,
+    lam_choices=LAM_CHOICES,
+    walk_choices=WALK_CHOICES,
 ):
+    """Fixed (lam, walk_limit), or with `conditioned` one policy sampling both per episode."""
     from sb3_contrib import MaskablePPO
 
-    env = ReplayEnv(replay, lam=lam, mu=mu, c=c, walk_limit=walk_limit, seed=seed)
+    env = ReplayEnv(
+        replay,
+        lam=lam,
+        mu=mu,
+        c=c,
+        walk_limit=walk_limit,
+        seed=seed,
+        conditioned=conditioned,
+        lam_choices=lam_choices if conditioned else None,
+        walk_choices=walk_choices if conditioned else None,
+    )
     model = MaskablePPO(
         "MlpPolicy", env, seed=seed, verbose=0, device="cpu", **PPO_SETTINGS
     )
@@ -41,12 +74,23 @@ def train(
         json.dumps(
             dict(
                 steps=steps,
-                lam=lam,
+                lam=None if conditioned else lam,
                 mu=mu,
                 c=c,
-                walk_limit_minutes=walk_limit,
+                walk_limit_minutes=None if conditioned else walk_limit,
+                conditioned=conditioned,
+                **(
+                    dict(
+                        lam_choices=list(lam_choices),
+                        walk_choices=list(walk_choices),
+                        lam_scale=LAM_SCALE,
+                        walk_scale=WALK_SCALE,
+                    )
+                    if conditioned
+                    else {}
+                ),
                 seed=seed,
-                observation_size=OBS_SIZE,
+                observation_size=CONDITIONED_OBS_SIZE if conditioned else OBS_SIZE,
                 training_requests=len(replay.requests),
                 versions=sorted({q.version for q in replay.requests}),
                 **(provenance or {}),
@@ -93,6 +137,14 @@ def main():
     p.add_argument("--c", type=float, default=0.5)
     p.add_argument("--walk-limit", type=float, default=10)
     p.add_argument("--seed", type=int, default=0)
+    p.add_argument(
+        "--conditioned",
+        action="store_true",
+        help="one policy for every rider: sample lambda and the walking limit per "
+        "episode and give both to the policy (--lam / --walk-limit are then ignored)",
+    )
+    p.add_argument("--lam-choices", type=float, nargs="+", default=list(LAM_CHOICES))
+    p.add_argument("--walk-choices", type=float, nargs="+", default=list(WALK_CHOICES))
     p.add_argument("--out", type=Path)
     add_request_args(p)
     a = p.parse_args()
@@ -105,7 +157,9 @@ def main():
         a.demand_scale,
         a.request_seed,
     )
-    out = a.out or a.data_root / "models/rl_dev/ppo.zip"
+    out = a.out or a.data_root / (
+        "models/rl_conditioned/ppo.zip" if a.conditioned else "models/rl_dev/ppo.zip"
+    )
     train(
         replay,
         out,
@@ -116,6 +170,9 @@ def main():
         a.walk_limit,
         a.seed,
         provenance=request_provenance(a),
+        conditioned=a.conditioned,
+        lam_choices=a.lam_choices,
+        walk_choices=a.walk_choices,
     )
     print(
         json.dumps(dict(out=str(out), training_requests=len(replay.requests)), indent=2)
