@@ -1,14 +1,14 @@
 {
-  "version": "m3-demo-v2",
+  "version": "m3-demo-v3",
   "model_version": "forecaster_v0_m3",
   "scope": "32 app stations; tune replay only",
   "replay_start": "2021-07-12T01:00:00-05:00",
   "replay_end_exclusive": "2021-07-26T00:00:00-05:00",
   "default_time": "2021-07-20T08:06:00-05:00",
-  "sha256": "0e70101874bb9360b47f6a268a63a8e1f42d97df95ce0f082f1b3a626a620a77",
-  "source_archive_sha256": "ce5c81da29fe215ed673a8951a54480434999f9537bd6c7a9c739de0046c998a",
+  "sha256": "70e5d465dde8a45e25fb4d16b1e3f1766cf08552e85c577e9970f047b79d8b5a",
+  "source_archive_sha256": "0e70101874bb9360b47f6a268a63a8e1f42d97df95ce0f082f1b3a626a620a77",
   "file_count": 72,
-  "size_bytes": 5889090,
+  "size_bytes": 5889017,
   "required_files": [
     "models/forecaster_v0_m3/bike_lgbm.txt",
     "models/forecaster_v0_m3/dock_lgbm.txt",

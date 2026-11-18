@@ -8,7 +8,7 @@
 *.duckdb
 *.duckdb.*
 *.zip
-!/artifacts/m3-demo-v2.zip
+!/artifacts/m3-demo-v3.zip
 *.json.gz
 
 # Python

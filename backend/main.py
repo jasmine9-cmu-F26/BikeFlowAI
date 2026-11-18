@@ -14,7 +14,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
-from .core import Planner, distance, horizon
+from .core import APP_LAM, RISK, Planner, distance, horizon
 from .providers import Providers, ZONE, local_time
 
 logger = logging.getLogger('bikeflow.requests')
@@ -223,7 +223,7 @@ def return_replan(values, snap):
         h = horizon(arrival)
         p = planner.probability(states[st['id']], h, 'return', method)
         if p is not None and (method != 'B1' or p > 0):
-            choices.append((1-1.5*(1-p)-.02*st['walk_minutes'], dict(pickup=None,
+            choices.append((1-RISK*(1-p)-APP_LAM*st['walk_minutes'], dict(pickup=None,
                            dropoff=planner.stop(st, states, p, h, arrival, q), wait_minutes=0,
                            ride_minutes=round(ride, 1), ride_method=source_method, total_minutes=round(ride+st['walk_minutes'], 1))))
     choices.sort(key=lambda c: -c[0])

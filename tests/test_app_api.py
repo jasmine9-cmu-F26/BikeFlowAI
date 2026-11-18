@@ -171,7 +171,7 @@ class PolicyBridge(unittest.TestCase):
             path.write_bytes(b'test')
             path.with_suffix('.json').write_text(json.dumps(dict(
                 conditioned=True, observation_size=33, walk_choices=[5., 10., 15.],
-                lam_choices=[0., .02, .16], lam_scale=.08, walk_scale=15., mu=.01, c=.5)))
+                lam_choices=[0., .02, .16], lam_scale=.08, walk_scale=15., mu=.01, c=.5, f=.1)))
             p = Policy(root)
             self.assertEqual(p.path, path)
             slot = dict(valid=True,walk_minutes=0,horizon=10,share=.5,empty_now=False,p_fail=.1,p_next=.1,p_b2=.1)
@@ -185,6 +185,11 @@ class PolicyBridge(unittest.TestCase):
                 self.assertAlmostEqual(sent[32], 5/15)
                 with self.assertRaisesRegex(ValueError,'walking limits'):
                     p.choose([slot],20)
+            # A policy trained for another failed-attempt penalty is not served.
+            meta = json.loads(path.with_suffix('.json').read_text())
+            path.with_suffix('.json').write_text(json.dumps(dict(meta, f=0.)))
+            with self.assertRaisesRegex(ValueError,'reward configuration'):
+                p.choose([slot],5)
 
 
 if __name__ == '__main__':

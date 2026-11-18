@@ -8,9 +8,7 @@ import importlib.util
 import subprocess
 import sys
 
-from .core import PROJECT
-
-APP_LAM, APP_MU, APP_C = .02, .01, .5
+from .core import APP_C, APP_F, APP_LAM, APP_MU, PROJECT
 
 
 def observation(slots, phase='pickup', waits=0, elapsed_minutes=0, failures=0, condition=None):
@@ -59,7 +57,7 @@ class Policy:
             if not any(abs(walk_limit - w) < 1e-8 for w in meta.get('walk_choices', [])):
                 raise ValueError(f"PPO was trained for walking limits {meta.get('walk_choices')} min; this request uses {walk_limit:g}")
             lams = meta.get('lam_choices', [])
-            if not lams or not min(lams) <= APP_LAM <= max(lams):
+            if not lams or not min(lams) <= APP_LAM <= max(lams) or abs(meta.get('f', 0.) - APP_F) > 1e-8:
                 raise ValueError('PPO reward configuration differs from the application')
             condition = (APP_LAM / meta['lam_scale'], walk_limit / meta['walk_scale'])
         elif meta.get('observation_size') != 31 or meta.get('walk_limit_minutes') != walk_limit:
