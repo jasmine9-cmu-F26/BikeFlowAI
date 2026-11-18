@@ -123,3 +123,21 @@ describe("station map interaction", () => {
     expect(layers.lines.every((p) => p.interactive === false)).toBe(true);
   });
 });
+
+describe("bike / dock risk layer", () => {
+  it("colors stations by open docks in the return view", async () => {
+    const { stationRisk } = await import("../src/Map");
+    const filling: Station = {
+      ...station,
+      docks: 8,
+      forecast: { 30: { p_bike: 0.99, p_dock: 0.76 } },
+    };
+    expect(stationRisk(filling, "bike", 900)).toBe("ok");
+    expect(stationRisk(filling, "dock", 900)).toBe("risk");
+    expect(stationRisk({ ...filling, docks: 0 }, "dock", 900)).toBe("empty");
+    expect(stationRisk({ ...filling, return: false }, "dock", 900)).toBe("off");
+    expect(
+      stationRisk({ ...filling, data_age_seconds: 1000 }, "dock", 900),
+    ).toBe("off");
+  });
+});

@@ -5,7 +5,7 @@ DATA_ROOT ?= $(DIVVY_ROOT)/chicago_historical_2021_sample
 RL_STEPS ?= 300000
 RL_MODEL ?= $(DATA_ROOT)/models/rl_dev/ppo.zip
 
-.PHONY: help data download audit app-audit audit-base trips collector-once test features train forward replay-demo rl-train rl-eval rl-eval-final rl-sweep pipeline
+.PHONY: help data download audit app-audit audit-base trips collector-once test features train forward replay-demo rl-train rl-eval rl-eval-final rl-sweep pipeline demo-setup demo demo-stop
 
 help:
 	@echo "make data           - bounded download then separate app32 snapshot/trip audit"
@@ -24,6 +24,9 @@ help:
 	@echo "make rl-eval-final  - frozen settings only: same comparison on test, once (needs final test scores)"
 	@echo "make rl-sweep       - retrain PPO and rerun B1/B2/B3 per walking penalty -> reports/rl_eval/lambda_sweep"
 	@echo "make pipeline       - train, forward, rl-train, rl-eval in one pass"
+	@echo "make demo-setup     - macOS/Linux: create .venv, install demo deps (incl. PPO) and frontend packages"
+	@echo "make demo           - macOS/Linux: start API :8000 + web :3000 in the background"
+	@echo "make demo-stop      - stop the processes started by make demo"
 
 data:
 	"$(PYTHON)" scripts/data/download_chicago_sample.py --data-root "$(DATA_ROOT)"
@@ -75,3 +78,18 @@ rl-sweep:
 
 # Separate processes on purpose: torch and lightgbm each bundle libomp.
 pipeline: train forward rl-train rl-eval
+
+# ---- Application demo (macOS / Linux). Windows: scripts/start_demo.ps1 ----
+DEMO_PYTHON ?= python3
+DEMO_REQUIREMENTS ?= backend/requirements-demo.txt
+
+demo-setup:
+	test -x .venv/bin/python || "$(DEMO_PYTHON)" -m venv .venv
+	.venv/bin/python -m pip install -r "$(DEMO_REQUIREMENTS)"
+	cd frontend && npm ci
+
+demo:
+	./scripts/start_demo.sh
+
+demo-stop:
+	./scripts/stop_demo.sh

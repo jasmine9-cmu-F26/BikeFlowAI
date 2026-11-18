@@ -48,6 +48,29 @@ npm.cmd run dev
 
 `--no-access-log` is intentional: the application's JSON logs exclude raw inputs and exact coordinates. Keep this flag if changing the launch command.
 
+## Start on macOS / Linux
+
+From the repository root (Python 3.12+ and Node 22+ on PATH):
+
+```bash
+make demo-setup     # once: .venv + backend/requirements-demo.txt (incl. PPO) + npm ci
+make demo           # or ./scripts/start_demo.sh [--no-live] [--python PATH]
+make demo-stop      # or ./scripts/stop_demo.sh
+```
+
+The shell launcher mirrors the Windows one: it refuses to start if ports 8000/3000 are busy or a previous run was not stopped, writes logs under `.local/`, waits for `/health` and the web server, and prints the active forecast method and PPO readiness. `stop_demo.sh` stops only the two processes it recorded (PID and command line must both match).
+
+## Guided demo stories (Replay)
+
+In Replay mode, the **Demo story** selector fills in a real tune-split request and plans it immediately:
+
+| Story | Request | What it shows |
+| --- | --- | --- |
+| Dock fills up · Loop commute | 2021-07-13 07:46, Franklin St & Jackson Blvd → Michigan Ave & Lake St, 5 min walk, B3 | The destination has 8 open docks now, but the dock forecast falls 92% → 76% (+30 min) → 55% (+60 min). B3 moves the return to State St & Randolph St (4.5 min walk). **What would a current-count app do?** shows B1 choosing Michigan & Lake; **Reveal historical outcomes** then shows it was full (0 docks) while State & Randolph had 17. |
+| Weekday ride · Pilsen → West Loop | 2021-07-20 08:06, Morgan St & 18th St → Aberdeen St & Jackson Blvd, 10 min walk | The default replay trip and the PPO walking limit. |
+
+The map's **Pickup · bikes / Return · docks** switch colors stations by the calibrated +30 min forecast (yellow when below 80%, orange when empty/full now). Each plan shows a **Return check** card with the destination's open-dock forecast for every horizon. Stories were chosen from tune-split labels only; calibration and final-test data are never used for demo selection.
+
 ## Included artifacts and optional external overrides
 
 No environment variable is needed for the Git-tracked bundle. It contains 70 serving files and covers **July 12–25, 2021 (tune only)**. Training/calibration/final-test tables, raw data and forward-training predictions remain outside Git. See [bundle provenance and contents](../artifacts/README.md).
@@ -149,4 +172,4 @@ The repository's existing Python CI includes these app tests; a separate app wor
 
 For a reproducible synthetic cached-replay smoke benchmark, run `python scripts/benchmark_app.py` after installing the test/model dependencies. It records aggregate results in `reports/app_demo/synthetic_smoke.json`. See [recorded checks and remaining verification limits](../reports/app_demo/README.md).
 
-Rehearse: Example normal → 10-minute walking limit → recommended plan → alternatives → failure replan → missing-model scenario → stale-data scenario. After installing real data: Replay tune date → plan → explicit historical reveal. Live: wait for cache → inspect real flags/counts → plan → check model/freshness warnings. The footer includes the City of Chicago disclaimer and map attribution.
+Rehearse (macOS/Linux: `make demo`): Replay → Demo story "Dock fills up" → compare with B1 → reveal → switch the map to Return · docks. Then Example normal → 10-minute walking limit → recommended plan → alternatives → failure replan → missing-model scenario → stale-data scenario. After installing real data: Replay tune date → plan → explicit historical reveal. Live: wait for cache → inspect real flags/counts → plan → check model/freshness warnings. The footer includes the City of Chicago disclaimer and map attribution.
