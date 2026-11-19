@@ -60,6 +60,10 @@ make demo-stop      # or ./scripts/stop_demo.sh
 
 The shell launcher mirrors the Windows one: it refuses to start if ports 8000/3000 are busy or a previous run was not stopped, writes logs under `.local/`, waits for `/health` and the web server, and prints the active forecast method and PPO readiness. `stop_demo.sh` stops only the two processes it recorded (PID and command line must both match).
 
+## First-visit guide
+
+On a browser's first visit a short "How BikeFlow works" dialog explains the difference from current-count apps in three steps (pick a demo story, read the bike/dock forecast, reveal what happened) and offers **Start with the "dock fills up" story**. It is remembered per browser (`localStorage`, failing safe if storage is blocked) and reopens from **How it works** in the header or the empty results panel.
+
 ## Guided demo stories (Replay)
 
 In Replay mode, the **Demo story** selector fills in a real tune-split request and plans it immediately:

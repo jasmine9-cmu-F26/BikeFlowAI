@@ -6,6 +6,7 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  CircleHelp,
   Clock3,
   Footprints,
   Info,
@@ -19,6 +20,10 @@ import {
 } from "lucide-react";
 import RideMap, { COLORS, RISK_HORIZON, type MapLayer } from "./Map";
 import DockInsight from "./DockInsight";
+import Onboarding, {
+  markOnboardingSeen,
+  shouldShowOnboarding,
+} from "./Onboarding";
 import {
   MethodNotice,
   WALK_CHOICES,
@@ -293,6 +298,12 @@ export default function App() {
   } | null>(null);
   const [layer, setLayer] = useState<MapLayer>("bike");
   const [story, setStory] = useState("");
+  const [guide, setGuide] = useState(false);
+  useEffect(() => setGuide(shouldShowOnboarding()), []);
+  const closeGuide = () => {
+    setGuide(false);
+    markOnboardingSeen();
+  };
   const [pendingRun, setPendingRun] = useState(false);
   const [wider, setWider] = useState<{ walk: number; plan: Plan } | null>(null);
   const [baseline, setBaseline] = useState<Plan | null>(null);
@@ -590,6 +601,9 @@ export default function App() {
         </a>
         <nav>
           <span className="nav-active">Trip planner</span>
+          <button className="nav-link" onClick={() => setGuide(true)}>
+            <CircleHelp size={14} /> How it works
+          </button>
           <a
             href="https://github.com/jasmine9-cmu-F26/BikeFlowAI"
             target="_blank"
@@ -966,14 +980,17 @@ export default function App() {
                 open dock at arrival.
               </p>
               <div className="how-row">
-                <span>01</span>Choose where you’re going
+                <span>01</span>Pick a demo story or your own trip
               </div>
               <div className="how-row">
-                <span>02</span>Compare expected availability
+                <span>02</span>Read the bike and dock forecast
               </div>
               <div className="how-row">
-                <span>03</span>Keep an alternative in reach
+                <span>03</span>Reveal what really happened
               </div>
+              <button className="compare-btn" onClick={() => setGuide(true)}>
+                <CircleHelp size={13} /> How it works
+              </button>
             </div>
           )}
           {loading && (
@@ -1197,6 +1214,16 @@ export default function App() {
           </div>
         </aside>
       </main>
+      {guide && (
+        <Onboarding
+          replayReady={Boolean(health?.replay_data_ready)}
+          onClose={closeGuide}
+          onStartStory={() => {
+            closeGuide();
+            applyStory("dock-commute");
+          }}
+        />
+      )}
       <footer className="site-footer">
         <span>
           BIKEFLOW AI <b> / </b> DIVVY · CHICAGO
