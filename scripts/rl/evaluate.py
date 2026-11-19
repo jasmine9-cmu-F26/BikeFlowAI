@@ -103,6 +103,7 @@ def summarize(rows):
                     lambda r: r["outcome"] == "failure" and r["phase"] == "return"
                 ),
                 failed_attempts_mean=rate(lambda r: r["failures"]),
+                full_dock_arrivals_mean=rate(lambda r: r.get("return_failures", 0)),
                 walk_minutes_mean=float(walk.mean()),
                 walk_minutes_median=float(np.median(walk)),
                 walk_minutes_p90=float(np.percentile(walk, 90)),

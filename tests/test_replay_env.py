@@ -105,6 +105,7 @@ class ReplayEnvTests(unittest.TestCase):
         total, info = run(env, [0, 0, 1])
         self.assertEqual(info["outcome"], "success")
         self.assertEqual(info["failures"], 1)
+        self.assertEqual(info["return_failures"], 1)
         self.assertAlmostEqual(total, 1 - 0.02 * WALK_AB, places=2)
 
     def test_failed_attempt_penalty_is_charged_per_failure(self):

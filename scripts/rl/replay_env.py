@@ -146,6 +146,7 @@ class ReplayEnv(gym.Env):
         self.phase, self.here = "pickup", self.request.origin
         self.candidates = self.replay.nearby(self.request.origin, self.walk_limit)
         self.tried, self.waits, self.failures = set(), 0, 0
+        self.return_failures = 0  # arrived at a full dock (included in failures)
         self.walk_minutes = self.wait_minutes = self.total = 0.0
         return self.observation(), {}
 
@@ -255,6 +256,7 @@ class ReplayEnv(gym.Env):
             walk_minutes=self.walk_minutes,
             wait_minutes=self.wait_minutes,
             failures=self.failures,
+            return_failures=self.return_failures,
             phase=self.phase,
         )
         return self.observation(), reward, True, False, info
@@ -291,6 +293,7 @@ class ReplayEnv(gym.Env):
         self.here = s
         if failed >= 0.5:
             self.failures += 1
+            self.return_failures += self.phase == "return"
             self.tried.add(s)
             return self._continue(reward - self.f)
         if self.phase == "pickup":
