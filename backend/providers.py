@@ -20,6 +20,9 @@ from .policy import Policy
 from .artifacts import resolve_data_root
 
 ZONE = ZoneInfo('America/Chicago')
+# Live-only sigmoid calibrators refit on 2026 data (scripts/model/recalibrate_live_2026.py).
+# The LightGBM trees and every replay prediction stay on the 2021 calibration.
+LIVE_CALIBRATION = PROJECT / 'artifacts/live_calibration.json'
 
 
 def local_time(value):
@@ -34,6 +37,8 @@ class Providers:
         self.root, self.data_source = resolve_data_root(root)
         self.stations = registry()
         self.service = self.b2 = None
+        self.live_service = None
+        self.live_calibration = None
         self.policy = Policy(self.root)
         self.error = None
         self.lock = threading.RLock()
@@ -67,8 +72,28 @@ class Providers:
                     rates = None
             self.service = ForecasterService(self.root / 'models/forecaster_v0_m3', rates)
             self.b2 = ForecasterService(None, self.service.b2)
+            self.live_service = self._live_service()
         except Exception as exc:
             self.error = f'Model runtime unavailable: {type(exc).__name__}: {exc}'
+
+    def _live_service(self):
+        """A copy of the forecaster with 2026 calibrators for Live mode, when they match this model."""
+        import dataclasses
+        from bikeflow_model.forecaster import Sigmoid
+        if not self.service.models or not LIVE_CALIBRATION.is_file():
+            return self.service
+        try:
+            cal = json.loads(LIVE_CALIBRATION.read_text(encoding='utf-8'))
+            if cal['model_version'] != getattr(self.service, 'version', None):
+                return self.service
+            live = copy.copy(self.service)
+            live.models = {t: dataclasses.replace(m, calibrator=Sigmoid(float(cal['calibrators'][t]['a']), float(cal['calibrators'][t]['b'])))
+                           for t, m in self.service.models.items()}
+            self.live_calibration = cal['fit_service_days']
+            return live
+        except Exception as exc:
+            self.error = f'Live calibration ignored: {type(exc).__name__}'
+            return self.service
 
     def health(self):
         status = self.service.status() if self.service else dict(status='unavailable', active_method='unavailable', errors=[self.error])
@@ -79,9 +104,10 @@ class Providers:
                     data_source=self.data_source,
                     default_replay_time='2021-07-20T08:06:00-05:00',
                     replay_window=dict(start='2021-07-12T01:00:00-05:00', end_exclusive='2021-07-26T00:00:00-05:00') if self.data_source == 'bundled_m3_tune' else None,
+                    live_calibration=self.live_calibration,
                     rl_ready=self.policy.ready() and self.policy.runtime_ready(), rl_artifacts_ready=self.policy.ready(),
                     rl_runtime_ready=self.policy.runtime_ready(),
-                    rl_reason='Current-action PPO bridge; install PPO dependencies, use a station origin, matching 10-minute walk limit and decision-grid departure.',
+                    rl_reason='Current-action PPO bridge; install PPO dependencies, use a station origin, a 5, 10 or 15-minute walk limit and decision-grid departure.',
                     timezone='America/Chicago')
 
     def start(self):
@@ -185,18 +211,19 @@ class Providers:
                     active_method='B2_historical' if scenario == 'model-missing' else 'fixture',
                     model_version='synthetic-fixture-v1', warnings=['SYNTHETIC EXAMPLE: counts and probabilities are invented for UI testing; not model results.'])
 
-    def _predict(self, df, age_limit):
+    def _predict(self, df, age_limit, service=None):
         import pandas as pd
         from replay_forecast import forecast
+        service = service or self.service
         # Serialize model calls; max_age is shared and differs between providers.
         with self.lock:
-            old = self.service.max_age
-            self.service.max_age = age_limit
+            old = service.max_age
+            service.max_age = age_limit
             try:
-                data = forecast(self.service, df)
+                data = forecast(service, df)
                 b2 = self.b2.predict(df)
             finally:
-                self.service.max_age = old
+                service.max_age = old
         out = []
         for st in data['stations']:
             rows = df[df.station_id == st['station_id']]
@@ -268,12 +295,14 @@ class Providers:
                                      return_=r['return_'], data_age_seconds=int(q.timestamp()-r['snapshot_time']), forecast={}, b2={}))
         for s in stations:
             s['return'] = s.pop('return_')
-        warnings = ['Live predictions use a model trained on summer 2021; current performance is not established.']
+        warnings = ['Live predictions use a model trained on summer 2021. On 19 days of November 2026 data it still beat current-count baselines by about 23% (reports/live_validation_2026); conditions keep changing.']
         active = 'unavailable'
         if self.service is not None:
             try:
                 df = self.live_features(q, history)
-                predicted = {s['id']: s for s in self._predict(df, 300)}
+                predicted = {s['id']: s for s in self._predict(df, 300, self.live_service)}
+                if self.live_calibration:
+                    warnings.append(f'Live probabilities use calibrators refit on {self.live_calibration[0]} to {self.live_calibration[1]} live data.')
                 for s in stations:
                     p = predicted.get(s['id'], {})
                     s['forecast'], s['b2'] = p.get('forecast', {}), p.get('b2', {})

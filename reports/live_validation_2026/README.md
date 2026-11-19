@@ -29,7 +29,7 @@ LGBM vs the better baseline (B1 in 2026), paired 19-day block bootstrap:
 
 - **The forecaster transfers.** Five years and a season later it still cuts Brier by about 23% against the best baseline for both bikes and docks, with every interval excluding zero. Its ranking quality is unchanged for bikes (PR-AUC 0.71 vs 0.71) and higher for docks (0.80 vs 0.74). In 2021 the gain over the better baseline was 34% / 30%; the smaller 2026 margin comes with a much easier B1 (half the bike base rate in November).
 - **Memorized calendar patterns do not transfer; current-state signals do.** B2's 2021 weekday × hour rates collapse in 2026 (bike PR-AUC 0.33 → 0.12) while the forecaster, which mainly reads current counts and recent changes, holds up. This is the answer to "new buildings and construction since 2021": the model reacts to what the station is doing now.
-- **Calibration is still good overall** (ECE 1.4 pp bike, 0.4 pp dock) but **under-predicts in the middle range** at 30 minutes: forecasts of 45–55% become 60–65% observed for bikes and 58–70% for docks. Recalibrating on recent data (no retraining) is the obvious fix.
+- **Calibration is still good overall** (ECE 1.4 pp bike, 0.4 pp dock) but **under-predicts in the middle range** at 30 minutes: forecasts of 45–55% become 60–65% observed for bikes and 58–70% for docks. Recalibrating on recent data (no retraining) fixes most of it: see [recalibration](recalibration/README.md) (held-out ECE 1.36 → 0.43 pp for bikes, 0.51 → 0.27 pp for docks), now used by Live mode.
 - **Docks stay predictable in winter** (base rate 3.3%), supporting the dock-side features of the app.
 
 ## Limits

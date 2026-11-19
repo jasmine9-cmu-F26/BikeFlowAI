@@ -1,0 +1,25 @@
+{
+  "purpose": "Live-mode sigmoid calibrators for the unchanged 2021 LightGBM trees, refit on 2026 live data",
+  "model_version": "forecaster_v0_m3",
+  "fitted_at": "2026-11-18T20:50:17+00:00",
+  "fit_service_days": [
+    "2026-10-31",
+    "2026-11-09"
+  ],
+  "heldout_service_days": [
+    "2026-11-10",
+    "2026-11-18"
+  ],
+  "fit_rows": 265680,
+  "calibrators": {
+    "bike": {
+      "a": 1.1988779259960594,
+      "b": 0.47167080701944736
+    },
+    "dock": {
+      "a": 1.1222722117143782,
+      "b": 0.0904286894618832
+    }
+  },
+  "report": "reports/live_validation_2026/recalibration/README.md"
+}
