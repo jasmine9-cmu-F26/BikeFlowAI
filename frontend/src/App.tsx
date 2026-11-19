@@ -6,6 +6,7 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  CircleHelp,
   Clock3,
   Footprints,
   Info,
@@ -17,7 +18,20 @@ import {
   TriangleAlert,
   X,
 } from "lucide-react";
-import RideMap from "./Map";
+import RideMap, { COLORS, RISK_HORIZON, type MapLayer } from "./Map";
+import DockInsight from "./DockInsight";
+import Onboarding, {
+  markOnboardingSeen,
+  shouldShowOnboarding,
+} from "./Onboarding";
+import {
+  MethodNotice,
+  WALK_CHOICES,
+  WalkSuggestion,
+  needsWiderWalk,
+  nextWalk,
+  widerIsBetter,
+} from "./PlanNotices";
 import {
   api,
   clock,
@@ -34,8 +48,61 @@ import {
 } from "./api";
 
 const HIST = "2021-07-20T08:06";
+// Guided replay stories on real tune-split data (July 12-25, 2021). Chosen from
+// tune-only labels for demonstration; final-test data is never used here.
+type Story = {
+  id: string;
+  name: string;
+  when: string;
+  origin: string;
+  destination: string;
+  walk: number;
+  method: Method;
+  layer: MapLayer;
+};
+const STORIES: Story[] = [
+  {
+    id: "dock-commute",
+    name: "Dock fills up · Loop commute",
+    when: "2021-07-13T07:46",
+    origin: "chicago:36",
+    destination: "chicago:52",
+    walk: 5,
+    method: "B3",
+    layer: "dock",
+  },
+  {
+    id: "walk-more",
+    name: "Empty station · walk a bit more",
+    when: "2021-07-21T17:36",
+    origin: "chicago:28",
+    destination: "chicago:31",
+    walk: 5,
+    method: "B3",
+    layer: "bike",
+  },
+  {
+    id: "weekday",
+    name: "Weekday ride · Pilsen → West Loop",
+    when: "2021-07-20T08:06",
+    origin: "chicago:14",
+    destination: "chicago:21",
+    walk: 10,
+    method: "B3",
+    layer: "bike",
+  },
+];
+type Outcome = {
+  station_id: string;
+  phase: string;
+  observed: number | null;
+  status: string;
+};
+// Never round a probability up to a certainty.
 const pct = (p: number | null) =>
-  p === null ? "Unavailable" : Math.round(p * 100) + "%";
+  p === null
+    ? "Unavailable"
+    : Math.min(Math.round(p * 100), p < 1 ? 99 : 100) + "%";
 const labels: Record<Mode, string> = {
   fixture: "Example",
   replay: "Replay",
@@ -81,7 +148,11 @@ function Journey({ route }: { route: Route }) {
                 <time>{clock(route.pickup.estimated_arrival_time)}</time>
               </div>
               <small>{route.pickup.bikes} bikes in latest snapshot</small>
-              <span className="probability">
+              <span
+                className={
+                  "probability" + (route.pickup.probability < 0.8 ? " low" : "")
+                }
+              >
                 <Check size={13} />
                 {pct(route.pickup.probability)} estimated bike availability
               </span>
@@ -113,8 +184,15 @@ function Journey({ route }: { route: Route }) {
             <strong>Return your bike</strong>
             <time>{clock(route.dropoff.estimated_arrival_time)}</time>
           </div>
-          <small>{route.dropoff.name}</small>
-          <span className="probability">
+          <small>
+            {route.dropoff.name} · {route.dropoff.docks} open docks in latest
+            snapshot
+          </small>
+          <span
+            className={
+              "probability" + (route.dropoff.probability < 0.8 ? " low" : "")
+            }
+          >
             <Check size={13} />
             {pct(route.dropoff.probability)} estimated dock availability
           </span>
@@ -214,9 +292,22 @@ export default function App() {
   const [failed, setFailed] = useState<string[]>([]);
   const [routeOrigin, setRouteOrigin] = useState<Endpoint>(origin);
   const [revealed, setRevealed] = useState<{
-    outcomes: { phase: string; observed: number | null; status: string }[];
+    outcomes: Outcome[];
+    baseline?: Outcome;
     warning: string;
   } | null>(null);
+  const [layer, setLayer] = useState<MapLayer>("bike");
+  const [story, setStory] = useState("");
+  const [guide, setGuide] = useState(false);
+  useEffect(() => setGuide(shouldShowOnboarding()), []);
+  const closeGuide = () => {
+    setGuide(false);
+    markOnboardingSeen();
+  };
+  const [pendingRun, setPendingRun] = useState(false);
+  const [wider, setWider] = useState<{ walk: number; plan: Plan } | null>(null);
+  const [baseline, setBaseline] = useState<Plan | null>(null);
+  const [comparing, setComparing] = useState(false);
   const requestRef = useRef<AbortController | null>(null);
   const [didPlan, setDidPlan] = useState(false);
   const initialModeSelected = useRef(false);
@@ -267,9 +358,53 @@ export default function App() {
     setDidPlan(false);
     setRouteOrigin(origin);
     setRevealed(null);
+    setBaseline(null);
+    setWider(null);
   }, [mode, when, offset, walk, method, origin, destination, scenario, reload]);
   useEffect(() => setRevealed(null), [shownRoute]);
   useEffect(() => () => requestRef.current?.abort(), []);
+  // Plan once new inputs (a story, a longer walk) are applied, after the reset effect above.
+  useEffect(() => {
+    if (!pendingRun) return;
+    setPendingRun(false);
+    submit();
+  }, [pendingRun]);
+  function applyStory(id: string) {
+    setStory(id);
+    const s = STORIES.find((x) => x.id === id);
+    if (!s) return;
+    initialModeSelected.current = true;
+    setMode("replay");
+    setWhen(s.when);
+    setOffset(0);
+    setOrigin(s.origin);
+    setDestination(s.destination);
+    setWalk(s.walk);
+    setMethod(s.method);
+    setLayer(s.layer);
+    setPendingRun(true);
+  }
+  async function compareBaseline() {
+    if (!plan) return;
+    setComparing(true);
+    try {
+      // Same request, current-count ranking only; the plan's decision clock is reused.
+      setBaseline(await api<Plan>("/plan", { ...body(), method: "B1" }));
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setComparing(false);
+    }
+  }
+  const stationName = (id: string) =>
+    stations.find((s) => s.id === id)?.name ?? id;
+  function outcomeText(o: Outcome) {
+    const where = `${o.phase === "pickup" ? "Pickup" : "Return"} at ${stationName(o.station_id)}`;
+    if (o.status === "unobservable") return `${where}: not observed`;
+    if (o.phase === "pickup")
+      return `${where}: ${o.status === "available" ? "bike available" : "no bike"} (${o.observed} bikes)`;
+    return `${where}: ${o.status === "available" ? "open dock" : "station full"} (${o.observed} open docks)`;
+  }
   const stations = snap?.stations.length ? snap.stations : registry;
   const body = (): Request => {
     const now = mode === "live" ? new Date() : new Date(historical(when));
@@ -293,6 +428,8 @@ export default function App() {
     setDidPlan(true);
     setFailed([]);
     setRevealed(null);
+    setBaseline(null);
+    setWider(null);
     setRouteOrigin(origin);
     try {
       const p = await api<Plan>("/plan", body(), ctrl.signal);
@@ -300,6 +437,16 @@ export default function App() {
       setShownRoute(p.primary);
       setSelectedAlternativeIndex(null);
       setTab("recommended");
+      // Sparse short-walk result: quietly check the next limit and offer it only if it clearly helps.
+      const w = nextWalk(walk);
+      if (w !== null && needsWiderWalk(p)) {
+        api<Plan>("/plan", { ...body(), walk_limit_minutes: w }, ctrl.signal)
+          .then((wp) => {
+            if (!ctrl.signal.aborted && widerIsBetter(p, wp))
+              setWider({ walk: w, plan: wp });
+          })
+          .catch(() => {});
+      }
     } catch (e) {
       if (!ctrl.signal.aborted) {
         setError((e as Error).message);
@@ -378,12 +525,26 @@ export default function App() {
     ];
     try {
       setError("");
-      setRevealed(
-        await api("/replay/reveal", {
-          historical_timestamp: plan.decision_time,
-          attempts,
-        }),
+      const main = await api<{ outcomes: Outcome[]; warning: string }>(
+        "/replay/reveal",
+        { historical_timestamp: plan.decision_time, attempts },
       );
+      const b1 = baseline?.primary?.dropoff;
+      let baselineOutcome: Outcome | undefined;
+      if (b1 && b1.id !== shownRoute.dropoff.id) {
+        const r = await api<{ outcomes: Outcome[] }>("/replay/reveal", {
+          historical_timestamp: plan.decision_time,
+          attempts: [
+            {
+              station_id: b1.id,
+              horizon_minutes: b1.horizon_minutes,
+              phase: "return",
+            },
+          ],
+        });
+        baselineOutcome = r.outcomes[0];
+      }
+      setRevealed({ ...main, baseline: baselineOutcome });
     } catch (e) {
       setError((e as Error).message);
     }
@@ -440,6 +601,9 @@ export default function App() {
         </a>
         <nav>
           <span className="nav-active">Trip planner</span>
+          <button className="nav-link" onClick={() => setGuide(true)}>
+            <CircleHelp size={14} /> How it works
+          </button>
           <a
             href="https://github.com/jasmine9-cmu-F26/BikeFlowAI"
             target="_blank"
@@ -494,6 +658,22 @@ export default function App() {
               </>
             )}
           </div>
+          {mode === "replay" && health?.replay_data_ready && (
+            <label className="field-label story-picker">
+              Demo story <span>real 2021 replay</span>
+              <select
+                value={story}
+                onChange={(e) => applyStory(e.target.value)}
+              >
+                <option value="">Choose a guided scenario…</option>
+                {STORIES.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -550,7 +730,7 @@ export default function App() {
               <label className="field-label">
                 Extra walking
                 <select value={walk} onChange={(e) => setWalk(+e.target.value)}>
-                  {[0, 5, 10, 15, 20].map((n) => (
+                  {WALK_CHOICES.map((n) => (
                     <option key={n} value={n}>
                       {n} min max
                     </option>
@@ -591,8 +771,8 @@ export default function App() {
           <div className="walk-note">
             <Footprints size={16} />
             <span>
-              Limit applies at each end. The 32-station area is sparse; try 10
-              min for more alternatives.
+              Limit applies at each end. One RL policy adapts to 5, 10 or 15
+              min; we suggest walking more only when it clearly helps.
             </span>
           </div>
           {mode === "fixture" && (
@@ -621,6 +801,7 @@ export default function App() {
         </aside>
         <section className="map-panel" aria-label="Chicago station map">
           <RideMap
+            layer={layer}
             ageLimit={mode === "live" ? 300 : 900}
             stations={snap?.stations || []}
             route={shownRoute}
@@ -643,6 +824,22 @@ export default function App() {
                   ? "HISTORICAL REPLAY"
                   : "LIVE STATIONS"}
             </span>
+            <div className="layer-switch" role="group" aria-label="Map view">
+              <button
+                className={layer === "bike" ? "selected" : ""}
+                aria-pressed={layer === "bike"}
+                onClick={() => setLayer("bike")}
+              >
+                <Bike size={13} /> Pickup · bikes
+              </button>
+              <button
+                className={layer === "dock" ? "selected" : ""}
+                aria-pressed={layer === "dock"}
+                onClick={() => setLayer("dock")}
+              >
+                <Layers size={13} /> Return · docks
+              </button>
+            </div>
             <button
               className="map-refresh"
               aria-label="Refresh station data"
@@ -724,15 +921,19 @@ export default function App() {
           <div className="map-bottom">
             <div className="map-legend">
               <span>
-                <i />
-                Station
+                <i style={{ background: COLORS.ok }} />
+                {layer === "bike" ? "Bikes likely" : "Open dock likely"}
               </span>
               <span>
-                <i className="orange" />
-                Empty
+                <i style={{ background: COLORS.risk }} />
+                At risk in {RISK_HORIZON} min
               </span>
               <span>
-                <i className="dark" />
+                <i style={{ background: COLORS.empty }} />
+                {layer === "bike" ? "Empty now" : "Full now"}
+              </span>
+              <span>
+                <i style={{ background: COLORS.chosen }} />
                 Recommended
               </span>
             </div>
@@ -779,14 +980,17 @@ export default function App() {
                 open dock at arrival.
               </p>
               <div className="how-row">
-                <span>01</span>Choose where you’re going
+                <span>01</span>Pick a demo story or your own trip
               </div>
               <div className="how-row">
-                <span>02</span>Compare expected availability
+                <span>02</span>Read the bike and dock forecast
               </div>
               <div className="how-row">
-                <span>03</span>Keep an alternative in reach
+                <span>03</span>Reveal what really happened
               </div>
+              <button className="compare-btn" onClick={() => setGuide(true)}>
+                <CircleHelp size={13} /> How it works
+              </button>
             </div>
           )}
           {loading && (
@@ -828,14 +1032,52 @@ export default function App() {
                     Try another endpoint, a shorter departure offset, or a
                     larger walking limit.
                   </p>
+                  {wider && (
+                    <WalkSuggestion
+                      current={plan}
+                      wider={wider.plan}
+                      walk={wider.walk}
+                      onUse={() => {
+                        setWalk(wider.walk);
+                        setPendingRun(true);
+                      }}
+                    />
+                  )}
                 </div>
               ) : tab === "recommended" && shownRoute ? (
-                <RouteDetails
-                  route={shownRoute}
-                  plan={plan}
-                  loading={loading}
-                  onReplan={replan}
-                />
+                <>
+                  <MethodNotice plan={plan} walk={walk} />
+                  {wider && !failed.length && (
+                    <WalkSuggestion
+                      current={plan}
+                      wider={wider.plan}
+                      walk={wider.walk}
+                      onUse={() => {
+                        setWalk(wider.walk);
+                        setPendingRun(true);
+                      }}
+                    />
+                  )}
+                  <DockInsight
+                    route={shownRoute}
+                    plan={plan}
+                    destination={destination}
+                    stations={snap?.stations || []}
+                    baseline={baseline}
+                    comparing={comparing}
+                    onCompare={
+                      plan.requested_method !== "B1" && !failed.length
+                        ? compareBaseline
+                        : null
+                    }
+                  />
+                  <RouteDetails
+                    route={shownRoute}
+                    plan={plan}
+                    loading={loading}
+                    onReplan={replan}
+                  />
+                </>
               ) : (
                 <div className="alternatives">
                   {selectedAlternativeIndex !== null && shownRoute ? (
@@ -907,14 +1149,19 @@ export default function App() {
                     </button>
                     {revealed && (
                       <>
-                        <p>
-                          {revealed.outcomes
-                            .map(
-                              (o) =>
-                                `${o.phase}: ${o.status}${o.observed === null ? "" : ` (${o.observed})`}`,
-                            )
-                            .join(" · ")}
-                        </p>
+                        <ul className="outcomes">
+                          {revealed.outcomes.map((o, i) => (
+                            <li key={i} className={o.status}>
+                              {outcomeText(o)}
+                            </li>
+                          ))}
+                          {revealed.baseline && (
+                            <li className={revealed.baseline.status}>
+                              B1 would have used ·{" "}
+                              {outcomeText(revealed.baseline)}
+                            </li>
+                          )}
+                        </ul>
                         <p>{revealed.warning}</p>
                       </>
                     )}
@@ -967,6 +1214,16 @@ export default function App() {
           </div>
         </aside>
       </main>
+      {guide && (
+        <Onboarding
+          replayReady={Boolean(health?.replay_data_ready)}
+          onClose={closeGuide}
+          onStartStory={() => {
+            closeGuide();
+            applyStory("dock-commute");
+          }}
+        />
+      )}
       <footer className="site-footer">
         <span>
           BIKEFLOW AI <b> / </b> DIVVY · CHICAGO

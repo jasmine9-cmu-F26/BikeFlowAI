@@ -7,6 +7,7 @@ frozen beforehand. Outputs go to reports/rl_eval/<split>/.
 import argparse
 import csv
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -41,11 +42,23 @@ def day_bootstrap(loss_a, loss_b, day, n=1000, seed=0):
     )
 
 
-def evaluate(replay, policies, lam, mu, c, walk_limit=10):
-    """One row per (policy, request). A masked action is a policy bug, not a result."""
-    env = ReplayEnv(replay, lam=lam, mu=mu, c=c, walk_limit=walk_limit)
+def evaluate(replay, policies, lam, mu, c, walk_limit=10, conditioned=(), f=0.0):
+    """One row per (policy, request). A masked action is a policy bug, not a result.
+
+    Policies named in `conditioned` see (lam, walk_limit) appended to their
+    observation; every policy is scored with the same fixed lam and walk limit.
+    """
     rows = []
     for name, policy in policies.items():
+        env = ReplayEnv(
+            replay,
+            lam=lam,
+            mu=mu,
+            c=c,
+            walk_limit=walk_limit,
+            conditioned=name in conditioned,
+            f=f,
+        )
         for i, request in enumerate(replay.requests):
             info = rollout(env, policy, i)
             if info["outcome"] == "invalid":
@@ -90,6 +103,7 @@ def summarize(rows):
                     lambda r: r["outcome"] == "failure" and r["phase"] == "return"
                 ),
                 failed_attempts_mean=rate(lambda r: r["failures"]),
+                full_dock_arrivals_mean=rate(lambda r: r.get("return_failures", 0)),
                 walk_minutes_mean=float(walk.mean()),
                 walk_minutes_median=float(np.median(walk)),
                 walk_minutes_p90=float(np.percentile(walk, 90)),
@@ -207,6 +221,9 @@ def main():
     p.add_argument("--mu", type=float, default=0.01)
     p.add_argument("--c", type=float, default=0.5)
     p.add_argument("--walk-limit", type=float, default=10)
+    p.add_argument(
+        "--f", type=float, default=0.0, help="penalty per failed attempt (0 = M3 reward)"
+    )
     p.add_argument("--bootstrap", type=int, default=1000)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--reports", type=Path)
@@ -222,16 +239,34 @@ def main():
         a.demand_scale,
         a.request_seed,
     )
-    policies = {s: greedy(s, a.lam, a.mu, a.c) for s in SOURCES}
+    policies = {s: greedy(s, a.lam, a.mu, a.c, a.f) for s in SOURCES}
     pairs = [("B3", "B1"), ("B3", "B2")]
     rl = rl_names(a.rl_model)
+    conditioned = set()
     if rl:
         from train_ppo import load_policy
 
         for name, path in rl.items():
+            meta = json.loads(Path(path).with_suffix(".json").read_text())
+            if abs(meta.get("f", 0.0) - a.f) > 1e-12:
+                print(
+                    f"note: {name} was trained with f={meta.get('f', 0.0)}, "
+                    f"evaluated with f={a.f}",
+                    file=sys.stderr,
+                )
+            if meta.get("conditioned"):
+                conditioned.add(name)
+                if a.walk_limit not in meta["walk_choices"] or not (
+                    min(meta["lam_choices"]) <= a.lam <= max(meta["lam_choices"])
+                ):
+                    raise ValueError(
+                        f"{name} was trained for walking limits {meta['walk_choices']} "
+                        f"and lambda in [{min(meta['lam_choices'])}, "
+                        f"{max(meta['lam_choices'])}]"
+                    )
             policies[name] = load_policy(path)
         pairs = [(n, b) for n in rl for b in ("B3", "B1")] + pairs
-    rows = evaluate(replay, policies, a.lam, a.mu, a.c, a.walk_limit)
+    rows = evaluate(replay, policies, a.lam, a.mu, a.c, a.walk_limit, conditioned, a.f)
     manifest = dict(
         split=split,
         **request_provenance(a),
@@ -239,8 +274,10 @@ def main():
         lam=a.lam,
         mu=a.mu,
         c=a.c,
+        f=a.f,
         walk_limit_minutes=a.walk_limit,
         rl_models={n: str(p) for n, p in rl.items()},
+        rl_conditioned=sorted(conditioned),
         bootstrap=a.bootstrap,
         seed=a.seed,
         test_opened=split == "test",

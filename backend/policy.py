@@ -8,10 +8,11 @@ import importlib.util
 import subprocess
 import sys
 
-from .core import PROJECT
+from .core import APP_C, APP_F, APP_LAM, APP_MU, PROJECT
 
 
-def observation(slots, phase='pickup', waits=0, elapsed_minutes=0, failures=0):
+def observation(slots, phase='pickup', waits=0, elapsed_minutes=0, failures=0, condition=None):
+    """31 training features; a conditioned policy also gets (lam/lam_scale, walk/walk_scale)."""
     obs = [0.] * 31
     mask = [False] * 4
     for j, slot in enumerate(slots[:3]):
@@ -24,12 +25,17 @@ def observation(slots, phase='pickup', waits=0, elapsed_minutes=0, failures=0):
                           slot['p_b2'], float(slot.get('tried', False))]
     obs[-4:] = [float(phase == 'return'), waits/2, elapsed_minutes/60, failures/3]
     mask[3] = phase == 'pickup' and waits < 2 and any(mask[:3])
+    if condition is not None:
+        obs += list(condition)
     return obs, mask
 
 
 class Policy:
     def __init__(self, root):
-        self.path = root / 'models/rl_dev/ppo.zip'
+        # Prefer the preference-conditioned policy (any walking limit it was trained
+        # for); fall back to the fixed 10-minute / lambda=.02 policy.
+        conditioned = root / 'models/rl_conditioned/ppo.zip'
+        self.path = conditioned if conditioned.exists() else root / 'models/rl_dev/ppo.zip'
         self.manifest = self.path.with_suffix('.json')
 
     def ready(self):
@@ -44,11 +50,23 @@ class Policy:
             raise ValueError('PPO artifact or manifest missing')
         meta = json.loads(self.manifest.read_text(encoding='utf-8'))
         # Do not silently run a policy trained for a different reward/action scope.
-        if meta.get('observation_size') != 31 or meta.get('walk_limit_minutes') != walk_limit:
+        condition = None
+        if meta.get('conditioned'):
+            if meta.get('observation_size') != 33:
+                raise ValueError('PPO observation configuration differs from training')
+            if not any(abs(walk_limit - w) < 1e-8 for w in meta.get('walk_choices', [])):
+                raise ValueError(f"PPO was trained for walking limits {meta.get('walk_choices')} min; this request uses {walk_limit:g}")
+            lams = meta.get('lam_choices', [])
+            if not lams or not min(lams) <= APP_LAM <= max(lams) or abs(meta.get('f', 0.) - APP_F) > 1e-8:
+                raise ValueError('PPO reward configuration differs from the application')
+            condition = (APP_LAM / meta['lam_scale'], walk_limit / meta['walk_scale'])
+        elif meta.get('observation_size') != 31 or meta.get('walk_limit_minutes') != walk_limit:
             raise ValueError('PPO observation or walking-limit configuration differs from training')
-        if any(abs(meta.get(k, -1)-v) > 1e-8 for k, v in [('lam', .02), ('mu', .01), ('c', .5)]):
+        elif abs(meta.get('lam', -1) - APP_LAM) > 1e-8:
             raise ValueError('PPO reward configuration differs from the application')
-        obs, mask = observation(slots, phase, waits, elapsed_minutes, failures)
+        if any(abs(meta.get(k, -1)-v) > 1e-8 for k, v in [('mu', APP_MU), ('c', APP_C)]):
+            raise ValueError('PPO reward configuration differs from the application')
+        obs, mask = observation(slots, phase, waits, elapsed_minutes, failures, condition)
         if not any(mask):
             raise ValueError('No valid PPO actions')
         result = subprocess.run([sys.executable, '-m', 'backend.policy_worker'],

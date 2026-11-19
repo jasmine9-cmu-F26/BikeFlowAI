@@ -105,7 +105,17 @@ class ReplayEnvTests(unittest.TestCase):
         total, info = run(env, [0, 0, 1])
         self.assertEqual(info["outcome"], "success")
         self.assertEqual(info["failures"], 1)
+        self.assertEqual(info["return_failures"], 1)
         self.assertAlmostEqual(total, 1 - 0.02 * WALK_AB, places=2)
+
+    def test_failed_attempt_penalty_is_charged_per_failure(self):
+        replay = make_replay()
+        replay.outcome[A, 2, 0, 0] = 1  # A empty: one failed pickup, then B
+        base, _ = run(self.env(replay), [0, 1, 0])
+        penalized, info = run(self.env(replay, f=0.1), [0, 1, 0])
+        self.assertEqual(info["failures"], 1)
+        self.assertAlmostEqual(penalized, base - 0.1, places=6)
+        self.assertAlmostEqual(info["reward"], base - 0.1, places=6)
 
     def test_missing_outcome_row_ends_as_unobservable(self):
         replay = make_replay()
@@ -162,6 +172,44 @@ class ReplayEnvTests(unittest.TestCase):
 
         check_env(self.env(), skip_render_check=True)
 
+
+
+class ConditionedEnvTests(unittest.TestCase):
+    """One preference-conditioned policy: lambda and walking limit are inputs."""
+
+    def test_fixed_preferences_are_appended_to_the_observation(self):
+        from replay_env import CONDITIONED_OBS_SIZE, LAM_SCALE, OBS_SIZE, WALK_SCALE
+
+        plain = ReplayEnv(make_replay(), lam=0.04, walk_limit=5)
+        cond = ReplayEnv(make_replay(), lam=0.04, walk_limit=5, conditioned=True)
+        o1, _ = plain.reset(options={"request": 0})
+        o2, _ = cond.reset(options={"request": 0})
+        self.assertEqual(o2.shape, (CONDITIONED_OBS_SIZE,))
+        np.testing.assert_array_equal(o1, o2[:OBS_SIZE])
+        np.testing.assert_allclose(o2[OBS_SIZE:], [0.04 / LAM_SCALE, 5 / WALK_SCALE])
+
+    def test_training_samples_preferences_per_episode_and_uses_them(self):
+        env = ReplayEnv(
+            make_replay(),
+            conditioned=True,
+            lam_choices=(0.0, 0.08),
+            walk_choices=(1, 10),
+            seed=0,
+        )
+        seen = set()
+        for _ in range(40):
+            obs, _ = env.reset(options={"request": 0})
+            seen.add((env.lam, env.walk_limit))
+            self.assertIn(env.lam, (0.0, 0.08))
+            self.assertIn(env.walk_limit, (1, 10))
+            from replay_env import OBS_SIZE, LAM_SCALE
+
+            self.assertAlmostEqual(float(obs[OBS_SIZE]), env.lam / LAM_SCALE, places=6)
+        self.assertEqual(len(seen), 4)
+
+    def test_sampling_without_conditioning_is_rejected(self):
+        with self.assertRaises(ValueError):
+            ReplayEnv(make_replay(), lam_choices=(0.0, 0.02))
 
 if __name__ == "__main__":
     unittest.main()

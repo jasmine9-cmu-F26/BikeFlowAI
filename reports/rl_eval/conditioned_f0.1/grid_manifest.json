@@ -1,0 +1,93 @@
+{
+  "split": "tune",
+  "walks": [
+    5,
+    10,
+    15
+  ],
+  "lams": [
+    0.0,
+    0.01,
+    0.02,
+    0.04,
+    0.08
+  ],
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "models": [
+    "../../BikeFlowAI-data/divvy/chicago_historical_2021_sample/models/rl_conditioned_f0.1/seed0/ppo.zip",
+    "../../BikeFlowAI-data/divvy/chicago_historical_2021_sample/models/rl_conditioned_f0.1/seed1/ppo.zip",
+    "../../BikeFlowAI-data/divvy/chicago_historical_2021_sample/models/rl_conditioned_f0.1/seed2/ppo.zip"
+  ],
+  "training": [
+    {
+      "steps": 1500000,
+      "lam_choices": [
+        0.0,
+        0.005,
+        0.01,
+        0.02,
+        0.04,
+        0.08,
+        0.16
+      ],
+      "walk_choices": [
+        5,
+        10,
+        15
+      ],
+      "seed": 0,
+      "f": 0.1
+    },
+    {
+      "steps": 1500000,
+      "lam_choices": [
+        0.0,
+        0.005,
+        0.01,
+        0.02,
+        0.04,
+        0.08,
+        0.16
+      ],
+      "walk_choices": [
+        5,
+        10,
+        15
+      ],
+      "seed": 1,
+      "f": 0.1
+    },
+    {
+      "steps": 1500000,
+      "lam_choices": [
+        0.0,
+        0.005,
+        0.01,
+        0.02,
+        0.04,
+        0.08,
+        0.16
+      ],
+      "walk_choices": [
+        5,
+        10,
+        15
+      ],
+      "seed": 2,
+      "f": 0.1
+    }
+  ],
+  "mu": 0.01,
+  "c": 0.5,
+  "f": 0.1,
+  "requests": "grid",
+  "demand_scale": 5.0,
+  "request_seed": 0,
+  "bootstrap": 1000,
+  "seed": 0,
+  "test_opened": false
+}

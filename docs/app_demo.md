@@ -8,7 +8,7 @@ The application is local-first: React / TypeScript / Vite / Leaflet, with a Fast
 | Replay | Audited causal feature Parquet, development forecaster or B2 | Yes, or B2 rates for degraded serving |
 | Live | Official GBFS, an independent 60-second in-memory cache and up to 75 minutes of look-back | Counts work without models; predictions require model/B2 files |
 
-The repository includes a **5.7 MB M3 serving bundle** under `artifacts/`: real calibrated model weights, PPO weights, B2 rates and tune-only features/labels for all 32 stations. A fresh clone needs **no private download or machine-specific data path**. Startup verifies its checksum and extracts an ignored `.local/data/` cache. When the model and replay data are ready, the page automatically selects **Replay** at **2021-07-20 08:06 Chicago time**. Example remains available as a separate, visibly synthetic mode. Explicit Replay requests never silently switch to examples.
+The repository includes a **5.9 MB serving bundle** (`artifacts/m3-demo-v3.zip`) under `artifacts/`: real calibrated model weights, PPO weights, B2 rates and tune-only features/labels for all 32 stations. A fresh clone needs **no private download or machine-specific data path**. Startup verifies its checksum and extracts an ignored `.local/data/` cache. When the model and replay data are ready, the page automatically selects **Replay** at **2021-07-20 08:06 Chicago time**. Example remains available as a separate, visibly synthetic mode. Explicit Replay requests never silently switch to examples.
 
 ## Start on Windows
 
@@ -48,9 +48,39 @@ npm.cmd run dev
 
 `--no-access-log` is intentional: the application's JSON logs exclude raw inputs and exact coordinates. Keep this flag if changing the launch command.
 
+## Start on macOS / Linux
+
+From the repository root (Python 3.12+ and Node 22+ on PATH):
+
+```bash
+make demo-setup     # once: .venv + backend/requirements-demo.txt (incl. PPO) + npm ci
+make demo           # or ./scripts/start_demo.sh [--no-live] [--python PATH]
+make demo-stop      # or ./scripts/stop_demo.sh
+```
+
+Verified from a fresh clone on 2026-11-18 (macOS, Homebrew Python 3.15.2, Node 26, no pip/npm cache, no activated virtualenv): `make demo-setup`, `make demo`, 133 backend and 10 frontend tests, the build, the first-visit guide and all demo stories passed. Two install messages are expected and harmless: npm 11 may say esbuild's install script was blocked (Vite still runs), and `npm audit` lists advisories in `vitest`, the dev-only test runner that is not part of the served site (fixing them needs a major vitest upgrade). Run `deactivate` first if another virtualenv is active, so `make demo-setup` uses a system Python.
+
+The shell launcher mirrors the Windows one: it refuses to start if ports 8000/3000 are busy or a previous run was not stopped, writes logs under `.local/`, waits for `/health` and the web server, and prints the active forecast method and PPO readiness. `stop_demo.sh` stops only the two processes it recorded (PID and command line must both match).
+
+## First-visit guide
+
+On a browser's first visit a short "How BikeFlow works" dialog explains the difference from current-count apps in three steps (pick a demo story, read the bike/dock forecast, reveal what happened) and offers **Start with the "dock fills up" story**. It is remembered per browser (`localStorage`, failing safe if storage is blocked) and reopens from **How it works** in the header or the empty results panel.
+
+## Guided demo stories (Replay)
+
+In Replay mode, the **Demo story** selector fills in a real tune-split request and plans it immediately:
+
+| Story | Request | What it shows |
+| --- | --- | --- |
+| Dock fills up · Loop commute | 2021-07-13 07:46, Franklin St & Jackson Blvd → Michigan Ave & Lake St, 5 min walk, B3 | The destination has 8 open docks now, but the dock forecast falls 92% → 76% (+30 min) → 55% (+60 min). B3 moves the return to State St & Randolph St (4.5 min walk). **What would a current-count app do?** shows B1 choosing Michigan & Lake; **Reveal historical outcomes** then shows it was full (0 docks) while State & Randolph had 17. |
+| Empty station · walk a bit more | 2021-07-21 17:36, Larrabee St & Menomonee St → Franklin St & Chicago Ave, 5 min walk, B3 | Within 5 minutes only the origin is reachable: 25% bike chance now, so B3 waits 20 minutes for 38%. The **Walk a little more?** card shows that 10 minutes reaches Larrabee St & North Ave (~100%); **Use 10 min** replans. Reveal: the origin was empty, North Ave had 6 bikes. |
+| Weekday ride · Pilsen → West Loop | 2021-07-20 08:06, Morgan St & 18th St → Aberdeen St & Jackson Blvd, 10 min walk | The default replay trip with more alternative stations. |
+
+The map's **Pickup · bikes / Return · docks** switch colors stations by the calibrated +30 min forecast (yellow when below 80%, orange when empty/full now). Each plan shows a **Return check** card with the destination's open-dock forecast for every horizon. Stories were chosen from tune-split labels only; calibration and final-test data are never used for demo selection.
+
 ## Included artifacts and optional external overrides
 
-No environment variable is needed for the Git-tracked bundle. It contains 70 serving files and covers **July 12–25, 2021 (tune only)**. Training/calibration/final-test tables, raw data and forward-training predictions remain outside Git. See [bundle provenance and contents](../artifacts/README.md).
+No environment variable is needed for the Git-tracked bundle. It contains 72 serving files and covers **July 12–25, 2021 (tune only)**. Training/calibration/final-test tables, raw data and forward-training predictions remain outside Git. See [bundle provenance and contents](../artifacts/README.md).
 
 To use a different complete external package, set this environment variable **before** starting the API:
 
@@ -84,16 +114,16 @@ The app currently loads the development forecaster. Calibration and final-test d
 ## Planning behavior and current boundaries
 
 - Coordinates or one of the 32 stable station IDs can be entered. Map clicks set coordinates; dropdowns select stations. The bounded service area is within 3 km of this cohort.
-- Product default: **5 minutes walking at each endpoint**. Try 10 minutes for a richer alternative-station demo; the existing PPO was trained at 10 minutes by default.
+- Product default: **5 minutes walking at each endpoint**. Try 10 minutes for a richer alternative-station demo. The bundled PPO is preference-conditioned and serves 5, 10 and 15 minutes; when a short limit leaves no alternatives or a risky plan, the UI quietly checks the next limit and offers it with its probabilities.
 - Up to three operational candidates per endpoint; at most two 10-minute waits; total decision-to-destination window at most 60 minutes. Effective horizons round up to 10/20/30/40/50/60 minutes.
 - Walking uses straight-line distance / 1.3 m/s. Riding uses the committed training-only OD median when supported, otherwise 1.3 × straight-line distance / 4 m/s. All route lines are indicative.
-- B1 ranks current availability; B2 uses training-only historical rates; B3 uses calibrated forecasts. The app's `decision-pair-v1` adapter scores **initial pickup/return pairs** with the existing greedy reward terms (λ=.02, μ=.01, c=.5). It is not the sequential evaluation policy in `scripts/rl/policies.py`; do not attach the evaluator's success rates to this adapter.
+- B1 ranks current availability; B2 uses training-only historical rates; B3 uses calibrated forecasts. The app's `decision-pair-v1` adapter scores **initial pickup/return pairs** with the greedy reward terms (λ=.02, μ=.01, c=.5, and f=.1 per failed attempt, shared with the PPO bridge in `backend/core.py`). It is not the sequential evaluation policy in `scripts/rl/policies.py`; do not attach the evaluator's success rates to this adapter.
 - Alternatives are feasible **initial plans**, not predictions that the primary will fail. `/replan` accepts the rider's current location/time, failed stations and pickup/return phase, excludes tried stations and recomputes a plan. The UI's failure buttons explicitly simulate a failed attempt and advance the replay clock. They do not claim to reveal an actual observed failure.
-- PPO runs in an isolated CPU subprocess to avoid mixing torch and LightGBM OpenMP runtimes. Install `scripts/rl/requirements-ppo.txt` in the API environment to enable it. The bridge checks the 31-feature observation layout, walking limit and reward settings against `ppo.json`, and validates the action mask. It serves current station-anchored decisions at the decision-grid time. A current pickup action can be RL while the future return itinerary stays provisional B3; `actual_method` explicitly reports `RL_pickup+B3_return` or `RL_wait+B3_provisional`. A return-only current-state request can use `RL_return`. Arbitrary-location, offset-departure, missing/incompatible artifact and failure-history requests explicitly fall back to B3, then B2. There is no end-to-end online PPO performance claim.
+- PPO runs in an isolated CPU subprocess to avoid mixing torch and LightGBM OpenMP runtimes. Install `scripts/rl/requirements-ppo.txt` in the API environment to enable it. The bridge prefers `models/rl_conditioned/` (33 features: the 31 training features plus λ and walking limit; walking limits 5/10/15) and falls back to the fixed 10-minute `models/rl_dev/` policy. It checks the observation layout, walking limit and reward settings against `ppo.json`, and validates the action mask. It serves current station-anchored decisions at the decision-grid time. A current pickup action can be RL while the future return itinerary stays provisional B3; `actual_method` explicitly reports `RL_pickup+B3_return` or `RL_wait+B3_provisional`. A return-only current-state request can use `RL_return`. Arbitrary-location, offset-departure, missing/incompatible artifact and failure-history requests explicitly fall back to B3, then B2. There is no end-to-end online PPO performance claim.
 - PPO worker cold-start can take seconds (15-second timeout). The proposal's cached p95 target should be measured separately for greedy serving; this process bridge is not a low-latency PPO deployment.
-- With the supplied policy, use **2021-07-20 08:06**, a station origin, departure **At replay clock**, and **10 min max** walking. Default 5-minute or offset-departure requests still work through the documented fallback. The real serialized PPO artifact is exercised by integration tests when the optional runtime is installed.
+- With the supplied policy, use **2021-07-20 08:06**, a station origin, departure **At replay clock**, and **5, 10 or 15 min max** walking. 0/20-minute or offset-departure requests still work through the documented B3 fallback. The real serialized PPO artifact is exercised by integration tests when the optional runtime is installed.
 - Live polling discovers official feed URLs, validates station identities within 50 m, reads current capacity and installed/renting/returning flags, and applies two-second timeouts with one retry per feed. Requests read memory and never block on network. Poll frequency is 60 seconds; observation freshness must be ≤5 minutes. Stale counts remain visible but are excluded from planning and from **all** predictive methods.
-- Live features use report timestamps for lag matching and keep missing history as missing. Restarting the app starts a cold history buffer. The external Google collector is independent and is never read by the app.
+- Live probabilities use the 2021 trees with sigmoid calibrators refit on 2026 live data (`artifacts/live_calibration.json`, see [recalibration](../reports/live_validation_2026/recalibration/README.md)); replay keeps the 2021 calibration. Live features use report timestamps for lag matching and keep missing history as missing. Restarting the app starts a cold history buffer. The external Google collector is independent and is never read by the app.
 - `/replay/reveal` is an explicit post-plan operation: it reads future labels for the selected quantized horizons. Missing outcomes remain unobservable. Counts are approximate (±5 minutes), not exact arrival-time stock or a simulated rider's effect on stock.
 
 ## API
@@ -149,4 +179,4 @@ The repository's existing Python CI includes these app tests; a separate app wor
 
 For a reproducible synthetic cached-replay smoke benchmark, run `python scripts/benchmark_app.py` after installing the test/model dependencies. It records aggregate results in `reports/app_demo/synthetic_smoke.json`. See [recorded checks and remaining verification limits](../reports/app_demo/README.md).
 
-Rehearse: Example normal → 10-minute walking limit → recommended plan → alternatives → failure replan → missing-model scenario → stale-data scenario. After installing real data: Replay tune date → plan → explicit historical reveal. Live: wait for cache → inspect real flags/counts → plan → check model/freshness warnings. The footer includes the City of Chicago disclaimer and map attribution.
+Rehearse (macOS/Linux: `make demo`): Replay → Demo story "Dock fills up" → compare with B1 → reveal → switch the map to Return · docks. Then Example normal → 10-minute walking limit → recommended plan → alternatives → failure replan → missing-model scenario → stale-data scenario. After installing real data: Replay tune date → plan → explicit historical reveal. Live: wait for cache → inspect real flags/counts → plan → check model/freshness warnings. The footer includes the City of Chicago disclaimer and map attribution.

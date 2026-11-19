@@ -36,6 +36,17 @@ class GreedyTests(unittest.TestCase):
         self.assertEqual(first_action(replay, "B3"), 3)
         self.assertEqual(first_action(replay, "B1"), 0)
 
+    def test_failed_attempt_penalty_makes_greedy_avoid_risk_sooner(self):
+        # A: no walk, 30% empty. B: a 5-minute walk (-0.1 at lam .02), 23.5% empty.
+        # Without f, A wins by 1.5 * .065 < .1; with f = .1, B wins by 1.6 * .065 > .1.
+        replay = make_replay()
+        replay.decision[A, K2, :, P_BIKE] = 0.3
+        replay.decision[B, K2, :, P_BIKE] = 0.235
+        env = ReplayEnv(replay, lam=0.02, mu=0.01, c=0.5)
+        obs, _ = env.reset(options={"request": 0})
+        self.assertEqual(greedy("B3", 0.02, 0.01, 0.5)(env, obs), 0)
+        self.assertEqual(greedy("B3", 0.02, 0.01, 0.5, f=0.1)(env, obs), 1)
+
     def test_historical_greedy_reads_b2(self):
         replay = make_replay()
         replay.decision[A, K2, 0, B2_BIKE] = 0.95

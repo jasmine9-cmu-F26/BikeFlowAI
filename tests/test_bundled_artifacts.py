@@ -30,10 +30,33 @@ class BundledArtifacts(unittest.TestCase):
     def test_bundle_is_complete_but_excludes_training_and_final_test_data(self):
         with zipfile.ZipFile(BUNDLE) as archive:
             names = archive.namelist()
-        self.assertEqual(len(names), 70)
+        self.assertEqual(len(names), 72)
+        self.assertIn('models/rl_conditioned/ppo.zip', names)
+        self.assertIn('models/rl_dev/ppo.zip', names)
         self.assertEqual(sum('/features/' in name for name in names), 32)
         self.assertEqual(sum('/labels/' in name for name in names), 32)
         self.assertFalse(any(token in name for name in names for token in ('_train.parquet', '_test.parquet', '_calibration.parquet', 'current_validation/', 'forward_train_predictions')))
+
+    def test_live_mode_uses_2026_calibrators_and_replay_keeps_2021(self):
+        from backend.providers import LIVE_CALIBRATION
+        cal = json.loads(LIVE_CALIBRATION.read_text(encoding='utf-8'))
+        p = self.provider
+        self.assertEqual(p.health()['live_calibration'], cal['fit_service_days'])
+        for target in ('bike', 'dock'):
+            live, replay = p.live_service.models[target], p.service.models[target]
+            self.assertIs(live.booster, replay.booster)  # same trees, only the sigmoid differs
+            self.assertAlmostEqual(live.calibrator.a, cal['calibrators'][target]['a'])
+            self.assertNotAlmostEqual(replay.calibrator.a, cal['calibrators'][target]['a'])
+
+    def test_live_calibration_for_another_model_version_is_ignored(self):
+        with tempfile.TemporaryDirectory() as d:
+            other = Path(d) / 'live_calibration.json'
+            other.write_text(json.dumps(dict(model_version='another', fit_service_days=['x', 'y'],
+                                             calibrators=dict(bike=dict(a=9, b=9), dock=dict(a=9, b=9)))))
+            with patch('backend.providers.LIVE_CALIBRATION', other):
+                provider = Providers(self.root)
+        self.assertIs(provider.live_service, provider.service)
+        self.assertIsNone(provider.health()['live_calibration'])
 
     def test_external_override_is_not_replaced_with_the_bundle(self):
         with patch.dict(os.environ, {'BIKEFLOW_DATA_ROOT':'explicit-missing-data'}):

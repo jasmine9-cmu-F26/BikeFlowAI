@@ -8,6 +8,11 @@ from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parents[1]
 HORIZONS = (10, 20, 30, 40, 50, 60)
+# App reward terms, shared by the greedy adapter and the PPO bridge: walking
+# penalty per minute, waiting penalty per minute, trip-failure penalty and
+# penalty per failed attempt (scripts/rl/policies.py, reports/rl_eval/conditioned_f0.1).
+APP_LAM, APP_MU, APP_C, APP_F = .02, .01, .5, .1
+RISK = 1 + APP_C + APP_F  # a slot's expected value is 1 - RISK * p_fail - lam * walk
 
 
 def registry():
@@ -143,8 +148,8 @@ class Planner:
                     if method == 'B1' and (pb == 0 or pd == 0):
                         continue
                     # Same one-step reward terms as policies.greedy; no independence claim.
-                    score = (1 - 1.5*(1-pb) - .02*p['walk_minutes'] +
-                             1 - 1.5*(1-pd) - .02*r['walk_minutes'] - .01*wait)
+                    score = (1 - RISK*(1-pb) - APP_LAM*p['walk_minutes'] +
+                             1 - RISK*(1-pd) - APP_LAM*r['walk_minutes'] - APP_MU*wait)
                     pairs.append(dict(pickup=self.stop(p, states, pb, ph, pickup_min, q),
                                       dropoff=self.stop(r, states, pd, rh, return_min, q),
                                       wait_minutes=wait, ride_minutes=round(ride, 1), ride_method=ride_method,

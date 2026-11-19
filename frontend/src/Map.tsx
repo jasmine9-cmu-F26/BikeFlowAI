@@ -10,7 +10,28 @@ import {
 } from "react-leaflet";
 import type { LatLngBoundsExpression } from "leaflet";
 import type { Endpoint, Route, Station, Point } from "./api";
+export type MapLayer = "bike" | "dock";
+// Stations are colored by what matters for the chosen trip end: bikes for
+// pickup, open docks for return, using the calibrated +30 min forecast.
+export const RISK_HORIZON = 30;
+export const RISK_THRESHOLD = 0.8;
+export const COLORS = {
+  ok: "#538b78",
+  risk: "#d9b14e",
+  empty: "#db9157",
+  off: "#aaa",
+  chosen: "#174e40",
+};
+export function stationRisk(s: Station, layer: MapLayer, ageLimit: number) {
+  const usable = layer === "bike" ? s.pickup : s.return;
+  if (!usable || s.data_age_seconds > ageLimit) return "off";
+  if ((layer === "bike" ? s.bikes : s.docks) === 0) return "empty";
+  const f = s.forecast?.[RISK_HORIZON];
+  const p = f ? (layer === "bike" ? f.p_bike : f.p_dock) : null;
+  return p !== null && p !== undefined && p < RISK_THRESHOLD ? "risk" : "ok";
+}
 type Props = {
+  layer?: MapLayer;
   ageLimit: number;
   stations: Station[];
   route: Route | null;
@@ -46,6 +67,7 @@ function Interaction({ stations, route, selecting, onPick }: Props) {
 }
 export default function RideMap(props: Props) {
   const { stations, route, origin, destination, selecting, onStation } = props;
+  const layer = props.layer ?? "bike";
   const locate = (v: Endpoint) =>
     typeof v === "string" ? stations.find((s) => s.id === v) : v;
   const a = locate(origin),
@@ -74,12 +96,8 @@ export default function RideMap(props: Props) {
               color: chosen ? "#fff" : "#fff",
               weight: 2,
               fillColor: chosen
-                ? "#174e40"
-                : !s.pickup || s.data_age_seconds > props.ageLimit
-                  ? "#aaa"
-                  : s.bikes === 0
-                    ? "#db9157"
-                    : "#538b78",
+                ? COLORS.chosen
+                : COLORS[stationRisk(s, layer, props.ageLimit)],
               fillOpacity: 1,
             }}
             eventHandlers={{
@@ -93,6 +111,14 @@ export default function RideMap(props: Props) {
               <strong>{s.name}</strong>
               <br />
               {s.bikes} bikes · {s.docks} docks
+              <br />
+              {(() => {
+                const f = s.forecast?.[RISK_HORIZON];
+                const p = f ? (layer === "bike" ? f.p_bike : f.p_dock) : null;
+                return p === null || p === undefined
+                  ? null
+                  : `${layer === "bike" ? "Bike" : "Open dock"} in ${RISK_HORIZON} min: ${Math.round(p * 100)}%`;
+              })()}
               <br />
               Snapshot {s.data_age_seconds}s old
             </Popup>

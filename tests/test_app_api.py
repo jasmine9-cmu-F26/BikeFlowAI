@@ -163,5 +163,34 @@ class PolicyBridge(unittest.TestCase):
                     p.choose([slot],5)
 
 
+    def test_conditioned_policy_serves_any_trained_walking_limit(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            path = root / 'models/rl_conditioned/ppo.zip'
+            path.parent.mkdir(parents=True)
+            path.write_bytes(b'test')
+            path.with_suffix('.json').write_text(json.dumps(dict(
+                conditioned=True, observation_size=33, walk_choices=[5., 10., 15.],
+                lam_choices=[0., .02, .16], lam_scale=.08, walk_scale=15., mu=.01, c=.5, f=.1)))
+            p = Policy(root)
+            self.assertEqual(p.path, path)
+            slot = dict(valid=True,walk_minutes=0,horizon=10,share=.5,empty_now=False,p_fail=.1,p_next=.1,p_b2=.1)
+            with patch('backend.policy.subprocess.run') as run:
+                run.return_value.returncode=0
+                run.return_value.stdout='{"action": 0}'
+                self.assertEqual(p.choose([slot],5), 0)
+                sent = json.loads(run.call_args.kwargs['input'])['observation']
+                self.assertEqual(len(sent), 33)
+                self.assertAlmostEqual(sent[31], .02/.08)
+                self.assertAlmostEqual(sent[32], 5/15)
+                with self.assertRaisesRegex(ValueError,'walking limits'):
+                    p.choose([slot],20)
+            # A policy trained for another failed-attempt penalty is not served.
+            meta = json.loads(path.with_suffix('.json').read_text())
+            path.with_suffix('.json').write_text(json.dumps(dict(meta, f=0.)))
+            with self.assertRaisesRegex(ValueError,'reward configuration'):
+                p.choose([slot],5)
+
+
 if __name__ == '__main__':
     unittest.main()
