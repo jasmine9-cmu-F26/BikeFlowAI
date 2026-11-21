@@ -58,7 +58,7 @@ make demo           # or ./scripts/start_demo.sh [--no-live] [--python PATH]
 make demo-stop      # or ./scripts/stop_demo.sh
 ```
 
-Verified from a fresh clone on 2026-11-18 (macOS, Homebrew Python 3.15.2, Node 26, no pip/npm cache, no activated virtualenv): `make demo-setup`, `make demo`, 133 backend and 10 frontend tests, the build, the first-visit guide and all demo stories passed. Two install messages are expected and harmless: npm 11 may say esbuild's install script was blocked (Vite still runs), and `npm audit` lists advisories in `vitest`, the dev-only test runner that is not part of the served site (fixing them needs a major vitest upgrade). Run `deactivate` first if another virtualenv is active, so `make demo-setup` uses a system Python.
+Verified from a fresh clone on 2026-11-21 (macOS, Homebrew Python 3.15.2, Node 26, no pip/npm cache, no activated virtualenv): `make demo-setup`, `make demo`, 133 backend and 10 frontend tests, the build, the first-visit guide and all demo stories passed. One install message is expected and harmless: npm 11 may say esbuild's install script was blocked (Vite still runs). The earlier `npm audit` advisories in the dev-only test runner were fixed by upgrading vitest 3.2.4 → 5.1.0 (Vite unchanged at 6.4); `npm ci` now reports 0 vulnerabilities. Run `deactivate` first if another virtualenv is active, so `make demo-setup` uses a system Python.
 
 The shell launcher mirrors the Windows one: it refuses to start if ports 8000/3000 are busy or a previous run was not stopped, writes logs under `.local/`, waits for `/health` and the web server, and prints the active forecast method and PPO readiness. `stop_demo.sh` stops only the two processes it recorded (PID and command line must both match).
 
