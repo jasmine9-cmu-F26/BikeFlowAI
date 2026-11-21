@@ -295,7 +295,7 @@ class Providers:
                                      return_=r['return_'], data_age_seconds=int(q.timestamp()-r['snapshot_time']), forecast={}, b2={}))
         for s in stations:
             s['return'] = s.pop('return_')
-        warnings = ['Live predictions use a model trained on summer 2021. On 19 days of November 2026 data it still beat current-count baselines by about 23% (reports/live_validation_2026); conditions keep changing.']
+        warnings = ['Live predictions use a model trained on summer 2021. On 22 days of Oct–Nov 2026 data it still beat current-count baselines by about 23% (reports/live_validation_2026); conditions keep changing.']
         active = 'unavailable'
         if self.service is not None:
             try:

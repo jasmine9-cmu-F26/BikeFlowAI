@@ -12,11 +12,11 @@ Open docks are missing only 2–3% of the time across the 32 stations, so networ
 | 2021 tune | all | 100% | 2.3% | 0.014 / 0.028 / **0.010** | 0.47 / **0.74** | −30% (−32 to −26) |
 | 2021 tune | nearly full now | 6% | 33% | 0.196 / 0.273 / **0.128** | 0.60 / **0.81** | **−35%** (−39 to −31) |
 | 2021 tune | busy dock hour | 14% | 7.2% | 0.041 / 0.108 / **0.029** | 0.54 / **0.79** | −28% (−31 to −25) |
-| 2026 live | all | 100% | 3.3% | 0.016 / 0.038 / **0.012** | 0.58 / **0.80** | −23% (−27 to −19) |
-| 2026 live | nearly full now | 10% | 31% | 0.139 / 0.272 / **0.103** | 0.67 / **0.84** | **−26%** (−31 to −21) |
-| 2026 live | busy dock hour | 14% | 7.7% | 0.026 / 0.114 / **0.021** | 0.70 / **0.88** | −18% (−26 to −9) |
+| 2026 live | all | 100% | 3.2% | 0.016 / 0.037 / **0.012** | 0.58 / **0.80** | −23% (−27 to −19) |
+| 2026 live | nearly full now | 10% | 30% | 0.138 / 0.262 / **0.102** | 0.66 / **0.83** | **−26%** (−30 to −22) |
+| 2026 live | busy dock hour | 15% | 8.0% | 0.028 / 0.112 / **0.023** | 0.69 / **0.87** | −18% (−23 to −10) |
 
-When a destination has two or fewer open docks, about one in three will be full on arrival. Current counts cannot tell which; the forecaster separates them (PR-AUC 0.81–0.84 against 0.60–0.67) in both 2021 and 2026. B1 is the better baseline everywhere; B2's calendar rates are worst. Intervals are day-block bootstraps (14 days in 2021, 19 in 2026).
+When a destination has two or fewer open docks, about one in three will be full on arrival. Current counts cannot tell which; the forecaster separates them (PR-AUC 0.81–0.83 against 0.60–0.66) in both 2021 and 2026. B1 is the better baseline everywhere; B2's calendar rates are worst. Intervals are day-block bootstraps (14 days in 2021, 22 in 2026: 2026-10-31 to 11-21).
 
 ## B. Trip planner: arriving at a full dock
 

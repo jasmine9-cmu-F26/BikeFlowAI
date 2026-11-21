@@ -55,13 +55,36 @@ def utc(value):
 
 
 def load_polls(root: Path, stations, cache: Path):
-    """One record per (poll, app station), the same fields Live mode keeps."""
-    if cache.exists():
-        return pd.read_parquet(cache)
-    meta_cache, rows = {}, []
+    """One record per (poll, app station), the same fields Live mode keeps.
+
+    The cache is incremental: a sidecar records how many polls it holds and the
+    last snapshot path. New collector output appends only the new polls; any
+    mismatch in the already-cached prefix rebuilds from scratch.
+    """
     polls = [json.loads(line) for line in (root / 'polls.jsonl').open(encoding='utf-8')]
     polls = [p for p in polls if p.get('status') == 'ok' and p.get('snapshot_path')]
-    for i, poll in enumerate(polls):
+    sidecar = cache.with_suffix('.json')
+    cached, start = None, 0
+    if cache.exists() and sidecar.exists():
+        info = json.loads(sidecar.read_text(encoding='utf-8'))
+        n = int(info.get('polls', -1))
+        if 0 < n <= len(polls) and polls[n - 1]['snapshot_path'] == info.get('last_snapshot_path'):
+            cached, start = pd.read_parquet(cache), n
+    if cached is not None and start == len(polls):
+        return cached
+    new = _parse_polls(root, stations, polls, start)
+    df = new if cached is None else pd.concat([cached, new], ignore_index=True)
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(cache)
+    sidecar.write_text(json.dumps(dict(polls=len(polls), last_snapshot_path=polls[-1]['snapshot_path'])), encoding='utf-8')
+    print(f'parsed polls {start}..{len(polls)} (cached before: {start})', file=sys.stderr)
+    return df
+
+
+def _parse_polls(root: Path, stations, polls, start: int) -> pd.DataFrame:
+    meta_cache, rows = {}, []
+    for i in range(start, len(polls)):
+        poll = polls[i]
         received = utc(poll['status_capture']['received_at_utc'])
         mpath = poll['metadata_path']
         if mpath not in meta_cache:
@@ -85,10 +108,7 @@ def load_polls(root: Path, stations, cache: Path):
                              return_=bool(mapped and r.get('is_installed') and r.get('is_returning'))))
         if i % 1000 == 0:
             print(f'parsed {i}/{len(polls)} polls', file=sys.stderr)
-    df = pd.DataFrame(rows)
-    cache.parent.mkdir(parents=True, exist_ok=True)
-    df.to_parquet(cache)
-    return df
+    return pd.DataFrame(rows)
 
 
 def dst_ambiguous(epoch_seconds) -> bool:
