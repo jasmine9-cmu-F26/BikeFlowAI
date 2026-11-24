@@ -383,6 +383,43 @@ describe("bike / dock risk layer", () => {
     expect(pin("pin-pickup").icon.className).toContain("status-empty");
     expect(pin("pin-return").icon.className).toContain("status-ok");
   });
+
+  it("writes the revealed outcome on each pin and marks where B1 went instead", () => {
+    const outcome = (
+      id: string,
+      phase: "pickup" | "return",
+      status: "available" | "unavailable",
+      observed: number,
+    ) => ({ station_id: id, horizon_minutes: 10, phase, status, observed });
+    reset();
+    renderToStaticMarkup(
+      <RideMap
+        stations={[station, destination, bystander]}
+        route={route}
+        origin={station.id}
+        destination={destination.id}
+        walkLimit={5}
+        ageLimit={900}
+        selecting={null}
+        onStation={vi.fn()}
+        onPick={vi.fn()}
+        outcomes={{
+          ours: [
+            outcome(station.id, "pickup", "available", 4),
+            outcome(destination.id, "return", "available", 2),
+          ],
+          b1: [outcome(bystander.id, "return", "unavailable", 0)],
+        }}
+      />,
+    );
+    expect(pin("pin-pickup").icon.html).toContain("At arrival: 4 bikes");
+    expect(pin("pin-pickup").icon.html).toContain("outcome-available");
+    const b1 = pin("b1-pin");
+    expect(b1.position).toEqual([bystander.lat, bystander.lon]);
+    expect(b1.icon.html).toContain("B1 would return here");
+    expect(b1.icon.html).toContain("At arrival: full");
+    expect(b1.icon.className).toContain("status-empty");
+  });
 });
 
 describe("map framing", () => {

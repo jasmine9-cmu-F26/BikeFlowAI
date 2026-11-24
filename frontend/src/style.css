@@ -477,6 +477,30 @@ h1 > span {
   color: #4f6153;
   border-color: #e2e6dc;
 }
+/* After a reveal: a second line on the pin with what was really there. */
+.trip-pin .pin-outcome {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 500;
+}
+.pin-outcome.outcome-available {
+  color: #3f6b4f;
+}
+.pin-outcome.outcome-unavailable {
+  color: #9a4a26;
+}
+.pin-outcome.outcome-unobservable {
+  color: #777;
+}
+/* Where B1 would have gone instead: same shape, dashed and quieter. */
+.trip-pin.b1-pin {
+  outline: 1.5px dashed #7a877e;
+}
+.trip-pin.b1-pin .pin-label {
+  font-weight: 500;
+  color: #4f6153;
+  border-style: dashed;
+}
 /* A free map point gets a small hollow mark; on a station the station's own
    dot is the mark and only the tag is added. */
 .trip-endpoint {
@@ -1412,6 +1436,20 @@ h1 > span {
 .outcomes li.unobservable {
   background: #f0f0ee;
   color: #777;
+}
+.outcomes-title {
+  margin: 10px 0 0;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #5d6a60;
+}
+.outcomes-title + .outcomes {
+  margin-top: 5px;
+}
+.failure-controls .outcomes-same {
+  font-size: 11px;
+  margin: 5px 0 6px;
 }
 
 /* ---- Walking limit switch and RL method notice (M4) ---- */

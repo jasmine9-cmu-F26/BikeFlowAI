@@ -33,6 +33,7 @@ import {
 } from "./PlanNotices";
 import { routeOnMap } from "./routeOnMap";
 import { debounced } from "./autoReplan";
+import { revealAttempts, type Outcome } from "./reveal";
 import {
   api,
   clock,
@@ -93,12 +94,6 @@ const STORIES: Story[] = [
     layer: "bike",
   },
 ];
-type Outcome = {
-  station_id: string;
-  phase: string;
-  observed: number | null;
-  status: string;
-};
 // Never round a probability up to a certainty.
 const pct = (p: number | null) =>
   p === null
@@ -309,10 +304,14 @@ export default function App() {
   const [routeDestination, setRouteDestination] =
     useState<Endpoint>(destination);
   const [revealed, setRevealed] = useState<{
-    outcomes: Outcome[];
-    baseline?: Outcome;
+    route: Route;
+    b1Route: Route | null;
+    compared: boolean;
+    ours: Outcome[];
+    b1: Outcome[];
     warning: string;
   } | null>(null);
+  const [revealing, setRevealing] = useState(false);
   const [layer, setLayer] = useState<MapLayer>("bike");
   const [story, setStory] = useState("");
   const [guide, setGuide] = useState(false);
@@ -538,48 +537,45 @@ export default function App() {
       if (!ctrl.signal.aborted) setLoading(false);
     }
   }
+  // One click: our trip and the current-count baseline (B1) checked together
+  // against what the 2021 data recorded at each arrival.
   async function reveal() {
     if (!plan || !shownRoute) return;
-    const attempts = [
-      ...(shownRoute.pickup
-        ? [
-            {
-              station_id: shownRoute.pickup.id,
-              horizon_minutes: shownRoute.pickup.horizon_minutes,
-              phase: "pickup",
-            },
-          ]
-        : []),
-      {
-        station_id: shownRoute.dropoff.id,
-        horizon_minutes: shownRoute.dropoff.horizon_minutes,
-        phase: "return",
-      },
-    ];
+    const route = shownRoute;
+    setRevealing(true);
     try {
       setError("");
-      const main = await api<{ outcomes: Outcome[]; warning: string }>(
-        "/replay/reveal",
-        { historical_timestamp: plan.decision_time, attempts },
-      );
-      const b1 = baseline?.primary?.dropoff;
-      let baselineOutcome: Outcome | undefined;
-      if (b1 && b1.id !== shownRoute.dropoff.id) {
-        const r = await api<{ outcomes: Outcome[] }>("/replay/reveal", {
-          historical_timestamp: plan.decision_time,
-          attempts: [
-            {
-              station_id: b1.id,
-              horizon_minutes: b1.horizon_minutes,
-              phase: "return",
-            },
-          ],
-        });
-        baselineOutcome = r.outcomes[0];
+      let b1Plan = baseline;
+      if (!b1Plan && plan.requested_method !== "B1") {
+        b1Plan = await api<Plan>("/plan", { ...body(), method: "B1" });
+        setBaseline(b1Plan);
       }
-      setRevealed({ ...main, baseline: baselineOutcome });
+      const b1Route =
+        plan.requested_method === "B1" ? null : (b1Plan?.primary ?? null);
+      const batches = revealAttempts(route, b1Route);
+      const check = (attempts: typeof batches.ours) =>
+        attempts.length
+          ? api<{ outcomes: Outcome[]; warning: string }>("/replay/reveal", {
+              historical_timestamp: plan.decision_time,
+              attempts,
+            })
+          : Promise.resolve({ outcomes: [], warning: "" });
+      const [ours, b1] = await Promise.all([
+        check(batches.ours),
+        check(batches.b1),
+      ]);
+      setRevealed({
+        route,
+        b1Route,
+        compared: plan.requested_method !== "B1",
+        warning: ours.warning,
+        ours: ours.outcomes,
+        b1: b1.outcomes,
+      });
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setRevealing(false);
     }
   }
   function endpointInput(
@@ -837,6 +833,9 @@ export default function App() {
             }}
             onStation={setSelected}
             onBackground={() => setSelected(null)}
+            outcomes={
+              revealed && revealed.route === mapRoute ? revealed : undefined
+            }
           />
           <div className="map-top">
             <span className="map-chip">
@@ -1172,24 +1171,48 @@ export default function App() {
                 (tab === "recommended" ||
                   selectedAlternativeIndex !== null) && (
                   <div className="failure-controls">
-                    <button onClick={reveal}>
-                      Reveal historical outcomes <ChevronRight size={14} />
-                    </button>
+                    {!revealed && (
+                      <button onClick={reveal} disabled={revealing}>
+                        {revealing
+                          ? "Checking the 2021 records…"
+                          : "Reveal historical outcomes"}{" "}
+                        <ChevronRight size={14} />
+                      </button>
+                    )}
                     {revealed && (
                       <>
+                        <h4 className="outcomes-title">What happened</h4>
                         <ul className="outcomes">
-                          {revealed.outcomes.map((o, i) => (
+                          {revealed.ours.map((o, i) => (
                             <li key={i} className={o.status}>
                               {outcomeText(o)}
                             </li>
                           ))}
-                          {revealed.baseline && (
-                            <li className={revealed.baseline.status}>
-                              B1 would have used ·{" "}
-                              {outcomeText(revealed.baseline)}
-                            </li>
-                          )}
                         </ul>
+                        {revealed.compared && (
+                          <>
+                            <h4 className="outcomes-title">
+                              Current-count app (B1)
+                            </h4>
+                            {!revealed.b1Route ? (
+                              <p className="outcomes-same">
+                                Found no ride within your walking limit.
+                              </p>
+                            ) : revealed.b1.length ? (
+                              <ul className="outcomes">
+                                {revealed.b1.map((o, i) => (
+                                  <li key={i} className={o.status}>
+                                    {outcomeText(o)}
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="outcomes-same">
+                                Would have picked the same stations.
+                              </p>
+                            )}
+                          </>
+                        )}
                         <p>{revealed.warning}</p>
                       </>
                     )}

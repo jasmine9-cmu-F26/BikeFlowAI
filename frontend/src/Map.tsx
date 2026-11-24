@@ -15,6 +15,7 @@ import type {
   Map as LeafletMap,
 } from "leaflet";
 import type { Endpoint, Route, Station, Point } from "./api";
+import { outcomeNote, type Outcome } from "./reveal";
 export type MapLayer = "bike" | "dock";
 // Stations are colored by what matters for the chosen trip end: bikes for
 // pickup, open docks for return, using the calibrated +30 min forecast.
@@ -88,13 +89,48 @@ const pinIcon = (
   kind: "pickup" | "return",
   label: string,
   status: keyof typeof COLORS,
+  outcome?: Outcome,
+  extraClass = "",
 ) =>
   divIcon({
-    className: `trip-pin pin-${kind} status-${status}`,
-    html: `<span class="pin-label">${label}</span>`,
+    className: `trip-pin pin-${kind} status-${status}${extraClass}`,
+    html:
+      `<span class="pin-label">${label}` +
+      (outcome
+        ? `<small class="pin-outcome outcome-${outcome.status}">${outcomeNote(outcome)}</small>`
+        : "") +
+      `</span>`,
     iconSize: [14, 14],
     iconAnchor: [7, 7],
   });
+// After a reveal: where the current-count baseline would have gone instead,
+// colored by what was really there.
+const OUTCOME_STATUS = {
+  available: "ok",
+  unavailable: "empty",
+  unobservable: "off",
+} as const;
+function BaselinePin({ s, outcome }: { s: Station; outcome: Outcome }) {
+  const icon = useMemo(
+    () =>
+      pinIcon(
+        outcome.phase,
+        `B1 would ${outcome.phase === "pickup" ? "pick up" : "return"} here`,
+        OUTCOME_STATUS[outcome.status],
+        outcome,
+        " b1-pin",
+      ),
+    [s.id, outcome],
+  );
+  return (
+    <Marker
+      position={[s.lat, s.lon]}
+      icon={icon}
+      interactive={false}
+      zIndexOffset={800}
+    />
+  );
+}
 // Your start / destination: a text tag. On a station the tag sits on that
 // station's own dot, so it keeps showing its availability color; a free map
 // point also gets a small hollow mark.
@@ -120,6 +156,7 @@ function TripPin({
   atEnd,
   waitMinutes,
   status,
+  outcome,
   onClick,
 }: {
   kind: "pickup" | "return";
@@ -127,12 +164,13 @@ function TripPin({
   atEnd: boolean;
   waitMinutes?: number;
   status: keyof typeof COLORS;
+  outcome?: Outcome;
   onClick: () => void;
 }) {
   const label = pinLabel(kind, s, atEnd, waitMinutes);
   const icon = useMemo(
-    () => pinIcon(kind, label, status),
-    [kind, label, status],
+    () => pinIcon(kind, label, status, outcome),
+    [kind, label, status, outcome],
   );
   return (
     <Marker
@@ -207,6 +245,9 @@ type Props = {
   onStation: (s: Station) => void;
   // A click on the map itself (not a station, not while picking): closes details.
   onBackground?: () => void;
+  // Revealed outcomes of the shown route, and of the B1 baseline's stops where
+  // it chose differently.
+  outcomes?: { ours: Outcome[]; b1: Outcome[] };
 };
 function Interaction({
   stations,
@@ -388,6 +429,7 @@ export default function RideMap(props: Props) {
             props.ageLimit,
             route?.pickup?.horizon_minutes,
           )}
+          outcome={props.outcomes?.ours.find((o) => o.phase === "pickup")}
           onClick={click(pickupStation)}
         />
       )}
@@ -402,9 +444,17 @@ export default function RideMap(props: Props) {
             props.ageLimit,
             route?.dropoff.horizon_minutes,
           )}
+          outcome={props.outcomes?.ours.find((o) => o.phase === "return")}
           onClick={click(returnStation)}
         />
       )}
+      {props.outcomes?.b1.map((o) => {
+        // Same station as ours: its pin already says what was there.
+        if (o.station_id === pickupStation?.id || o.station_id === returnStation?.id)
+          return null;
+        const s = props.stations.find((x) => x.id === o.station_id);
+        return s ? <BaselinePin key={o.phase + s.id} s={s} outcome={o} /> : null;
+      })}
     </MapContainer>
   );
 }
