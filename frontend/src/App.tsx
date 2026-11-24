@@ -288,6 +288,15 @@ export default function App() {
   const [selectedAlternativeIndex, setSelectedAlternativeIndex] = useState<
     number | null
   >(null);
+  // Station details close like a map app's place panel: Esc or a click on the map.
+  useEffect(() => {
+    if (!selected) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelected(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selected]);
   const [reload, setReload] = useState(0);
   const [failed, setFailed] = useState<string[]>([]);
   const [routeOrigin, setRouteOrigin] = useState<Endpoint>(origin);
@@ -803,6 +812,7 @@ export default function App() {
           <RideMap
             layer={layer}
             ageLimit={mode === "live" ? 300 : 900}
+            walkLimit={walk}
             stations={snap?.stations || []}
             route={shownRoute}
             origin={shownRoute ? routeOrigin : origin}
@@ -814,6 +824,7 @@ export default function App() {
               setSelecting(null);
             }}
             onStation={setSelected}
+            onBackground={() => setSelected(null)}
           />
           <div className="map-top">
             <span className="map-chip">
@@ -919,7 +930,34 @@ export default function App() {
             </div>
           )}
           <div className="map-bottom">
-            <div className="map-legend">
+            <div className="map-legend" aria-label="Map legend">
+              <span>
+                <i className="glyph endpoint-start" />
+                Your start
+              </span>
+              <span>
+                <i className="glyph endpoint-end" />
+                Destination
+              </span>
+              {shownRoute && (
+                <>
+                  {shownRoute.pickup && (
+                    <span>
+                      <i className="glyph pin-pickup" />
+                      Pick up here
+                    </span>
+                  )}
+                  <span>
+                    <i className="glyph pin-return" />
+                    Return here
+                  </span>
+                  <span>
+                    <i className="glyph candidate" />
+                    Considered · within {walk} min walk
+                  </span>
+                </>
+              )}
+              <span className="legend-break" />
               <span>
                 <i style={{ background: COLORS.ok }} />
                 {layer === "bike" ? "Bikes likely" : "Open dock likely"}
@@ -931,10 +969,6 @@ export default function App() {
               <span>
                 <i style={{ background: COLORS.empty }} />
                 {layer === "bike" ? "Empty now" : "Full now"}
-              </span>
-              <span>
-                <i style={{ background: COLORS.chosen }} />
-                Recommended
               </span>
             </div>
             <span className="route-note">

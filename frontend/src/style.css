@@ -423,30 +423,106 @@ h1 > span {
 }
 .map-legend {
   display: flex;
-  gap: 13px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  max-width: 100%;
   background: #fffefbf5;
   border: 1px solid #e2e6dc;
   border-radius: 6px;
-  padding: 10px 12px;
-  font-size: 9px;
-  color: #6e7f70;
+  padding: 9px 12px;
+  font-size: 11px;
+  color: #4f6153;
 }
 .map-legend span {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 .map-legend i {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #538b78;
+  flex-shrink: 0;
 }
-.map-legend .orange {
-  background: #db9157;
+.map-legend .legend-break {
+  width: 1px;
+  align-self: stretch;
+  background: var(--line);
 }
-.map-legend .dark {
-  background: #174e40;
+/* Legend glyphs drawn like the map markers they explain. */
+.map-legend i.glyph.endpoint-start {
+  width: 11px;
+  height: 11px;
+  background: #fff;
+  border: 2.5px solid var(--green);
+}
+.map-legend i.glyph.endpoint-end {
+  width: 11px;
+  height: 11px;
+  background: #fff;
+  border: 2.5px solid var(--orange);
+  border-radius: 2px;
+}
+.map-legend i.glyph.pin-pickup,
+.map-legend i.glyph.pin-return {
+  width: 10px;
+  height: 10px;
+  background: var(--green);
+}
+.map-legend i.glyph.pin-return {
+  border-radius: 1px;
+}
+.map-legend i.glyph.candidate {
+  width: 11px;
+  height: 11px;
+  background: #538b78;
+  border: 2.5px solid var(--green);
+}
+/* Map markers: circle = start side, square = end side (as in the form and
+   the journey timeline); filled = recommended station, hollow = your endpoint. */
+.trip-pin {
+  box-sizing: border-box;
+  background: var(--green);
+  border: 2px solid #fff;
+  border-radius: 50%;
+}
+.trip-pin.pin-return {
+  border-radius: 2px;
+}
+.trip-pin .pin-label {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  padding: 1px 6px;
+  white-space: nowrap;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--green);
+  background: #fff;
+  border: 1px solid #cfd8cd;
+  border-radius: 3px;
+}
+.trip-endpoint {
+  box-sizing: border-box;
+  background: #fff;
+  border: 3px solid var(--green);
+  border-radius: 50%;
+}
+.trip-endpoint.endpoint-end {
+  border-color: var(--orange);
+  border-radius: 2px;
+}
+.trip-endpoint.framed {
+  background: transparent;
+  border-width: 2.5px;
+}
+.trip-endpoint.endpoint-end.framed {
+  border-radius: 4px;
 }
 .route-note {
   font-size: 9px;
@@ -1004,6 +1080,28 @@ h1 > span {
 .site-footer > span:last-child {
   font-style: italic;
   white-space: nowrap;
+}
+/* Desktop: an app frame, not a long page. The map stays put while each side
+   panel scrolls on its own; narrow screens keep the stacked page below. */
+@media (min-width: 901px) {
+  .app-shell {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    overflow: hidden;
+  }
+  .workspace {
+    min-height: 0;
+  }
+  .planner-panel,
+  .results-panel {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .map-panel {
+    min-height: 0;
+  }
 }
 @media (min-width: 1500px) {
   .workspace {
