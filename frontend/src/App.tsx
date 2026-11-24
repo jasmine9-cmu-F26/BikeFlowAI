@@ -26,8 +26,7 @@ import Onboarding, {
 } from "./Onboarding";
 import {
   MethodNotice,
-  WALK_CHOICES,
-  WalkSuggestion,
+  WalkChoice,
   needsWiderWalk,
   nextWalk,
   widerIsBetter,
@@ -762,29 +761,19 @@ export default function App() {
                 </select>
               </label>
               <label className="field-label">
-                Extra walking
-                <select value={walk} onChange={(e) => setWalk(+e.target.value)}>
-                  {WALK_CHOICES.map((n) => (
-                    <option key={n} value={n}>
-                      {n} min max
+                Planning method
+                <select
+                  value={method}
+                  onChange={(e) => setMethod(e.target.value as Method)}
+                >
+                  {Object.entries(methods).map(([k, v]) => (
+                    <option key={k} value={k}>
+                      {k} · {v}
                     </option>
                   ))}
                 </select>
               </label>
             </div>
-            <label className="field-label">
-              Planning method
-              <select
-                value={method}
-                onChange={(e) => setMethod(e.target.value as Method)}
-              >
-                {Object.entries(methods).map(([k, v]) => (
-                  <option key={k} value={k}>
-                    {k} · {v}
-                  </option>
-                ))}
-              </select>
-            </label>
             <button
               className="primary-btn"
               disabled={loading || loadingMap || !stations.length}
@@ -802,13 +791,6 @@ export default function App() {
               )}
             </button>
           </form>
-          <div className="walk-note">
-            <Footprints size={16} />
-            <span>
-              Limit applies at each end. One RL policy adapts to 5, 10 or 15
-              min; we suggest walking more only when it clearly helps.
-            </span>
-          </div>
           {mode === "fixture" && (
             <div className="demo-controls">
               <label className="field-label">
@@ -1049,6 +1031,14 @@ export default function App() {
               <p>Checking stations and arrival horizons…</p>
             </div>
           )}
+          {plan && (
+            <WalkChoice
+              walk={walk}
+              current={plan}
+              wider={loading || failed.length ? null : wider}
+              onChange={setWalk}
+            />
+          )}
           {loading && plan && (
             <p className="updating-note" role="status">
               <RefreshCw size={13} className="spin" /> Updating for your changes…
@@ -1085,34 +1075,12 @@ export default function App() {
                   <p>{plan.no_plan_reason}</p>
                   <p>
                     Try another endpoint, a shorter departure offset, or a
-                    larger walking limit.
+                    longer walk above.
                   </p>
-                  {wider && (
-                    <WalkSuggestion
-                      current={plan}
-                      wider={wider.plan}
-                      walk={wider.walk}
-                      onUse={() => {
-                        setWalk(wider.walk);
-                        setPendingRun(true);
-                      }}
-                    />
-                  )}
                 </div>
               ) : tab === "recommended" && shownRoute ? (
                 <>
                   <MethodNotice plan={plan} walk={walk} />
-                  {wider && !failed.length && (
-                    <WalkSuggestion
-                      current={plan}
-                      wider={wider.plan}
-                      walk={wider.walk}
-                      onUse={() => {
-                        setWalk(wider.walk);
-                        setPendingRun(true);
-                      }}
-                    />
-                  )}
                   <DockInsight
                     route={shownRoute}
                     plan={plan}

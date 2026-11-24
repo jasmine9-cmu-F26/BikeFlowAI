@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { Plan, Route } from "../src/api";
-import { needsWiderWalk, nextWalk, widerIsBetter } from "../src/PlanNotices";
+import {
+  needsWiderWalk,
+  nextWalk,
+  widerIsBetter,
+  widerReason,
+  widerRows,
+} from "../src/PlanNotices";
 
 const stop = (id: string, probability: number) => ({
   id,
@@ -70,5 +76,24 @@ describe("walking-limit suggestion", () => {
     expect(nextWalk(5)).toBe(10);
     expect(nextWalk(10)).toBe(15);
     expect(nextWalk(15)).toBeNull();
+  });
+
+  it("names what the longer walk buys, in a word for the switch", () => {
+    const risky = plan(route(0.7, 0.95), [route(0.6, 0.9)]);
+    expect(widerReason(plan(null), plan(route(0.9, 0.9)))).toBe("possible");
+    expect(widerReason(risky, plan(route(0.95, 0.95, "c")))).toBe("safer");
+    expect(
+      widerReason(plan(route(0.95, 0.95)), plan(route(0.95, 0.95), [route(0.9, 0.9)])),
+    ).toBe("backup");
+  });
+
+  it("spells out the trade-off against the current plan", () => {
+    const current = plan(route(0.38, 0.99, "start", "end"));
+    const wider = plan(route(0.99, 0.99, "north", "end"), [route(0.9, 0.9)]);
+    expect(widerRows(current, wider)).toEqual([
+      "Pick up at north · 99% bike (now 38%)",
+      "1 alternative instead of 0",
+      "4.0 min total walking (now 4.0)",
+    ]);
   });
 });
