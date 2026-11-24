@@ -46,7 +46,7 @@ vi.mock("react-leaflet", () => ({
   },
 }));
 
-import RideMap, { COLORS } from "../src/Map";
+import RideMap, { COLORS, framePoints, tripBounds } from "../src/Map";
 
 const station: Station = {
   id: "chicago:14",
@@ -362,5 +362,43 @@ describe("bike / dock risk layer", () => {
     expect(fill(nearStart)).toBe(COLORS.risk); // bikes at +10, not docks at +30
     expect(fill(nearEnd)).toBe(COLORS.risk); // docks at +20
     expect(fill(bystander)).toBe(COLORS.off); // out of reach: greyed
+  });
+});
+
+describe("map framing", () => {
+  const other: Route = {
+    ...route,
+    pickup: stop(bystander),
+    dropoff: stop({ ...destination, id: "chicago:7", lat: 41.88, lon: -87.66 }),
+  };
+
+  it("frames every route it is given, so previewing one does not move the map", () => {
+    const points = tripBounds([route, other], [station, destination]);
+    expect(points).toContainEqual([bystander.lat, bystander.lon]);
+    expect(points).toContainEqual([41.88, -87.66]);
+    expect(points).toContainEqual([station.lat, station.lon]);
+  });
+
+  it("gives the same frame whichever route is shown inside it", () => {
+    const a = tripBounds([route, other], [station, destination]);
+    const b = tripBounds([route, other], [station, destination]);
+    expect(JSON.stringify(a)).toBe(JSON.stringify(b));
+  });
+
+  it("skips a missing pickup and unknown endpoints", () => {
+    const points = tripBounds([{ ...route, pickup: null }], [undefined, destination]);
+    expect(points).toEqual([[destination.lat, destination.lon]]);
+  });
+
+  it("keeps every station within walking reach in view, not just the chosen two", () => {
+    const nearEnd = { ...station, id: "chicago:60", lat: destination.lat - 0.003 };
+    const points = framePoints(
+      [{ ...route, pickup: null }],
+      [station, destination],
+      [station, destination, nearEnd, bystander],
+      5,
+    );
+    expect(points).toContainEqual([nearEnd.lat, nearEnd.lon]);
+    expect(points).not.toContainEqual([bystander.lat, bystander.lon]);
   });
 });

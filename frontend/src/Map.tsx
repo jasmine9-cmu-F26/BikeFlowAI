@@ -129,13 +129,40 @@ function TripPin({
     />
   );
 }
+// Every station of the given routes plus the trip's endpoints, once each.
+export function tripBounds(routes: Route[], ends: (Point | undefined)[]) {
+  const seen = new Map<string, [number, number]>();
+  for (const p of [...routes.flatMap((r) => [r.pickup, r.dropoff]), ...ends])
+    if (p) seen.set(`${p.lat},${p.lon}`, [p.lat, p.lon]);
+  return [...seen.values()];
+}
+// What the view must show: the routes, the endpoints, and every station within
+// walking reach of either end (the pickup end only when a route picks up), so
+// no station the trip colors ends up off screen or under the legend.
+export function framePoints(
+  routes: Route[],
+  [start, end]: (Point | undefined)[],
+  stations: Station[],
+  reach?: number,
+) {
+  const pickup = routes.some((r) => r.pickup);
+  const near = (p: Point | undefined, s: Station) =>
+    !!p && reach !== undefined && walkMinutes(p, s) <= reach;
+  const nearby = stations.filter(
+    (s) => (pickup && near(start, s)) || near(end, s),
+  );
+  return tripBounds(routes, [start, end, ...nearby]);
+}
 type Props = {
   layer?: MapLayer;
   ageLimit: number;
-  // The walking limit the shown plan used; draws the candidate range.
+  // The walking limit the shown plan used; stations beyond it are greyed.
   walkLimit?: number;
   stations: Station[];
   route: Route | null;
+  // Routes the view should frame; defaults to the shown route. Framing all of
+  // a plan's options keeps the map still while one of them is previewed.
+  frame?: Route[];
   origin: Endpoint;
   destination: Endpoint;
   selecting: "origin" | "destination" | null;
@@ -149,6 +176,8 @@ function Interaction({
   route,
   origin,
   destination,
+  frame,
+  walkLimit,
   selecting,
   onPick,
   onBackground,
@@ -160,29 +189,30 @@ function Interaction({
       else onBackground?.();
     },
   });
+  // Frame the whole trip, endpoints included, clear of the top chips and the
+  // legend. Keyed on the points themselves, so a re-render that shows another
+  // route inside the same frame leaves the view alone.
+  const ends = [origin, destination].map((v) =>
+    typeof v === "string" ? stations.find((s) => s.id === v) : v,
+  );
+  const routes = frame?.length ? frame : route ? [route] : [];
+  const points = routes.length
+    ? framePoints(routes, ends, stations, walkLimit)
+    : [];
+  const key = JSON.stringify(points);
   useEffect(() => {
-    if (route) {
-      // Frame the whole trip, endpoints included, clear of the top chips and the legend.
-      const ends = [origin, destination].map((v) =>
-        typeof v === "string" ? stations.find((s) => s.id === v) : v,
-      );
-      const points = [route.pickup, route.dropoff, ...ends].filter(
-        Boolean,
-      ) as Point[];
-      map.fitBounds(
-        points.map((s) => [s.lat, s.lon]) as LatLngBoundsExpression,
-        {
-          paddingTopLeft: [70, 100],
-          paddingBottomRight: [70, 140],
-          maxZoom: 15,
-        },
-      );
-    } else if (stations.length)
+    if (points.length)
+      map.fitBounds(points as LatLngBoundsExpression, {
+        paddingTopLeft: [70, 100],
+        paddingBottomRight: [70, 140],
+        maxZoom: 15,
+      });
+    else if (stations.length)
       map.fitBounds(
         stations.map((s) => [s.lat, s.lon]) as LatLngBoundsExpression,
         { padding: [35, 35], maxZoom: 13 },
       );
-  }, [route, stations, origin, destination, map]);
+  }, [key, stations.length, map]);
   return null;
 }
 export default function RideMap(props: Props) {

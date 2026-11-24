@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   ArrowUpDown,
@@ -33,6 +33,7 @@ import {
   widerIsBetter,
 } from "./PlanNotices";
 import { routeOnMap } from "./routeOnMap";
+import { debounced } from "./autoReplan";
 import {
   api,
   clock,
@@ -361,19 +362,29 @@ export default function App() {
       });
     return () => ctrl.abort();
   }, [mode, when, scenario, reload]);
+  // Latest submit for the debounced auto replan, so it reads the newest inputs.
+  const submitRef = useRef<() => void>(() => {});
+  const auto = useMemo(() => debounced(() => submitRef.current()), []);
+  useEffect(() => () => auto.cancel(), [auto]);
   useEffect(() => {
+    // Facts about the old plan stop being true as soon as the trip changes.
+    setRevealed(null);
+    setBaseline(null);
+    setWider(null);
+    setPreview(null);
+    // With a plan on screen, replan in place: the old result stays until the
+    // new one arrives. A date being typed is skipped until it is complete.
+    if (didPlan) {
+      if (mode === "live" || when) auto.schedule();
+      return;
+    }
     requestRef.current?.abort();
     setLoading(false);
     setPlan(null);
     setShownRoute(null);
     setSelectedAlternativeIndex(null);
-    setPreview(null);
     setFailed([]);
-    setDidPlan(false);
     setRouteOrigin(origin);
-    setRevealed(null);
-    setBaseline(null);
-    setWider(null);
   }, [mode, when, offset, walk, method, origin, destination, scenario, reload]);
   useEffect(() => setRevealed(null), [shownRoute]);
   useEffect(() => () => requestRef.current?.abort(), []);
@@ -434,6 +445,7 @@ export default function App() {
     };
   };
   async function submit() {
+    auto.cancel();
     requestRef.current?.abort();
     const ctrl = new AbortController();
     requestRef.current = ctrl;
@@ -472,6 +484,7 @@ export default function App() {
       if (!ctrl.signal.aborted) setLoading(false);
     }
   }
+  submitRef.current = submit;
   async function replan(phase: "pickup" | "return") {
     if (!shownRoute) return;
     const station = phase === "pickup" ? shownRoute.pickup : shownRoute.dropoff;
@@ -820,6 +833,11 @@ export default function App() {
             walkLimit={walk}
             stations={snap?.stations || []}
             route={mapRoute}
+            frame={
+              plan && tab === "alternatives" && selectedAlternativeIndex === null
+                ? [plan.primary, ...plan.backups].filter((r): r is Route => !!r)
+                : undefined
+            }
             origin={mapRoute ? routeOrigin : origin}
             destination={destination}
             selecting={selecting}
@@ -863,8 +881,6 @@ export default function App() {
               className="map-refresh"
               aria-label="Refresh station data"
               onClick={() => {
-                setPlan(null);
-                setShownRoute(null);
                 setReload((r) => r + 1);
               }}
             >
@@ -1023,14 +1039,19 @@ export default function App() {
               </button>
             </div>
           )}
-          {loading && (
+          {loading && !plan && (
             <div className="loading-state">
               <RefreshCw size={24} className="spin" />
               <p>Checking stations and arrival horizons…</p>
             </div>
           )}
-          {plan && !loading && (
-            <>
+          {loading && plan && (
+            <p className="updating-note" role="status">
+              <RefreshCw size={13} className="spin" /> Updating for your changes…
+            </p>
+          )}
+          {plan && (
+            <div className={loading ? "plan-view stale" : "plan-view"} aria-busy={loading}>
               <div className="result-tabs">
                 <button
                   className={tab === "recommended" ? "active" : ""}
@@ -1229,7 +1250,7 @@ export default function App() {
                   <dd>{plan.request_id}</dd>
                 </dl>
               </details>
-            </>
+            </div>
           )}
           {!didPlan &&
             snap?.warnings.map((w, i) => (
