@@ -46,7 +46,7 @@ vi.mock("react-leaflet", () => ({
   },
 }));
 
-import RideMap, { COLORS, tripCandidates, WALK_SPEED } from "../src/Map";
+import RideMap, { COLORS } from "../src/Map";
 
 const station: Station = {
   id: "chicago:14",
@@ -128,12 +128,10 @@ const pin = (kind: string) =>
 describe("station map interaction", () => {
   beforeEach(reset);
 
-  it("keeps route lines, walking ranges and endpoint marks out of hit testing", () => {
+  it("keeps route lines and endpoint marks out of hit testing", () => {
     render();
     expect(layers.lines).toHaveLength(3);
     expect(layers.lines.every((p) => p.interactive === false)).toBe(true);
-    expect(layers.circles).toHaveLength(2);
-    expect(layers.circles.every((p) => p.interactive === false)).toBe(true);
     reset();
     render(null, null);
     expect(layers.pins).toHaveLength(2);
@@ -228,17 +226,19 @@ describe("trip markers", () => {
     expect(label).toContain("3 bikes now");
   });
 
-  it("frames an endpoint station without covering its status color", () => {
+  it("labels an endpoint on a station without covering its status color", () => {
     render(null, { ...route, dropoff: stop(bystander) });
-    expect(pin("endpoint-end").icon.className).toContain("framed");
-    // The destination station keeps its own colored marker inside the frame.
+    const end = pin("endpoint-end").icon;
+    expect(end.className).toContain("on-station");
+    expect(end.html).toContain("Destination");
+    // The destination station keeps its own colored marker under the label.
     expect(layers.markers.map((p) => p.center)).toContainEqual([
       destination.lat,
       destination.lon,
     ]);
   });
 
-  it("draws a free map point as a plain endpoint mark", () => {
+  it("draws a free map point as a labelled mark", () => {
     reset();
     renderToStaticMarkup(
       <RideMap
@@ -252,69 +252,40 @@ describe("trip markers", () => {
         onPick={vi.fn()}
       />,
     );
-    expect(pin("endpoint-start").icon.className).not.toMatch(/framed|ringed/);
-    expect(pin("endpoint-end").icon.className).toContain("framed");
+    const start = pin("endpoint-start").icon;
+    expect(start.className).not.toContain("on-station");
+    expect(start.html).toContain("Start");
+    expect(pin("endpoint-end").icon.className).toContain("on-station");
   });
 
   it("shows only the endpoints before a plan exists", () => {
     render(null, null);
     expect(layers.pins.filter((p) => p.eventHandlers)).toHaveLength(0);
     expect(layers.pins).toHaveLength(2);
-    expect(layers.circles).toHaveLength(0);
     expect(layers.markers.every((p) => p.pathOptions.fillOpacity === 1)).toBe(
       true,
     );
   });
 
-  it("fades stations the planner could not consider", () => {
+  it("greys stations beyond the walking limit once a trip is planned", () => {
     render();
     const [far] = layers.markers;
+    expect(far.pathOptions.fillColor).toBe(COLORS.off);
     expect(far.pathOptions.fillOpacity).toBeLessThan(1);
   });
 
-  it("draws the walking range at the planner's walking speed", () => {
+  it("needs no extra rings or circles to explain the trip", () => {
     render();
-    expect(layers.circles[0].radius).toBeCloseTo(5 * 60 * WALK_SPEED);
+    expect(layers.circles).toHaveLength(0);
+    expect(layers.markers.every((p) => p.pathOptions.color === "#fff")).toBe(
+      true,
+    );
   });
 
   it("keeps empty / full stations visually distinct from the destination", () => {
     expect(COLORS.empty.toLowerCase()).not.toEqual(COLORS.destination);
   });
 });
-
-describe("planner candidates", () => {
-  // 0.001 degrees of latitude is about 111 m, i.e. 1.4 walking minutes.
-  const at = (id: string, dLat: number, extra: Partial<Station> = {}) => ({
-    ...station,
-    id,
-    lat: station.lat + dLat,
-    ...extra,
-  });
-
-  it("mirrors the backend: usable, fresh, within the limit, nearest three", () => {
-    const stations = [
-      at("far", 0.004),
-      at("c", 0.002),
-      at("closed", 0.0005, { pickup: false }),
-      at("stale", 0.0007, { data_age_seconds: 1000 }),
-      at("d", 0.0025),
-      at("a", 0),
-      at("b", 0.001),
-    ];
-    const ids = tripCandidates(stations, station, "pickup", 5, 900).map(
-      (s) => s.id,
-    );
-    expect(ids).toEqual(["a", "b", "c"]);
-  });
-
-  it("uses dock availability flags for the return side", () => {
-    const stations = [at("a", 0, { return: false }), at("b", 0.001)];
-    expect(
-      tripCandidates(stations, station, "return", 5, 900).map((s) => s.id),
-    ).toEqual(["b"]);
-  });
-});
-
 describe("bike / dock risk layer", () => {
   it("colors stations by open docks in the return view", async () => {
     const { stationRisk } = await import("../src/Map");
@@ -330,5 +301,66 @@ describe("bike / dock risk layer", () => {
     expect(
       stationRisk({ ...filling, data_age_seconds: 1000 }, "dock", 900),
     ).toBe("off");
+  });
+
+  it("reads the forecast at the horizon it is asked for", async () => {
+    const { stationRisk } = await import("../src/Map");
+    const draining: Station = {
+      ...station,
+      forecast: {
+        10: { p_bike: 0.95, p_dock: 0.99 },
+        30: { p_bike: 0.5, p_dock: 0.99 },
+      },
+    };
+    expect(stationRisk(draining, "bike", 900, 10)).toBe("ok");
+    expect(stationRisk(draining, "bike", 900, 30)).toBe("risk");
+    // A horizon the forecaster does not publish falls back to the nearest one.
+    expect(stationRisk(draining, "bike", 900, 25)).toBe("risk");
+  });
+
+  it("colors a planned trip by arrival time at each end, whatever the toggle says", () => {
+    // 0.001 degrees of latitude is about 1.4 walking minutes.
+    const nearStart: Station = {
+      ...station,
+      id: "near-start",
+      lat: station.lat + 0.001,
+      forecast: {
+        10: { p_bike: 0.5, p_dock: 0.99 },
+        30: { p_bike: 0.99, p_dock: 0.99 },
+      },
+    };
+    const nearEnd: Station = {
+      ...destination,
+      id: "near-end",
+      lat: destination.lat + 0.001,
+      forecast: {
+        20: { p_bike: 0.99, p_dock: 0.5 },
+        30: { p_bike: 0.99, p_dock: 0.99 },
+      },
+    };
+    reset();
+    renderToStaticMarkup(
+      <RideMap
+        layer="dock"
+        stations={[station, destination, bystander, nearStart, nearEnd]}
+        route={{
+          ...route,
+          pickup: { ...stop(station), horizon_minutes: 10 },
+          dropoff: { ...stop(destination), horizon_minutes: 20 },
+        }}
+        origin={station.id}
+        destination={destination.id}
+        walkLimit={5}
+        ageLimit={900}
+        selecting={null}
+        onStation={vi.fn()}
+        onPick={vi.fn()}
+      />,
+    );
+    const fill = (s: Station) =>
+      layers.markers.find((p) => p.center[0] === s.lat).pathOptions.fillColor;
+    expect(fill(nearStart)).toBe(COLORS.risk); // bikes at +10, not docks at +30
+    expect(fill(nearEnd)).toBe(COLORS.risk); // docks at +20
+    expect(fill(bystander)).toBe(COLORS.off); // out of reach: greyed
   });
 });

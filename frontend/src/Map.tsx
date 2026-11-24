@@ -2,7 +2,6 @@ import { useEffect, useMemo } from "react";
 import {
   MapContainer,
   TileLayer,
-  Circle,
   CircleMarker,
   Marker,
   Polyline,
@@ -38,28 +37,27 @@ export function walkMinutes(a: Point, b: Point) {
     Math.cos(lat1) * Math.cos(lat2) * Math.sin(((b.lon - a.lon) * r) / 2) ** 2;
   return (6371000 * 2 * Math.asin(Math.sqrt(Math.min(1, v)))) / WALK_SPEED / 60;
 }
-// The stations the planner may choose from at one end of the trip: usable for
-// that phase, fresh, within the walking limit, nearest three (ties by id).
-export function tripCandidates(
-  stations: Station[],
-  point: Point,
-  phase: "pickup" | "return",
-  limit: number,
-  ageLimit: number,
-) {
-  return stations
-    .filter((s) => s[phase] && s.data_age_seconds <= ageLimit)
-    .map((s) => ({ s, walk: walkMinutes(point, s) }))
-    .filter((c) => c.walk <= limit + 1e-9)
-    .sort((x, y) => x.walk - y.walk || x.s.id.localeCompare(y.s.id))
-    .slice(0, 3)
-    .map((c) => c.s);
+// The forecaster publishes +10 … +60 min; an arrival in between reads the nearest.
+function forecastAt(s: Station, horizon: number) {
+  const f = s.forecast ?? {};
+  if (f[horizon]) return f[horizon];
+  const keys = Object.keys(f).map(Number);
+  if (!keys.length) return undefined;
+  const near = keys.reduce((x, y) =>
+    Math.abs(y - horizon) < Math.abs(x - horizon) ? y : x,
+  );
+  return f[near];
 }
-export function stationRisk(s: Station, layer: MapLayer, ageLimit: number) {
+export function stationRisk(
+  s: Station,
+  layer: MapLayer,
+  ageLimit: number,
+  horizon = RISK_HORIZON,
+) {
   const usable = layer === "bike" ? s.pickup : s.return;
   if (!usable || s.data_age_seconds > ageLimit) return "off";
   if ((layer === "bike" ? s.bikes : s.docks) === 0) return "empty";
-  const f = s.forecast?.[RISK_HORIZON];
+  const f = forecastAt(s, horizon);
   const p = f ? (layer === "bike" ? f.p_bike : f.p_dock) : null;
   return p !== null && p !== undefined && p < RISK_THRESHOLD ? "risk" : "ok";
 }
@@ -87,23 +85,22 @@ const pinIcon = (kind: "pickup" | "return", label: string) =>
     iconSize: [14, 14],
     iconAnchor: [7, 7],
   });
-// Your start / destination. On a station it is a hollow frame around that
-// station's dot, so the station keeps showing its availability color.
-const endpointIcon = (kind: "start" | "end", framed: boolean) => {
-  const size = framed ? 24 : 14;
-  return divIcon({
-    className: `trip-endpoint endpoint-${kind}${framed ? " framed" : ""}`,
-    html: "",
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
+// Your start / destination: a text tag. On a station the tag sits on that
+// station's own dot, so it keeps showing its availability color; a free map
+// point also gets a small hollow mark.
+const endpointIcon = (kind: "start" | "end", onStation: boolean) =>
+  divIcon({
+    className: `trip-endpoint endpoint-${kind}${onStation ? " on-station" : ""}`,
+    html: `<span class="pin-label endpoint-label">${kind === "start" ? "Start" : "Destination"}</span>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
   });
-};
 // Built once: react-leaflet calls setIcon whenever the icon object changes.
 const ICONS = {
   start: endpointIcon("start", false),
-  startFramed: endpointIcon("start", true),
+  startOnStation: endpointIcon("start", true),
   end: endpointIcon("end", false),
-  endFramed: endpointIcon("end", true),
+  endOnStation: endpointIcon("end", true),
 };
 const samePlace = (a: Point, b: Point) =>
   Math.abs(a.lat - b.lat) < 1e-6 && Math.abs(a.lon - b.lon) < 1e-6;
@@ -206,25 +203,19 @@ export default function RideMap(props: Props) {
   const startAtPickup = !!(a && pickupStation && samePlace(a, pickupStation)),
     endAtReturn = !!(b && returnStation && samePlace(b, returnStation));
   const isStation = (p: Point) => stations.some((s) => samePlace(s, p));
-  // With a plan on screen, outline what the planner could choose from and fade the rest.
-  const candidates = new Set<string>();
-  if (route && props.walkLimit !== undefined) {
-    const ends: [Point | undefined, "pickup" | "return"][] = [
-      [route.pickup ? a : undefined, "pickup"],
-      [b, "return"],
-    ];
-    for (const [point, phase] of ends)
-      if (point)
-        for (const s of tripCandidates(
-          stations,
-          point,
-          phase,
-          props.walkLimit,
-          props.ageLimit,
-        ))
-          candidates.add(s.id);
-  }
-  const range = (props.walkLimit ?? 0) * 60 * WALK_SPEED;
+  // With a plan on screen, color each station for the end of the trip it can
+  // serve, at the time the rider would get there: bikes within walking reach of
+  // the start, open docks within reach of the destination. The rest are greyed.
+  const reach = props.walkLimit;
+  const tripRisk = (s: Station) => {
+    if (!route || reach === undefined)
+      return stationRisk(s, layer, props.ageLimit);
+    if (route.pickup && a && walkMinutes(a, s) <= reach)
+      return stationRisk(s, "bike", props.ageLimit, route.pickup.horizon_minutes);
+    if (b && walkMinutes(b, s) <= reach)
+      return stationRisk(s, "dock", props.ageLimit, route.dropoff.horizon_minutes);
+    return null;
+  };
   return (
     <MapContainer
       center={[41.89, -87.65]}
@@ -237,55 +228,21 @@ export default function RideMap(props: Props) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <Interaction {...props} />
-      {route && props.walkLimit !== undefined && (
-        <>
-          {route.pickup && a && (
-            <Circle
-              interactive={false}
-              center={[a.lat, a.lon]}
-              radius={range}
-              pathOptions={{
-                color: COLORS.origin,
-                weight: 1.5,
-                dashArray: "4 6",
-                fillColor: COLORS.origin,
-                fillOpacity: 0.05,
-              }}
-            />
-          )}
-          {b && (
-            <Circle
-              interactive={false}
-              center={[b.lat, b.lon]}
-              radius={range}
-              pathOptions={{
-                color: COLORS.destination,
-                weight: 1.5,
-                dashArray: "4 6",
-                fillColor: COLORS.destination,
-                fillOpacity: 0.06,
-              }}
-            />
-          )}
-        </>
-      )}
       {stations
         .filter((s) => s.id !== pickupId && s.id !== returnId)
         .map((s) => {
-          const candidate = candidates.has(s.id);
-          const faded = route && !candidate;
+          const risk = tripRisk(s);
           return (
             <CircleMarker
               key={s.id}
               center={[s.lat, s.lon]}
-              radius={candidate ? 8 : faded ? 6 : 7}
+              radius={risk ? 7 : 5}
               bubblingMouseEvents={false}
               pathOptions={{
-                color: candidate ? COLORS.chosen : "#fff",
-                weight: candidate ? 3 : faded ? 1.5 : 2,
-                opacity: faded ? 0.7 : 1,
-                fillColor: COLORS[stationRisk(s, layer, props.ageLimit)],
-                fillOpacity: faded ? 0.35 : 1,
+                color: "#fff",
+                weight: risk ? 2 : 1,
+                fillColor: COLORS[risk ?? "off"],
+                fillOpacity: risk ? 1 : 0.55,
               }}
               eventHandlers={{ click: click(s) }}
             />
@@ -340,7 +297,7 @@ export default function RideMap(props: Props) {
           interactive={false}
           position={[a.lat, a.lon]}
           zIndexOffset={500}
-          icon={isStation(a) ? ICONS.startFramed : ICONS.start}
+          icon={isStation(a) ? ICONS.startOnStation : ICONS.start}
         />
       )}
       {b && !endAtReturn && (
@@ -348,7 +305,7 @@ export default function RideMap(props: Props) {
           interactive={false}
           position={[b.lat, b.lon]}
           zIndexOffset={500}
-          icon={isStation(b) ? ICONS.endFramed : ICONS.end}
+          icon={isStation(b) ? ICONS.endOnStation : ICONS.end}
         />
       )}
       {pickupStation && (

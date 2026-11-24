@@ -446,42 +446,12 @@ h1 > span {
   background: #538b78;
   flex-shrink: 0;
 }
-.map-legend .legend-break {
-  width: 1px;
-  align-self: stretch;
-  background: var(--line);
+.map-legend .legend-off {
+  background: #aaa;
+  opacity: 0.55;
 }
-/* Legend glyphs drawn like the map markers they explain. */
-.map-legend i.glyph.endpoint-start {
-  width: 11px;
-  height: 11px;
-  background: #fff;
-  border: 2.5px solid var(--green);
-}
-.map-legend i.glyph.endpoint-end {
-  width: 11px;
-  height: 11px;
-  background: #fff;
-  border: 2.5px solid var(--orange);
-  border-radius: 2px;
-}
-.map-legend i.glyph.pin-pickup,
-.map-legend i.glyph.pin-return {
-  width: 10px;
-  height: 10px;
-  background: var(--green);
-}
-.map-legend i.glyph.pin-return {
-  border-radius: 1px;
-}
-.map-legend i.glyph.candidate {
-  width: 11px;
-  height: 11px;
-  background: #538b78;
-  border: 2.5px solid var(--green);
-}
-/* Map markers: circle = start side, square = end side (as in the form and
-   the journey timeline); filled = recommended station, hollow = your endpoint. */
+/* Map markers carry their own words, so the legend only explains colors.
+   Shapes follow the form: circle = start side, square = end side. */
 .trip-pin {
   box-sizing: border-box;
   background: var(--green);
@@ -491,7 +461,8 @@ h1 > span {
 .trip-pin.pin-return {
   border-radius: 2px;
 }
-.trip-pin .pin-label {
+.trip-pin .pin-label,
+.trip-endpoint .pin-label {
   position: absolute;
   top: 50%;
   left: 16px;
@@ -507,6 +478,13 @@ h1 > span {
   border: 1px solid #cfd8cd;
   border-radius: 3px;
 }
+.trip-endpoint .endpoint-label {
+  font-weight: 500;
+  color: #4f6153;
+  border-color: #e2e6dc;
+}
+/* A free map point gets a small hollow mark; on a station the station's own
+   dot is the mark and only the tag is added. */
 .trip-endpoint {
   box-sizing: border-box;
   background: #fff;
@@ -517,12 +495,9 @@ h1 > span {
   border-color: var(--orange);
   border-radius: 2px;
 }
-.trip-endpoint.framed {
+.trip-endpoint.on-station {
   background: transparent;
-  border-width: 2.5px;
-}
-.trip-endpoint.endpoint-end.framed {
-  border-radius: 4px;
+  border: 0;
 }
 .route-note {
   font-size: 9px;

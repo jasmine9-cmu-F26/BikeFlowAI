@@ -32,6 +32,7 @@ import {
   nextWalk,
   widerIsBetter,
 } from "./PlanNotices";
+import { routeOnMap } from "./routeOnMap";
 import {
   api,
   clock,
@@ -288,6 +289,9 @@ export default function App() {
   const [selectedAlternativeIndex, setSelectedAlternativeIndex] = useState<
     number | null
   >(null);
+  // The alternative under the pointer in the list, previewed on the map.
+  const [preview, setPreview] = useState<number | null>(null);
+  const mapRoute = routeOnMap(plan, shownRoute, preview);
   // Station details close like a map app's place panel: Esc or a click on the map.
   useEffect(() => {
     if (!selected) return;
@@ -363,6 +367,7 @@ export default function App() {
     setPlan(null);
     setShownRoute(null);
     setSelectedAlternativeIndex(null);
+    setPreview(null);
     setFailed([]);
     setDidPlan(false);
     setRouteOrigin(origin);
@@ -814,8 +819,8 @@ export default function App() {
             ageLimit={mode === "live" ? 300 : 900}
             walkLimit={walk}
             stations={snap?.stations || []}
-            route={shownRoute}
-            origin={shownRoute ? routeOrigin : origin}
+            route={mapRoute}
+            origin={mapRoute ? routeOrigin : origin}
             destination={destination}
             selecting={selecting}
             onPick={(p) => {
@@ -835,22 +840,25 @@ export default function App() {
                   ? "HISTORICAL REPLAY"
                   : "LIVE STATIONS"}
             </span>
-            <div className="layer-switch" role="group" aria-label="Map view">
-              <button
-                className={layer === "bike" ? "selected" : ""}
-                aria-pressed={layer === "bike"}
-                onClick={() => setLayer("bike")}
-              >
-                <Bike size={13} /> Pickup · bikes
-              </button>
-              <button
-                className={layer === "dock" ? "selected" : ""}
-                aria-pressed={layer === "dock"}
-                onClick={() => setLayer("dock")}
-              >
-                <Layers size={13} /> Return · docks
-              </button>
-            </div>
+            {/* With a trip shown, each end is already colored for what it needs. */}
+            {!mapRoute && (
+              <div className="layer-switch" role="group" aria-label="Map view">
+                <button
+                  className={layer === "bike" ? "selected" : ""}
+                  aria-pressed={layer === "bike"}
+                  onClick={() => setLayer("bike")}
+                >
+                  <Bike size={13} /> Pickup · bikes
+                </button>
+                <button
+                  className={layer === "dock" ? "selected" : ""}
+                  aria-pressed={layer === "dock"}
+                  onClick={() => setLayer("dock")}
+                >
+                  <Layers size={13} /> Return · docks
+                </button>
+              </div>
+            )}
             <button
               className="map-refresh"
               aria-label="Refresh station data"
@@ -930,46 +938,34 @@ export default function App() {
             </div>
           )}
           <div className="map-bottom">
-            <div className="map-legend" aria-label="Map legend">
-              <span>
-                <i className="glyph endpoint-start" />
-                Your start
-              </span>
-              <span>
-                <i className="glyph endpoint-end" />
-                Destination
-              </span>
-              {shownRoute && (
-                <>
-                  {shownRoute.pickup && (
-                    <span>
-                      <i className="glyph pin-pickup" />
-                      Pick up here
-                    </span>
-                  )}
-                  <span>
-                    <i className="glyph pin-return" />
-                    Return here
-                  </span>
-                  <span>
-                    <i className="glyph candidate" />
-                    Considered · within {walk} min walk
-                  </span>
-                </>
-              )}
-              <span className="legend-break" />
+            {/* Markers are labelled on the map; the legend only explains colors. */}
+            <div className="map-legend" aria-label="Map colors">
               <span>
                 <i style={{ background: COLORS.ok }} />
-                {layer === "bike" ? "Bikes likely" : "Open dock likely"}
+                {mapRoute
+                  ? "Likely when you get there"
+                  : `${layer === "bike" ? "Bikes" : "Open docks"} likely in ${RISK_HORIZON} min`}
               </span>
               <span>
                 <i style={{ background: COLORS.risk }} />
-                At risk in {RISK_HORIZON} min
+                {mapRoute
+                  ? "Might run out by then"
+                  : `Might run out in ${RISK_HORIZON} min`}
               </span>
               <span>
                 <i style={{ background: COLORS.empty }} />
-                {layer === "bike" ? "Empty now" : "Full now"}
+                {mapRoute
+                  ? "Empty or full now"
+                  : layer === "bike"
+                    ? "Empty now"
+                    : "Full now"}
               </span>
+              {mapRoute && (
+                <span>
+                  <i className="legend-off" />
+                  Beyond your {walk}-min walk
+                </span>
+              )}
             </div>
             <span className="route-note">
               Route lines are indicative · not turn-by-turn directions
@@ -1143,9 +1139,14 @@ export default function App() {
                         <button
                           className="alternative"
                           key={i}
+                          onMouseEnter={() => setPreview(i)}
+                          onMouseLeave={() => setPreview(null)}
+                          onFocus={() => setPreview(i)}
+                          onBlur={() => setPreview(null)}
                           onClick={() => {
                             setSelectedAlternativeIndex(i);
                             setShownRoute(r);
+                            setPreview(null);
                           }}
                         >
                           <div>
