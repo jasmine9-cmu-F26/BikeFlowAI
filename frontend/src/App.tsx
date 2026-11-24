@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   ArrowUpDown,
@@ -26,12 +26,14 @@ import Onboarding, {
 } from "./Onboarding";
 import {
   MethodNotice,
-  WALK_CHOICES,
-  WalkSuggestion,
+  WalkChoice,
   needsWiderWalk,
   nextWalk,
   widerIsBetter,
 } from "./PlanNotices";
+import { routeOnMap } from "./routeOnMap";
+import { debounced } from "./autoReplan";
+import { revealAttempts, type Outcome } from "./reveal";
 import {
   api,
   clock,
@@ -92,12 +94,6 @@ const STORIES: Story[] = [
     layer: "bike",
   },
 ];
-type Outcome = {
-  station_id: string;
-  phase: string;
-  observed: number | null;
-  status: string;
-};
 // Never round a probability up to a certainty.
 const pct = (p: number | null) =>
   p === null
@@ -288,14 +284,34 @@ export default function App() {
   const [selectedAlternativeIndex, setSelectedAlternativeIndex] = useState<
     number | null
   >(null);
+  // The alternative under the pointer in the list, previewed on the map.
+  const [preview, setPreview] = useState<number | null>(null);
+  const mapRoute = routeOnMap(plan, shownRoute, preview);
+  // Station details close like a map app's place panel: Esc or a click on the map.
+  useEffect(() => {
+    if (!selected) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelected(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selected]);
   const [reload, setReload] = useState(0);
   const [failed, setFailed] = useState<string[]>([]);
+  // Endpoints of the plan on screen; the form may already hold new ones while
+  // that plan is being replaced.
   const [routeOrigin, setRouteOrigin] = useState<Endpoint>(origin);
+  const [routeDestination, setRouteDestination] =
+    useState<Endpoint>(destination);
   const [revealed, setRevealed] = useState<{
-    outcomes: Outcome[];
-    baseline?: Outcome;
+    route: Route;
+    b1Route: Route | null;
+    compared: boolean;
+    ours: Outcome[];
+    b1: Outcome[];
     warning: string;
   } | null>(null);
+  const [revealing, setRevealing] = useState(false);
   const [layer, setLayer] = useState<MapLayer>("bike");
   const [story, setStory] = useState("");
   const [guide, setGuide] = useState(false);
@@ -348,18 +364,30 @@ export default function App() {
       });
     return () => ctrl.abort();
   }, [mode, when, scenario, reload]);
+  // Latest submit for the debounced auto replan, so it reads the newest inputs.
+  const submitRef = useRef<() => void>(() => {});
+  const auto = useMemo(() => debounced(() => submitRef.current()), []);
+  useEffect(() => () => auto.cancel(), [auto]);
   useEffect(() => {
+    // Facts about the old plan stop being true as soon as the trip changes.
+    setRevealed(null);
+    setBaseline(null);
+    setWider(null);
+    setPreview(null);
+    // With a plan on screen, replan in place: the old result stays until the
+    // new one arrives. A date being typed is skipped until it is complete.
+    if (didPlan) {
+      if (mode === "live" || when) auto.schedule();
+      return;
+    }
     requestRef.current?.abort();
     setLoading(false);
     setPlan(null);
     setShownRoute(null);
     setSelectedAlternativeIndex(null);
     setFailed([]);
-    setDidPlan(false);
     setRouteOrigin(origin);
-    setRevealed(null);
-    setBaseline(null);
-    setWider(null);
+    setRouteDestination(destination);
   }, [mode, when, offset, walk, method, origin, destination, scenario, reload]);
   useEffect(() => setRevealed(null), [shownRoute]);
   useEffect(() => () => requestRef.current?.abort(), []);
@@ -420,6 +448,7 @@ export default function App() {
     };
   };
   async function submit() {
+    auto.cancel();
     requestRef.current?.abort();
     const ctrl = new AbortController();
     requestRef.current = ctrl;
@@ -430,9 +459,11 @@ export default function App() {
     setRevealed(null);
     setBaseline(null);
     setWider(null);
-    setRouteOrigin(origin);
     try {
       const p = await api<Plan>("/plan", body(), ctrl.signal);
+      // The map's endpoints switch together with the route they belong to.
+      setRouteOrigin(origin);
+      setRouteDestination(destination);
       setPlan(p);
       setShownRoute(p.primary);
       setSelectedAlternativeIndex(null);
@@ -458,6 +489,7 @@ export default function App() {
       if (!ctrl.signal.aborted) setLoading(false);
     }
   }
+  submitRef.current = submit;
   async function replan(phase: "pickup" | "return") {
     if (!shownRoute) return;
     const station = phase === "pickup" ? shownRoute.pickup : shownRoute.dropoff;
@@ -505,48 +537,45 @@ export default function App() {
       if (!ctrl.signal.aborted) setLoading(false);
     }
   }
+  // One click: our trip and the current-count baseline (B1) checked together
+  // against what the 2021 data recorded at each arrival.
   async function reveal() {
     if (!plan || !shownRoute) return;
-    const attempts = [
-      ...(shownRoute.pickup
-        ? [
-            {
-              station_id: shownRoute.pickup.id,
-              horizon_minutes: shownRoute.pickup.horizon_minutes,
-              phase: "pickup",
-            },
-          ]
-        : []),
-      {
-        station_id: shownRoute.dropoff.id,
-        horizon_minutes: shownRoute.dropoff.horizon_minutes,
-        phase: "return",
-      },
-    ];
+    const route = shownRoute;
+    setRevealing(true);
     try {
       setError("");
-      const main = await api<{ outcomes: Outcome[]; warning: string }>(
-        "/replay/reveal",
-        { historical_timestamp: plan.decision_time, attempts },
-      );
-      const b1 = baseline?.primary?.dropoff;
-      let baselineOutcome: Outcome | undefined;
-      if (b1 && b1.id !== shownRoute.dropoff.id) {
-        const r = await api<{ outcomes: Outcome[] }>("/replay/reveal", {
-          historical_timestamp: plan.decision_time,
-          attempts: [
-            {
-              station_id: b1.id,
-              horizon_minutes: b1.horizon_minutes,
-              phase: "return",
-            },
-          ],
-        });
-        baselineOutcome = r.outcomes[0];
+      let b1Plan = baseline;
+      if (!b1Plan && plan.requested_method !== "B1") {
+        b1Plan = await api<Plan>("/plan", { ...body(), method: "B1" });
+        setBaseline(b1Plan);
       }
-      setRevealed({ ...main, baseline: baselineOutcome });
+      const b1Route =
+        plan.requested_method === "B1" ? null : (b1Plan?.primary ?? null);
+      const batches = revealAttempts(route, b1Route);
+      const check = (attempts: typeof batches.ours) =>
+        attempts.length
+          ? api<{ outcomes: Outcome[]; warning: string }>("/replay/reveal", {
+              historical_timestamp: plan.decision_time,
+              attempts,
+            })
+          : Promise.resolve({ outcomes: [], warning: "" });
+      const [ours, b1] = await Promise.all([
+        check(batches.ours),
+        check(batches.b1),
+      ]);
+      setRevealed({
+        route,
+        b1Route,
+        compared: plan.requested_method !== "B1",
+        warning: ours.warning,
+        ours: ours.outcomes,
+        b1: b1.outcomes,
+      });
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setRevealing(false);
     }
   }
   function endpointInput(
@@ -728,29 +757,19 @@ export default function App() {
                 </select>
               </label>
               <label className="field-label">
-                Extra walking
-                <select value={walk} onChange={(e) => setWalk(+e.target.value)}>
-                  {WALK_CHOICES.map((n) => (
-                    <option key={n} value={n}>
-                      {n} min max
+                Planning method
+                <select
+                  value={method}
+                  onChange={(e) => setMethod(e.target.value as Method)}
+                >
+                  {Object.entries(methods).map(([k, v]) => (
+                    <option key={k} value={k}>
+                      {k} · {v}
                     </option>
                   ))}
                 </select>
               </label>
             </div>
-            <label className="field-label">
-              Planning method
-              <select
-                value={method}
-                onChange={(e) => setMethod(e.target.value as Method)}
-              >
-                {Object.entries(methods).map(([k, v]) => (
-                  <option key={k} value={k}>
-                    {k} · {v}
-                  </option>
-                ))}
-              </select>
-            </label>
             <button
               className="primary-btn"
               disabled={loading || loadingMap || !stations.length}
@@ -768,13 +787,6 @@ export default function App() {
               )}
             </button>
           </form>
-          <div className="walk-note">
-            <Footprints size={16} />
-            <span>
-              Limit applies at each end. One RL policy adapts to 5, 10 or 15
-              min; we suggest walking more only when it clearly helps.
-            </span>
-          </div>
           {mode === "fixture" && (
             <div className="demo-controls">
               <label className="field-label">
@@ -803,10 +815,16 @@ export default function App() {
           <RideMap
             layer={layer}
             ageLimit={mode === "live" ? 300 : 900}
+            walkLimit={walk}
             stations={snap?.stations || []}
-            route={shownRoute}
-            origin={shownRoute ? routeOrigin : origin}
-            destination={destination}
+            route={mapRoute}
+            frame={
+              plan && tab === "alternatives" && selectedAlternativeIndex === null
+                ? [plan.primary, ...plan.backups].filter((r): r is Route => !!r)
+                : undefined
+            }
+            origin={mapRoute ? routeOrigin : origin}
+            destination={mapRoute ? routeDestination : destination}
             selecting={selecting}
             onPick={(p) => {
               if (selecting === "origin") setOrigin(p);
@@ -814,6 +832,10 @@ export default function App() {
               setSelecting(null);
             }}
             onStation={setSelected}
+            onBackground={() => setSelected(null)}
+            outcomes={
+              revealed && revealed.route === mapRoute ? revealed : undefined
+            }
           />
           <div className="map-top">
             <span className="map-chip">
@@ -824,28 +846,29 @@ export default function App() {
                   ? "HISTORICAL REPLAY"
                   : "LIVE STATIONS"}
             </span>
-            <div className="layer-switch" role="group" aria-label="Map view">
-              <button
-                className={layer === "bike" ? "selected" : ""}
-                aria-pressed={layer === "bike"}
-                onClick={() => setLayer("bike")}
-              >
-                <Bike size={13} /> Pickup · bikes
-              </button>
-              <button
-                className={layer === "dock" ? "selected" : ""}
-                aria-pressed={layer === "dock"}
-                onClick={() => setLayer("dock")}
-              >
-                <Layers size={13} /> Return · docks
-              </button>
-            </div>
+            {/* With a trip shown, each end is already colored for what it needs. */}
+            {!mapRoute && (
+              <div className="layer-switch" role="group" aria-label="Map view">
+                <button
+                  className={layer === "bike" ? "selected" : ""}
+                  aria-pressed={layer === "bike"}
+                  onClick={() => setLayer("bike")}
+                >
+                  <Bike size={13} /> Pickup · bikes
+                </button>
+                <button
+                  className={layer === "dock" ? "selected" : ""}
+                  aria-pressed={layer === "dock"}
+                  onClick={() => setLayer("dock")}
+                >
+                  <Layers size={13} /> Return · docks
+                </button>
+              </div>
+            )}
             <button
               className="map-refresh"
               aria-label="Refresh station data"
               onClick={() => {
-                setPlan(null);
-                setShownRoute(null);
                 setReload((r) => r + 1);
               }}
             >
@@ -919,27 +942,35 @@ export default function App() {
             </div>
           )}
           <div className="map-bottom">
-            <div className="map-legend">
+            {/* Markers are labelled on the map; the legend only explains colors. */}
+            <div className="map-legend" aria-label="Map colors">
               <span>
                 <i style={{ background: COLORS.ok }} />
-                {layer === "bike" ? "Bikes likely" : "Open dock likely"}
+                {mapRoute
+                  ? "Likely when you get there"
+                  : `${layer === "bike" ? "Bikes" : "Open docks"} likely in ${RISK_HORIZON} min`}
               </span>
               <span>
                 <i style={{ background: COLORS.risk }} />
-                At risk in {RISK_HORIZON} min
+                {mapRoute
+                  ? "Might run out by then"
+                  : `Might run out in ${RISK_HORIZON} min`}
               </span>
               <span>
                 <i style={{ background: COLORS.empty }} />
-                {layer === "bike" ? "Empty now" : "Full now"}
+                {mapRoute
+                  ? "Empty or full now"
+                  : layer === "bike"
+                    ? "Empty now"
+                    : "Full now"}
               </span>
-              <span>
-                <i style={{ background: COLORS.chosen }} />
-                Recommended
-              </span>
+              {mapRoute && (
+                <span>
+                  <i className="legend-off" />
+                  Beyond your {walk}-min walk
+                </span>
+              )}
             </div>
-            <span className="route-note">
-              Route lines are indicative · not turn-by-turn directions
-            </span>
           </div>
         </section>
         <aside
@@ -993,14 +1024,27 @@ export default function App() {
               </button>
             </div>
           )}
-          {loading && (
+          {loading && !plan && (
             <div className="loading-state">
               <RefreshCw size={24} className="spin" />
               <p>Checking stations and arrival horizons…</p>
             </div>
           )}
-          {plan && !loading && (
-            <>
+          {plan && (
+            <WalkChoice
+              walk={walk}
+              current={plan}
+              wider={loading || failed.length ? null : wider}
+              onChange={setWalk}
+            />
+          )}
+          {loading && plan && (
+            <p className="updating-note" role="status">
+              <RefreshCw size={13} className="spin" /> Updating for your changes…
+            </p>
+          )}
+          {plan && (
+            <div className={loading ? "plan-view stale" : "plan-view"} aria-busy={loading}>
               <div className="result-tabs">
                 <button
                   className={tab === "recommended" ? "active" : ""}
@@ -1030,34 +1074,12 @@ export default function App() {
                   <p>{plan.no_plan_reason}</p>
                   <p>
                     Try another endpoint, a shorter departure offset, or a
-                    larger walking limit.
+                    longer walk above.
                   </p>
-                  {wider && (
-                    <WalkSuggestion
-                      current={plan}
-                      wider={wider.plan}
-                      walk={wider.walk}
-                      onUse={() => {
-                        setWalk(wider.walk);
-                        setPendingRun(true);
-                      }}
-                    />
-                  )}
                 </div>
               ) : tab === "recommended" && shownRoute ? (
                 <>
                   <MethodNotice plan={plan} walk={walk} />
-                  {wider && !failed.length && (
-                    <WalkSuggestion
-                      current={plan}
-                      wider={wider.plan}
-                      walk={wider.walk}
-                      onUse={() => {
-                        setWalk(wider.walk);
-                        setPendingRun(true);
-                      }}
-                    />
-                  )}
                   <DockInsight
                     route={shownRoute}
                     plan={plan}
@@ -1109,9 +1131,14 @@ export default function App() {
                         <button
                           className="alternative"
                           key={i}
+                          onMouseEnter={() => setPreview(i)}
+                          onMouseLeave={() => setPreview(null)}
+                          onFocus={() => setPreview(i)}
+                          onBlur={() => setPreview(null)}
                           onClick={() => {
                             setSelectedAlternativeIndex(i);
                             setShownRoute(r);
+                            setPreview(null);
                           }}
                         >
                           <div>
@@ -1144,24 +1171,48 @@ export default function App() {
                 (tab === "recommended" ||
                   selectedAlternativeIndex !== null) && (
                   <div className="failure-controls">
-                    <button onClick={reveal}>
-                      Reveal historical outcomes <ChevronRight size={14} />
-                    </button>
+                    {!revealed && (
+                      <button onClick={reveal} disabled={revealing}>
+                        {revealing
+                          ? "Checking the 2021 records…"
+                          : "Reveal historical outcomes"}{" "}
+                        <ChevronRight size={14} />
+                      </button>
+                    )}
                     {revealed && (
                       <>
+                        <h4 className="outcomes-title">What happened</h4>
                         <ul className="outcomes">
-                          {revealed.outcomes.map((o, i) => (
+                          {revealed.ours.map((o, i) => (
                             <li key={i} className={o.status}>
                               {outcomeText(o)}
                             </li>
                           ))}
-                          {revealed.baseline && (
-                            <li className={revealed.baseline.status}>
-                              B1 would have used ·{" "}
-                              {outcomeText(revealed.baseline)}
-                            </li>
-                          )}
                         </ul>
+                        {revealed.compared && (
+                          <>
+                            <h4 className="outcomes-title">
+                              Current-count app (B1)
+                            </h4>
+                            {!revealed.b1Route ? (
+                              <p className="outcomes-same">
+                                Found no ride within your walking limit.
+                              </p>
+                            ) : revealed.b1.length ? (
+                              <ul className="outcomes">
+                                {revealed.b1.map((o, i) => (
+                                  <li key={i} className={o.status}>
+                                    {outcomeText(o)}
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="outcomes-same">
+                                Would have picked the same stations.
+                              </p>
+                            )}
+                          </>
+                        )}
                         <p>{revealed.warning}</p>
                       </>
                     )}
@@ -1194,7 +1245,7 @@ export default function App() {
                   <dd>{plan.request_id}</dd>
                 </dl>
               </details>
-            </>
+            </div>
           )}
           {!didPlan &&
             snap?.warnings.map((w, i) => (

@@ -1,15 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import {
   MapContainer,
   TileLayer,
   CircleMarker,
-  Popup,
+  Marker,
   Polyline,
   useMap,
   useMapEvents,
 } from "react-leaflet";
-import type { LatLngBoundsExpression } from "leaflet";
+import { divIcon } from "leaflet";
+import type {
+  FitBoundsOptions,
+  LatLngBoundsExpression,
+  Map as LeafletMap,
+} from "leaflet";
 import type { Endpoint, Route, Station, Point } from "./api";
+import { outcomeNote, type Outcome } from "./reveal";
 export type MapLayer = "bike" | "dock";
 // Stations are colored by what matters for the chosen trip end: bikes for
 // pickup, open docks for return, using the calibrated +30 min forecast.
@@ -18,51 +24,274 @@ export const RISK_THRESHOLD = 0.8;
 export const COLORS = {
   ok: "#538b78",
   risk: "#d9b14e",
-  empty: "#db9157",
+  // Red, not orange: orange marks the destination everywhere in the app.
+  empty: "#c4513f",
   off: "#aaa",
   chosen: "#174e40",
+  origin: "#174e40",
+  destination: "#cb8253",
 };
-export function stationRisk(s: Station, layer: MapLayer, ageLimit: number) {
+// Same walking model as backend/core.py `candidates`: straight line at 1.3 m/s.
+export const WALK_SPEED = 1.3;
+export function walkMinutes(a: Point, b: Point) {
+  const r = Math.PI / 180,
+    lat1 = a.lat * r,
+    lat2 = b.lat * r;
+  const v =
+    Math.sin((lat2 - lat1) / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(((b.lon - a.lon) * r) / 2) ** 2;
+  return (6371000 * 2 * Math.asin(Math.sqrt(Math.min(1, v)))) / WALK_SPEED / 60;
+}
+// The forecaster publishes +10 … +60 min; an arrival in between reads the nearest.
+function forecastAt(s: Station, horizon: number) {
+  const f = s.forecast ?? {};
+  if (f[horizon]) return f[horizon];
+  const keys = Object.keys(f).map(Number);
+  if (!keys.length) return undefined;
+  const near = keys.reduce((x, y) =>
+    Math.abs(y - horizon) < Math.abs(x - horizon) ? y : x,
+  );
+  return f[near];
+}
+export function stationRisk(
+  s: Station,
+  layer: MapLayer,
+  ageLimit: number,
+  horizon = RISK_HORIZON,
+) {
   const usable = layer === "bike" ? s.pickup : s.return;
   if (!usable || s.data_age_seconds > ageLimit) return "off";
   if ((layer === "bike" ? s.bikes : s.docks) === 0) return "empty";
-  const f = s.forecast?.[RISK_HORIZON];
+  const f = forecastAt(s, horizon);
   const p = f ? (layer === "bike" ? f.p_bike : f.p_dock) : null;
   return p !== null && p !== undefined && p < RISK_THRESHOLD ? "risk" : "ok";
+}
+// Recommended stations: a plain dot (pickup) or square (return), as in the
+// form, with a text tag that says what to do there and what is there now.
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+export function pinLabel(
+  kind: "pickup" | "return",
+  s: Station,
+  atEnd: boolean,
+  waitMinutes = 0,
+) {
+  if (kind === "return")
+    return `Return${atEnd ? " at destination" : ""} · ${plural(s.docks, "dock")}`;
+  // A plan that waits at an empty dock must not read like "pick up · 0 bikes".
+  const wait = Math.round(waitMinutes);
+  return wait > 0
+    ? `Wait ${wait} min, then pick up${atEnd ? " at start" : ""} · ${plural(s.bikes, "bike")} now`
+    : `Pick up${atEnd ? " at start" : ""} · ${plural(s.bikes, "bike")}`;
+}
+// The fill follows the legend like every other station (bikes at pickup, docks
+// at return, at arrival time); shape, size and the tag mark it as the pick.
+const pinIcon = (
+  kind: "pickup" | "return",
+  label: string,
+  status: keyof typeof COLORS,
+  outcome?: Outcome,
+  extraClass = "",
+) =>
+  divIcon({
+    className: `trip-pin pin-${kind} status-${status}${extraClass}`,
+    html:
+      `<span class="pin-label">${label}` +
+      (outcome
+        ? `<small class="pin-outcome outcome-${outcome.status}">${outcomeNote(outcome)}</small>`
+        : "") +
+      `</span>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
+  });
+// After a reveal: where the current-count baseline would have gone instead,
+// colored by what was really there.
+const OUTCOME_STATUS = {
+  available: "ok",
+  unavailable: "empty",
+  unobservable: "off",
+} as const;
+function BaselinePin({ s, outcome }: { s: Station; outcome: Outcome }) {
+  const icon = useMemo(
+    () =>
+      pinIcon(
+        outcome.phase,
+        `B1 would ${outcome.phase === "pickup" ? "pick up" : "return"} here`,
+        OUTCOME_STATUS[outcome.status],
+        outcome,
+        " b1-pin",
+      ),
+    [s.id, outcome],
+  );
+  return (
+    <Marker
+      position={[s.lat, s.lon]}
+      icon={icon}
+      interactive={false}
+      zIndexOffset={800}
+    />
+  );
+}
+// Your start / destination: a text tag. On a station the tag sits on that
+// station's own dot, so it keeps showing its availability color; a free map
+// point also gets a small hollow mark.
+const endpointIcon = (kind: "start" | "end", onStation: boolean) =>
+  divIcon({
+    className: `trip-endpoint endpoint-${kind}${onStation ? " on-station" : ""}`,
+    html: `<span class="pin-label endpoint-label">${kind === "start" ? "Start" : "Destination"}</span>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
+  });
+// Built once: react-leaflet calls setIcon whenever the icon object changes.
+const ICONS = {
+  start: endpointIcon("start", false),
+  startOnStation: endpointIcon("start", true),
+  end: endpointIcon("end", false),
+  endOnStation: endpointIcon("end", true),
+};
+const samePlace = (a: Point, b: Point) =>
+  Math.abs(a.lat - b.lat) < 1e-6 && Math.abs(a.lon - b.lon) < 1e-6;
+function TripPin({
+  kind,
+  s,
+  atEnd,
+  waitMinutes,
+  status,
+  outcome,
+  onClick,
+}: {
+  kind: "pickup" | "return";
+  s: Station;
+  atEnd: boolean;
+  waitMinutes?: number;
+  status: keyof typeof COLORS;
+  outcome?: Outcome;
+  onClick: () => void;
+}) {
+  const label = pinLabel(kind, s, atEnd, waitMinutes);
+  const icon = useMemo(
+    () => pinIcon(kind, label, status, outcome),
+    [kind, label, status, outcome],
+  );
+  return (
+    <Marker
+      position={[s.lat, s.lon]}
+      icon={icon}
+      zIndexOffset={1000}
+      bubblingMouseEvents={false}
+      eventHandlers={{ click: onClick }}
+    />
+  );
+}
+// Every station of the given routes plus the trip's endpoints, once each.
+export function tripBounds(routes: Route[], ends: (Point | undefined)[]) {
+  const seen = new Map<string, [number, number]>();
+  for (const p of [...routes.flatMap((r) => [r.pickup, r.dropoff]), ...ends])
+    if (p) seen.set(`${p.lat},${p.lon}`, [p.lat, p.lon]);
+  return [...seen.values()];
+}
+// What the view must show: the routes, the endpoints, and every station within
+// walking reach of either end (the pickup end only when a route picks up), so
+// no station the trip colors ends up off screen or under the legend.
+export function framePoints(
+  routes: Route[],
+  [start, end]: (Point | undefined)[],
+  stations: Station[],
+  reach?: number,
+) {
+  const pickup = routes.some((r) => r.pickup);
+  const near = (p: Point | undefined, s: Station) =>
+    !!p && reach !== undefined && walkMinutes(p, s) <= reach;
+  const nearby = stations.filter(
+    (s) => (pickup && near(start, s)) || near(end, s),
+  );
+  return tripBounds(routes, [start, end, ...nearby]);
+}
+// Leaflet drops a fitBounds that arrives while a zoom animation is running
+// (Map._tryAnimatedZoom returns early), which left the view on the previous
+// trip when a new plan landed right after the station snapshot. Wait for the
+// zoom to end and apply only the latest request.
+const pendingFit = new WeakMap<LeafletMap, () => void>();
+export function fitWhenIdle(
+  map: LeafletMap,
+  points: LatLngBoundsExpression,
+  options: FitBoundsOptions,
+) {
+  const fit = () => map.fitBounds(points, options);
+  if (!(map as unknown as { _animatingZoom?: boolean })._animatingZoom)
+    return void fit();
+  const waiting = pendingFit.has(map);
+  pendingFit.set(map, fit);
+  if (!waiting)
+    map.once("zoomend", () => {
+      const latest = pendingFit.get(map);
+      pendingFit.delete(map);
+      latest?.();
+    });
 }
 type Props = {
   layer?: MapLayer;
   ageLimit: number;
+  // The walking limit the shown plan used; stations beyond it are greyed.
+  walkLimit?: number;
   stations: Station[];
   route: Route | null;
+  // Routes the view should frame; defaults to the shown route. Framing all of
+  // a plan's options keeps the map still while one of them is previewed.
+  frame?: Route[];
   origin: Endpoint;
   destination: Endpoint;
   selecting: "origin" | "destination" | null;
   onPick: (p: Point) => void;
   onStation: (s: Station) => void;
+  // A click on the map itself (not a station, not while picking): closes details.
+  onBackground?: () => void;
+  // Revealed outcomes of the shown route, and of the B1 baseline's stops where
+  // it chose differently.
+  outcomes?: { ours: Outcome[]; b1: Outcome[] };
 };
-function Interaction({ stations, route, selecting, onPick }: Props) {
+function Interaction({
+  stations,
+  route,
+  origin,
+  destination,
+  frame,
+  walkLimit,
+  selecting,
+  onPick,
+  onBackground,
+}: Props) {
   const map = useMap();
   useMapEvents({
     click: (e) => {
       if (selecting) onPick({ lat: e.latlng.lat, lon: e.latlng.lng });
+      else onBackground?.();
     },
   });
+  // Frame the whole trip, endpoints included, clear of the top chips. Keyed on
+  // the points themselves, so a re-render that shows another route inside the
+  // same frame leaves the view alone.
+  const ends = [origin, destination].map((v) =>
+    typeof v === "string" ? stations.find((s) => s.id === v) : v,
+  );
+  const routes = frame?.length ? frame : route ? [route] : [];
+  const points = routes.length
+    ? framePoints(routes, ends, stations, walkLimit)
+    : [];
+  const key = JSON.stringify(points);
   useEffect(() => {
-    if (route) {
-      const stops = [route.pickup, route.dropoff].filter(
-        Boolean,
-      ) as NonNullable<Route["pickup"]>[];
-      map.fitBounds(
-        stops.map((s) => [s.lat, s.lon]) as LatLngBoundsExpression,
-        { padding: [100, 100], maxZoom: 14 },
-      );
-    } else if (stations.length)
-      map.fitBounds(
+    if (points.length)
+      fitWhenIdle(map, points as LatLngBoundsExpression, {
+        paddingTopLeft: [70, 100],
+        paddingBottomRight: [70, 50],
+        maxZoom: 15,
+      });
+    else if (stations.length)
+      fitWhenIdle(
+        map,
         stations.map((s) => [s.lat, s.lon]) as LatLngBoundsExpression,
         { padding: [35, 35], maxZoom: 13 },
       );
-  }, [route, stations, map]);
+  }, [key, stations.length, map]);
   return null;
 }
 export default function RideMap(props: Props) {
@@ -72,6 +301,30 @@ export default function RideMap(props: Props) {
     typeof v === "string" ? stations.find((s) => s.id === v) : v;
   const a = locate(origin),
     b = locate(destination);
+  const click = (s: Station) => () => {
+    if (selecting) props.onPick({ lat: s.lat, lon: s.lon });
+    else onStation(s);
+  };
+  const pickupId = route?.pickup?.id,
+    returnId = route?.dropoff.id;
+  const pickupStation = stations.find((s) => s.id === pickupId),
+    returnStation = stations.find((s) => s.id === returnId);
+  const startAtPickup = !!(a && pickupStation && samePlace(a, pickupStation)),
+    endAtReturn = !!(b && returnStation && samePlace(b, returnStation));
+  const isStation = (p: Point) => stations.some((s) => samePlace(s, p));
+  // With a plan on screen, color each station for the end of the trip it can
+  // serve, at the time the rider would get there: bikes within walking reach of
+  // the start, open docks within reach of the destination. The rest are greyed.
+  const reach = props.walkLimit;
+  const tripRisk = (s: Station) => {
+    if (!route || reach === undefined)
+      return stationRisk(s, layer, props.ageLimit);
+    if (route.pickup && a && walkMinutes(a, s) <= reach)
+      return stationRisk(s, "bike", props.ageLimit, route.pickup.horizon_minutes);
+    if (b && walkMinutes(b, s) <= reach)
+      return stationRisk(s, "dock", props.ageLimit, route.dropoff.horizon_minutes);
+    return null;
+  };
   return (
     <MapContainer
       center={[41.89, -87.65]}
@@ -84,47 +337,26 @@ export default function RideMap(props: Props) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <Interaction {...props} />
-      {stations.map((s) => {
-        const chosen = s.id === route?.pickup?.id || s.id === route?.dropoff.id;
-        return (
-          <CircleMarker
-            key={s.id}
-            center={[s.lat, s.lon]}
-            radius={chosen ? 11 : 7}
-            bubblingMouseEvents={false}
-            pathOptions={{
-              color: chosen ? "#fff" : "#fff",
-              weight: 2,
-              fillColor: chosen
-                ? COLORS.chosen
-                : COLORS[stationRisk(s, layer, props.ageLimit)],
-              fillOpacity: 1,
-            }}
-            eventHandlers={{
-              click: () => {
-                if (selecting) props.onPick({ lat: s.lat, lon: s.lon });
-                else onStation(s);
-              },
-            }}
-          >
-            <Popup>
-              <strong>{s.name}</strong>
-              <br />
-              {s.bikes} bikes · {s.docks} docks
-              <br />
-              {(() => {
-                const f = s.forecast?.[RISK_HORIZON];
-                const p = f ? (layer === "bike" ? f.p_bike : f.p_dock) : null;
-                return p === null || p === undefined
-                  ? null
-                  : `${layer === "bike" ? "Bike" : "Open dock"} in ${RISK_HORIZON} min: ${Math.round(p * 100)}%`;
-              })()}
-              <br />
-              Snapshot {s.data_age_seconds}s old
-            </Popup>
-          </CircleMarker>
-        );
-      })}
+      {stations
+        .filter((s) => s.id !== pickupId && s.id !== returnId)
+        .map((s) => {
+          const risk = tripRisk(s);
+          return (
+            <CircleMarker
+              key={s.id}
+              center={[s.lat, s.lon]}
+              radius={risk ? 7 : 5}
+              bubblingMouseEvents={false}
+              pathOptions={{
+                color: "#fff",
+                weight: risk ? 2 : 1,
+                fillColor: COLORS[risk ?? "off"],
+                fillOpacity: risk ? 1 : 0.55,
+              }}
+              eventHandlers={{ click: click(s) }}
+            />
+          );
+        })}
       {route && (
         <>
           {route.pickup && a && (
@@ -169,23 +401,60 @@ export default function RideMap(props: Props) {
           )}
         </>
       )}
-      {[a, b].map(
-        (p, i) =>
-          p && (
-            <CircleMarker
-              key={i}
-              interactive={false}
-              center={[p.lat, p.lon]}
-              radius={7}
-              pathOptions={{
-                color: "#fff",
-                weight: 3,
-                fillColor: i ? "#d78b54" : "#343e38",
-                fillOpacity: 1,
-              }}
-            />
-          ),
+      {a && !startAtPickup && (
+        <Marker
+          interactive={false}
+          position={[a.lat, a.lon]}
+          zIndexOffset={500}
+          icon={isStation(a) ? ICONS.startOnStation : ICONS.start}
+        />
       )}
+      {b && !endAtReturn && (
+        <Marker
+          interactive={false}
+          position={[b.lat, b.lon]}
+          zIndexOffset={500}
+          icon={isStation(b) ? ICONS.endOnStation : ICONS.end}
+        />
+      )}
+      {pickupStation && (
+        <TripPin
+          kind="pickup"
+          s={pickupStation}
+          atEnd={startAtPickup}
+          waitMinutes={route?.wait_minutes}
+          status={stationRisk(
+            pickupStation,
+            "bike",
+            props.ageLimit,
+            route?.pickup?.horizon_minutes,
+          )}
+          outcome={props.outcomes?.ours.find((o) => o.phase === "pickup")}
+          onClick={click(pickupStation)}
+        />
+      )}
+      {returnStation && (
+        <TripPin
+          kind="return"
+          s={returnStation}
+          atEnd={endAtReturn}
+          status={stationRisk(
+            returnStation,
+            "dock",
+            props.ageLimit,
+            route?.dropoff.horizon_minutes,
+          )}
+          outcome={props.outcomes?.ours.find((o) => o.phase === "return")}
+          onClick={click(returnStation)}
+        />
+      )}
+      {props.outcomes?.b1.map((o) => {
+        // Same station as ours: its pin already says what was there.
+        if (o.station_id === pickupStation?.id || o.station_id === returnStation?.id)
+          return null;
+        const s = props.stations.find((x) => x.id === o.station_id);
+        return s ? <BaselinePin key={o.phase + s.id} s={s} outcome={o} /> : null;
+      })}
     </MapContainer>
   );
 }

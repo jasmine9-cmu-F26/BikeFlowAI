@@ -1,4 +1,4 @@
-import { ArrowRight, BrainCircuit, Footprints, Info } from "lucide-react";
+import { BrainCircuit, Footprints, Info } from "lucide-react";
 import type { Plan, Route } from "./api";
 
 export const WALK_CHOICES = [5, 10, 15];
@@ -28,21 +28,17 @@ export function nextWalk(walk: number) {
   return WALK_CHOICES.find((w) => w > walk) ?? null;
 }
 
-/**
- * Turns a sparse 5-minute result into a concrete trade-off: what walking a bit
- * further buys (probabilities, alternatives), with one click to apply it.
- */
-export function WalkSuggestion({
-  current,
-  wider,
-  walk,
-  onUse,
-}: {
-  current: Plan;
-  wider: Plan;
-  walk: number;
-  onUse: () => void;
-}) {
+/** What walking further buys, in one word for the walking switch. */
+export function widerReason(current: Plan, wider: Plan) {
+  const a = current.status === "ok" ? current.primary : null;
+  if (!a) return "possible" as const;
+  return weakest(wider.primary!) - weakest(a) >= 0.05
+    ? ("safer" as const)
+    : ("backup" as const);
+}
+
+/** The concrete trade-off of the longer walk against the current plan. */
+export function widerRows(current: Plan, wider: Plan) {
   const a = current.status === "ok" ? current.primary : null;
   const b = wider.primary!;
   const extra = (r: Route) =>
@@ -62,30 +58,66 @@ export function WalkSuggestion({
     rows.push(
       `${wider.backups.length} alternative${wider.backups.length > 1 ? "s" : ""} instead of ${a ? current.backups.length : 0}`,
     );
+  rows.push(
+    `${extra(b).toFixed(1)} min total walking` +
+      (a ? ` (now ${extra(a).toFixed(1)})` : ""),
+  );
+  return rows;
+}
+
+const REASON_TAG = {
+  possible: "makes it possible",
+  safer: "safer",
+  backup: "adds a backup",
+};
+
+/**
+ * The walking limit, set on the result rather than in the form: each choice
+ * replans in place, the longer walk is tagged when it clearly helps, and the
+ * rider can always switch back.
+ */
+export function WalkChoice({
+  walk,
+  current,
+  wider,
+  onChange,
+}: {
+  walk: number;
+  current: Plan;
+  wider: { walk: number; plan: Plan } | null;
+  onChange: (walk: number) => void;
+}) {
+  const reason = wider ? widerReason(current, wider.plan) : null;
   return (
-    <section className="walk-suggestion" aria-label="Longer walking option">
-      <span className="eyebrow">
-        <Footprints size={12} /> WALK A LITTLE MORE?
-      </span>
-      <strong>
-        {!a
-          ? `Up to ${walk} min walking makes this trip possible`
-          : weakest(b) - weakest(a) >= 0.05
-            ? `Up to ${walk} min walking gives a safer ride`
-            : `Up to ${walk} min walking keeps a backup station in reach`}
-      </strong>
-      <ul>
-        {rows.map((r) => (
-          <li key={r}>{r}</li>
-        ))}
-        <li>
-          {extra(b).toFixed(1)} min total walking
-          {a ? ` (now ${extra(a).toFixed(1)})` : ""}
-        </li>
-      </ul>
-      <button className="compare-btn" onClick={onUse}>
-        Use {walk} min <ArrowRight size={13} />
-      </button>
+    <section className="walk-choice" aria-label="Walking limit">
+      <div className="walk-choice-row">
+        <span className="walk-choice-label">
+          <Footprints size={13} /> Walk at each end
+        </span>
+        <div className="walk-segments" role="radiogroup" aria-label="Walk up to">
+          {WALK_CHOICES.map((n) => (
+            <button
+              key={n}
+              role="radio"
+              aria-checked={n === walk}
+              className={
+                (n === walk ? "selected" : "") +
+                (wider?.walk === n ? " suggested" : "")
+              }
+              onClick={() => onChange(n)}
+            >
+              ≤ {n} min
+              {wider?.walk === n && reason && <small>{REASON_TAG[reason]}</small>}
+            </button>
+          ))}
+        </div>
+      </div>
+      {wider && (
+        <p className="walk-choice-hint">
+          <strong>{wider.walk} min:</strong>{" "}
+          {widerRows(current, wider.plan).join(" · ")}
+        </p>
+      )}
     </section>
   );
 }
