@@ -9,7 +9,11 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import { divIcon } from "leaflet";
-import type { LatLngBoundsExpression } from "leaflet";
+import type {
+  FitBoundsOptions,
+  LatLngBoundsExpression,
+  Map as LeafletMap,
+} from "leaflet";
 import type { Endpoint, Route, Station, Point } from "./api";
 export type MapLayer = "bike" | "dock";
 // Stations are colored by what matters for the chosen trip end: bikes for
@@ -78,9 +82,15 @@ export function pinLabel(
     ? `Wait ${wait} min, then pick up${atEnd ? " at start" : ""} · ${plural(s.bikes, "bike")} now`
     : `Pick up${atEnd ? " at start" : ""} · ${plural(s.bikes, "bike")}`;
 }
-const pinIcon = (kind: "pickup" | "return", label: string) =>
+// The fill follows the legend like every other station (bikes at pickup, docks
+// at return, at arrival time); shape, size and the tag mark it as the pick.
+const pinIcon = (
+  kind: "pickup" | "return",
+  label: string,
+  status: keyof typeof COLORS,
+) =>
   divIcon({
-    className: `trip-pin pin-${kind}`,
+    className: `trip-pin pin-${kind} status-${status}`,
     html: `<span class="pin-label">${label}</span>`,
     iconSize: [14, 14],
     iconAnchor: [7, 7],
@@ -109,16 +119,21 @@ function TripPin({
   s,
   atEnd,
   waitMinutes,
+  status,
   onClick,
 }: {
   kind: "pickup" | "return";
   s: Station;
   atEnd: boolean;
   waitMinutes?: number;
+  status: keyof typeof COLORS;
   onClick: () => void;
 }) {
   const label = pinLabel(kind, s, atEnd, waitMinutes);
-  const icon = useMemo(() => pinIcon(kind, label), [kind, label]);
+  const icon = useMemo(
+    () => pinIcon(kind, label, status),
+    [kind, label, status],
+  );
   return (
     <Marker
       position={[s.lat, s.lon]}
@@ -152,6 +167,28 @@ export function framePoints(
     (s) => (pickup && near(start, s)) || near(end, s),
   );
   return tripBounds(routes, [start, end, ...nearby]);
+}
+// Leaflet drops a fitBounds that arrives while a zoom animation is running
+// (Map._tryAnimatedZoom returns early), which left the view on the previous
+// trip when a new plan landed right after the station snapshot. Wait for the
+// zoom to end and apply only the latest request.
+const pendingFit = new WeakMap<LeafletMap, () => void>();
+export function fitWhenIdle(
+  map: LeafletMap,
+  points: LatLngBoundsExpression,
+  options: FitBoundsOptions,
+) {
+  const fit = () => map.fitBounds(points, options);
+  if (!(map as unknown as { _animatingZoom?: boolean })._animatingZoom)
+    return void fit();
+  const waiting = pendingFit.has(map);
+  pendingFit.set(map, fit);
+  if (!waiting)
+    map.once("zoomend", () => {
+      const latest = pendingFit.get(map);
+      pendingFit.delete(map);
+      latest?.();
+    });
 }
 type Props = {
   layer?: MapLayer;
@@ -189,9 +226,9 @@ function Interaction({
       else onBackground?.();
     },
   });
-  // Frame the whole trip, endpoints included, clear of the top chips and the
-  // legend. Keyed on the points themselves, so a re-render that shows another
-  // route inside the same frame leaves the view alone.
+  // Frame the whole trip, endpoints included, clear of the top chips. Keyed on
+  // the points themselves, so a re-render that shows another route inside the
+  // same frame leaves the view alone.
   const ends = [origin, destination].map((v) =>
     typeof v === "string" ? stations.find((s) => s.id === v) : v,
   );
@@ -202,13 +239,14 @@ function Interaction({
   const key = JSON.stringify(points);
   useEffect(() => {
     if (points.length)
-      map.fitBounds(points as LatLngBoundsExpression, {
+      fitWhenIdle(map, points as LatLngBoundsExpression, {
         paddingTopLeft: [70, 100],
-        paddingBottomRight: [70, 140],
+        paddingBottomRight: [70, 50],
         maxZoom: 15,
       });
     else if (stations.length)
-      map.fitBounds(
+      fitWhenIdle(
+        map,
         stations.map((s) => [s.lat, s.lon]) as LatLngBoundsExpression,
         { padding: [35, 35], maxZoom: 13 },
       );
@@ -344,6 +382,12 @@ export default function RideMap(props: Props) {
           s={pickupStation}
           atEnd={startAtPickup}
           waitMinutes={route?.wait_minutes}
+          status={stationRisk(
+            pickupStation,
+            "bike",
+            props.ageLimit,
+            route?.pickup?.horizon_minutes,
+          )}
           onClick={click(pickupStation)}
         />
       )}
@@ -352,6 +396,12 @@ export default function RideMap(props: Props) {
           kind="return"
           s={returnStation}
           atEnd={endAtReturn}
+          status={stationRisk(
+            returnStation,
+            "dock",
+            props.ageLimit,
+            route?.dropoff.horizon_minutes,
+          )}
           onClick={click(returnStation)}
         />
       )}

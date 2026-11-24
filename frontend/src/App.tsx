@@ -304,7 +304,11 @@ export default function App() {
   }, [selected]);
   const [reload, setReload] = useState(0);
   const [failed, setFailed] = useState<string[]>([]);
+  // Endpoints of the plan on screen; the form may already hold new ones while
+  // that plan is being replaced.
   const [routeOrigin, setRouteOrigin] = useState<Endpoint>(origin);
+  const [routeDestination, setRouteDestination] =
+    useState<Endpoint>(destination);
   const [revealed, setRevealed] = useState<{
     outcomes: Outcome[];
     baseline?: Outcome;
@@ -385,6 +389,7 @@ export default function App() {
     setSelectedAlternativeIndex(null);
     setFailed([]);
     setRouteOrigin(origin);
+    setRouteDestination(destination);
   }, [mode, when, offset, walk, method, origin, destination, scenario, reload]);
   useEffect(() => setRevealed(null), [shownRoute]);
   useEffect(() => () => requestRef.current?.abort(), []);
@@ -456,9 +461,11 @@ export default function App() {
     setRevealed(null);
     setBaseline(null);
     setWider(null);
-    setRouteOrigin(origin);
     try {
       const p = await api<Plan>("/plan", body(), ctrl.signal);
+      // The map's endpoints switch together with the route they belong to.
+      setRouteOrigin(origin);
+      setRouteDestination(destination);
       setPlan(p);
       setShownRoute(p.primary);
       setSelectedAlternativeIndex(null);
@@ -839,7 +846,7 @@ export default function App() {
                 : undefined
             }
             origin={mapRoute ? routeOrigin : origin}
-            destination={destination}
+            destination={mapRoute ? routeDestination : destination}
             selecting={selecting}
             onPick={(p) => {
               if (selecting === "origin") setOrigin(p);
@@ -983,9 +990,6 @@ export default function App() {
                 </span>
               )}
             </div>
-            <span className="route-note">
-              Route lines are indicative · not turn-by-turn directions
-            </span>
           </div>
         </section>
         <aside

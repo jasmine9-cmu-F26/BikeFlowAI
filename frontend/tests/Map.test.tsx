@@ -46,7 +46,7 @@ vi.mock("react-leaflet", () => ({
   },
 }));
 
-import RideMap, { COLORS, framePoints, tripBounds } from "../src/Map";
+import RideMap, { COLORS, fitWhenIdle, framePoints, tripBounds } from "../src/Map";
 
 const station: Station = {
   id: "chicago:14",
@@ -363,6 +363,26 @@ describe("bike / dock risk layer", () => {
     expect(fill(nearEnd)).toBe(COLORS.risk); // docks at +20
     expect(fill(bystander)).toBe(COLORS.off); // out of reach: greyed
   });
+
+  it("colors the recommended stations by the same rule, not a fixed green", () => {
+    const emptyStart = { ...station, bikes: 0 };
+    reset();
+    renderToStaticMarkup(
+      <RideMap
+        stations={[emptyStart, destination]}
+        route={{ ...route, pickup: stop(emptyStart), wait_minutes: 20 }}
+        origin={station.id}
+        destination={destination.id}
+        walkLimit={5}
+        ageLimit={900}
+        selecting={null}
+        onStation={vi.fn()}
+        onPick={vi.fn()}
+      />,
+    );
+    expect(pin("pin-pickup").icon.className).toContain("status-empty");
+    expect(pin("pin-return").icon.className).toContain("status-ok");
+  });
 });
 
 describe("map framing", () => {
@@ -400,5 +420,35 @@ describe("map framing", () => {
     );
     expect(points).toContainEqual([nearEnd.lat, nearEnd.lon]);
     expect(points).not.toContainEqual([bystander.lat, bystander.lon]);
+  });
+});
+
+describe("refitting the view", () => {
+  const fakeMap = (animating: boolean) => {
+    const handlers: Record<string, () => void> = {};
+    return {
+      _animatingZoom: animating,
+      fitBounds: vi.fn(),
+      once: vi.fn((event: string, fn: () => void) => {
+        handlers[event] = fn;
+      }),
+      fire: (event: string) => handlers[event]?.(),
+    };
+  };
+
+  it("fits right away when the map is idle", () => {
+    const map = fakeMap(false);
+    fitWhenIdle(map as any, [[41.9, -87.6]], {});
+    expect(map.fitBounds).toHaveBeenCalledTimes(1);
+  });
+
+  it("waits for a running zoom to end instead of being dropped", () => {
+    // Leaflet ignores a fitBounds that arrives mid zoom animation.
+    const map = fakeMap(true);
+    fitWhenIdle(map as any, [[41.9, -87.6]], {});
+    expect(map.fitBounds).not.toHaveBeenCalled();
+    map._animatingZoom = false;
+    map.fire("zoomend");
+    expect(map.fitBounds).toHaveBeenCalledTimes(1);
   });
 });

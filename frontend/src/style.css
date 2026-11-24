@@ -345,17 +345,20 @@ h1 > span {
   padding-top: 18px;
   margin-top: auto;
 }
+/* The map fills the panel above a legend strip, so the legend never covers a
+   station. */
 .map-panel {
   position: relative;
   isolation: isolate;
   min-height: 680px;
   background: #e6eadf;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
 }
 .ride-map {
   height: 100%;
   width: 100%;
-  position: absolute;
-  inset: 0;
+  position: relative;
   z-index: 0;
 }
 .ride-map.picking {
@@ -410,28 +413,17 @@ h1 > span {
   font-weight: 400 !important;
 }
 .map-bottom {
-  position: absolute;
-  bottom: 28px;
-  left: 18px;
-  right: 18px;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  flex-direction: column;
-  z-index: 401;
-  pointer-events: none;
+  padding: 9px 18px;
+  background: #fffefb;
+  border-top: 1px solid var(--line);
 }
 .map-legend {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  gap: 8px 14px;
-  max-width: 100%;
-  background: #fffefbf5;
-  border: 1px solid #e2e6dc;
-  border-radius: 6px;
-  padding: 9px 12px;
-  font-size: 11px;
+  gap: 6px 22px;
+  font-size: 12px;
   color: #4f6153;
 }
 .map-legend span {
@@ -454,9 +446,22 @@ h1 > span {
    Shapes follow the form: circle = start side, square = end side. */
 .trip-pin {
   box-sizing: border-box;
-  background: var(--green);
   border: 2px solid #fff;
   border-radius: 50%;
+  /* A hairline keeps the pick apart from plain stations of the same color. */
+  outline: 1.5px solid var(--green);
+}
+.trip-pin.status-ok {
+  background: #538b78;
+}
+.trip-pin.status-risk {
+  background: #d9b14e;
+}
+.trip-pin.status-empty {
+  background: #c4513f;
+}
+.trip-pin.status-off {
+  background: #aaa;
 }
 .trip-pin.pin-return {
   border-radius: 2px;
@@ -498,13 +503,6 @@ h1 > span {
 .trip-endpoint.on-station {
   background: transparent;
   border: 0;
-}
-.route-note {
-  font-size: 9px;
-  color: #53634e;
-  background: #fffffff0;
-  padding: 5px 8px;
-  border-radius: 4px;
 }
 .example-watermark {
   position: absolute;
@@ -1127,9 +1125,8 @@ h1 > span {
     gap: 24px;
   }
   .map-legend {
-    gap: 8px;
-    font-size: 8px;
-    padding: 8px;
+    gap: 6px 14px;
+    font-size: 11px;
   }
 }
 @media (max-width: 900px) {
@@ -1250,9 +1247,6 @@ h1 > span {
   }
   .example-watermark {
     font-size: 23px;
-  }
-  .route-note {
-    font-size: 8px;
   }
   .station-card {
     top: 85px;
